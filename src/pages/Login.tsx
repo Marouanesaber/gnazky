@@ -21,19 +21,19 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left side - Image */}
-      <div className="hidden md:block md:w-1/2 bg-blue-500 relative">
+    <div className="min-h-screen w-full flex items-center justify-center relative">
+      {/* Full background image */}
+      <div className="absolute inset-0 z-0">
         <img 
           src="/lovable-uploads/31bae6b5-4c67-44e3-8e8e-94f85875080b.png" 
           alt="Husky dog with sunglasses" 
           className="w-full h-full object-cover"
         />
       </div>
-
-      {/* Right side - Login Form */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8">
-        <Card className="w-full max-w-md">
+      
+      {/* Login Card - centered with glassmorphism effect */}
+      <div className="z-10 w-full max-w-md p-4">
+        <Card className="backdrop-blur-sm bg-white/80 shadow-xl">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-3xl font-bold">Sign In</CardTitle>
             <CardDescription>
