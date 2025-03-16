@@ -1,11 +1,10 @@
-
 import { NavLink } from "react-router-dom";
 import {
   Home,
   Calendar,
   Stethoscope,
   Syringe,
-  Flask,
+  Beaker,
   Scissors,
   PawPrint,
   Users,
@@ -96,7 +95,7 @@ export function Sidebar() {
                 }`
               }
             >
-              <Flask className="h-5 w-5" />
+              <Beaker className="h-5 w-5" />
               <span>Laboratory</span>
             </NavLink>
             <NavLink
