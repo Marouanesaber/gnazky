@@ -16,6 +16,8 @@ import PetsPage from "./pages/Pets";
 import OwnersPage from "./pages/Owners";
 import SettingsPage from "./pages/Settings";
 import Layout from "./components/Layout";
+import Login from "./pages/Login";
+import Home from "./pages/Home";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Index />} />
               <Route path="/appointments" element={<AppointmentsPage />} />
