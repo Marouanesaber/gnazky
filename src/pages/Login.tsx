@@ -17,7 +17,7 @@ const Login = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, you would handle authentication here
-    navigate("/");
+    navigate("/dashboard");
   };
 
   return (

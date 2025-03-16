@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -29,20 +29,21 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/home" element={<Home />} />
+            <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Layout />}>
+            <Route path="/dashboard" element={<Layout />}>
               <Route index element={<Index />} />
-              <Route path="/appointments" element={<AppointmentsPage />} />
-              <Route path="/consultations" element={<ConsultationsPage />} />
-              <Route path="/vaccinations" element={<VaccinationsPage />} />
-              <Route path="/laboratory" element={<LaboratoryPage />} />
-              <Route path="/surgery" element={<SurgeryPage />} />
-              <Route path="/pets" element={<PetsPage />} />
-              <Route path="/owners" element={<OwnersPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/dashboard/appointments" element={<AppointmentsPage />} />
+              <Route path="/dashboard/consultations" element={<ConsultationsPage />} />
+              <Route path="/dashboard/vaccinations" element={<VaccinationsPage />} />
+              <Route path="/dashboard/laboratory" element={<LaboratoryPage />} />
+              <Route path="/dashboard/surgery" element={<SurgeryPage />} />
+              <Route path="/dashboard/pets" element={<PetsPage />} />
+              <Route path="/dashboard/owners" element={<OwnersPage />} />
+              <Route path="/dashboard/settings" element={<SettingsPage />} />
               <Route path="*" element={<NotFound />} />
             </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
