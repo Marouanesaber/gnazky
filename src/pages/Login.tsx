@@ -25,8 +25,8 @@ const Login = () => {
       {/* Full background image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="/lovable-uploads/31bae6b5-4c67-44e3-8e8e-94f85875080b.png" 
-          alt="Husky dog with sunglasses" 
+          src="/lovable-uploads/53e5364f-8c3a-4ab4-a79a-201ef7f981b4.png" 
+          alt="Dog with yellow sunglasses on blue background" 
           className="w-full h-full object-cover"
         />
       </div>
