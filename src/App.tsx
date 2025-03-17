@@ -41,14 +41,14 @@ const App = () => (
             <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/dashboard" element={<Layout />}>
               <Route index element={<Index />} />
-              <Route path="/dashboard/appointments" element={<AppointmentsPage />} />
-              <Route path="/dashboard/consultations" element={<ConsultationsPage />} />
-              <Route path="/dashboard/vaccinations" element={<VaccinationsPage />} />
-              <Route path="/dashboard/laboratory" element={<LaboratoryPage />} />
-              <Route path="/dashboard/surgery" element={<SurgeryPage />} />
-              <Route path="/dashboard/pets" element={<PetsPage />} />
-              <Route path="/dashboard/owners" element={<OwnersPage />} />
-              <Route path="/dashboard/settings" element={<SettingsPage />} />
+              <Route path="appointments" element={<AppointmentsPage />} />
+              <Route path="consultations" element={<ConsultationsPage />} />
+              <Route path="vaccinations" element={<VaccinationsPage />} />
+              <Route path="laboratory" element={<LaboratoryPage />} />
+              <Route path="surgery" element={<SurgeryPage />} />
+              <Route path="pets" element={<PetsPage />} />
+              <Route path="owners" element={<OwnersPage />} />
+              <Route path="settings" element={<SettingsPage />} />
               <Route path="*" element={<NotFound />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,3 +1,4 @@
+
 import { NavLink } from "react-router-dom";
 import {
   Home,
@@ -9,6 +10,7 @@ import {
   PawPrint,
   Users,
   Settings,
+  ShoppingCart,
 } from "lucide-react";
 
 export function Sidebar() {
@@ -27,7 +29,8 @@ export function Sidebar() {
           </h3>
           <div className="space-y-1">
             <NavLink
-              to="/"
+              to="/dashboard"
+              end
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                   isActive
@@ -39,6 +42,13 @@ export function Sidebar() {
               <Home className="h-5 w-5" />
               <span>Dashboard</span>
             </NavLink>
+            <NavLink
+              to="/"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              <span>Main Page</span>
+            </NavLink>
           </div>
         </div>
         <div className="px-3 py-2">
@@ -47,7 +57,7 @@ export function Sidebar() {
           </h3>
           <div className="space-y-1">
             <NavLink
-              to="/appointments"
+              to="/dashboard/appointments"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                   isActive
@@ -60,7 +70,7 @@ export function Sidebar() {
               <span>Appointments</span>
             </NavLink>
             <NavLink
-              to="/consultations"
+              to="/dashboard/consultations"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                   isActive
@@ -73,7 +83,7 @@ export function Sidebar() {
               <span>Consultations</span>
             </NavLink>
             <NavLink
-              to="/vaccinations"
+              to="/dashboard/vaccinations"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                   isActive
@@ -86,7 +96,7 @@ export function Sidebar() {
               <span>Vaccinations</span>
             </NavLink>
             <NavLink
-              to="/laboratory"
+              to="/dashboard/laboratory"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                   isActive
@@ -99,7 +109,7 @@ export function Sidebar() {
               <span>Laboratory</span>
             </NavLink>
             <NavLink
-              to="/surgery"
+              to="/dashboard/surgery"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                   isActive
@@ -119,7 +129,7 @@ export function Sidebar() {
           </h3>
           <div className="space-y-1">
             <NavLink
-              to="/pets"
+              to="/dashboard/pets"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                   isActive
@@ -132,7 +142,7 @@ export function Sidebar() {
               <span>Pets</span>
             </NavLink>
             <NavLink
-              to="/owners"
+              to="/dashboard/owners"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                   isActive
@@ -152,7 +162,7 @@ export function Sidebar() {
           </h3>
           <div className="space-y-1">
             <NavLink
-              to="/settings"
+              to="/dashboard/settings"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                   isActive

@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { Link } from "react-router-dom";
-import { Home } from "lucide-react";
+import { Home, ShoppingCart } from "lucide-react";
 import { Button } from "./ui/button";
 
 const Layout = () => {
@@ -12,11 +12,17 @@ const Layout = () => {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <div className="px-4 py-2 border-b">
-          <Link to="/">
+        <div className="px-4 py-2 border-b flex items-center gap-2">
+          <Link to="/dashboard">
             <Button variant="ghost" size="sm" className="gap-2">
               <Home size={16} />
-              Return to Main Page
+              Dashboard
+            </Button>
+          </Link>
+          <Link to="/">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <ShoppingCart size={16} />
+              Main Page
             </Button>
           </Link>
         </div>
