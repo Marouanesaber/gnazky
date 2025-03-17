@@ -14,13 +14,13 @@ const Layout = () => {
         <Header />
         <div className="px-4 py-2 border-b flex items-center gap-2">
           <Link to="/dashboard">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 transition-all hover:bg-gray-100">
               <Home size={16} />
               Dashboard
             </Button>
           </Link>
           <Link to="/">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 transition-all hover:bg-blue-100 hover:text-blue-700">
               <ShoppingCart size={16} />
               Main Page
             </Button>
