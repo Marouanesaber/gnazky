@@ -12,7 +12,7 @@ const Home = () => {
       <header className="border-b py-4 px-6 bg-white">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <h1 className="font-bold text-xl text-blue-600">OutstandenVet</h1>
+            <Link to="/" className="font-bold text-xl text-blue-600">OutstandenVet</Link>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-sm font-medium text-gray-900 hover:text-blue-600">Home</Link>
@@ -37,9 +37,11 @@ const Home = () => {
             <p className="text-gray-600 mb-8 max-w-md">
               Standard modern and efficient, affordable healthcare for your pets and other animals. So you don't have experience. Make an Appointment now!
             </p>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              Book Now
-            </Button>
+            <Link to="/book-appointment">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Book Now
+              </Button>
+            </Link>
           </div>
           <div className="md:w-1/2 relative">
             <div className="bg-white rounded-2xl shadow-lg p-4 relative z-10">
@@ -93,8 +95,12 @@ const Home = () => {
                 <p className="text-gray-600 mb-6">If you have any questions about our services, please don't hesitate to contact us.</p>
               </div>
               <div className="flex gap-3">
-                <Button variant="outline" className="flex-1">Contact Us</Button>
-                <Button className="flex-1 bg-blue-600">Book a Demo</Button>
+                <Link to="/contact-us" className="flex-1">
+                  <Button variant="outline" className="w-full">Contact Us</Button>
+                </Link>
+                <Link to="/book-appointment" className="flex-1">
+                  <Button className="w-full bg-blue-600">Book a Demo</Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -114,7 +120,7 @@ const Home = () => {
               <p className="text-gray-600 mb-6">
                 With our veterinary care services, you can easily access detailed reports about your pet's health and growth. All the necessary filters are available to make your specific search.
               </p>
-              <Link to="/reports" className="text-blue-600 hover:underline flex items-center">
+              <Link to="/login" className="text-blue-600 hover:underline flex items-center">
                 Sign in or Join OutstandenVet Today <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </div>
@@ -175,7 +181,7 @@ const Home = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-blue-600" />
-                  <a href="tel:+1234567890" className="text-gray-700 hover:text-blue-600">+33 746 80 8745</a>
+                  <a href="tel:+33746808745" className="text-gray-700 hover:text-blue-600">+33 746 80 8745</a>
                 </div>
                 <div className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-blue-600" />

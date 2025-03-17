@@ -18,6 +18,10 @@ import SettingsPage from "./pages/Settings";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import BookAppointment from "./pages/BookAppointment";
+import Services from "./pages/Services";
+import Technicians from "./pages/Technicians";
+import ContactUs from "./pages/ContactUs";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +35,10 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/book-appointment" element={<BookAppointment />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/technicians" element={<Technicians />} />
+            <Route path="/contact-us" element={<ContactUs />} />
             <Route path="/dashboard" element={<Layout />}>
               <Route index element={<Index />} />
               <Route path="/dashboard/appointments" element={<AppointmentsPage />} />
