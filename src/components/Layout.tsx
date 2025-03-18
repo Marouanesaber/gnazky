@@ -2,7 +2,7 @@
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import { Home, ShoppingCart, LogOut } from "lucide-react";
+import { Home, Globe, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "./AuthProvider";
 import { useEffect } from "react";
@@ -29,6 +29,7 @@ const Layout = () => {
 
   // Preserve authentication when navigating to main page
   const navigateToMainPage = () => {
+    // Don't logout - just navigate
     navigate("/");
   };
 
@@ -51,7 +52,7 @@ const Layout = () => {
               className="gap-2 transition-all hover:bg-blue-100 hover:text-blue-700"
               onClick={navigateToMainPage}
             >
-              <ShoppingCart size={16} />
+              <Globe size={16} />
               Main Page
             </Button>
           </div>

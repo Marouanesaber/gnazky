@@ -300,8 +300,32 @@ CREATE TABLE settings (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Insert initial data
+-- Create notifications table
+CREATE TABLE notifications (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  title VARCHAR(100) NOT NULL,
+  message TEXT NOT NULL,
+  type ENUM('info', 'success', 'warning', 'error') NOT NULL DEFAULT 'info',
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
+-- Create user_settings table for storing user preferences
+CREATE TABLE user_settings (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL UNIQUE,
+  theme VARCHAR(20) DEFAULT 'light',
+  font_size VARCHAR(10) DEFAULT 'medium',
+  notifications_enabled BOOLEAN DEFAULT TRUE,
+  email_notifications BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Insert initial data
 -- Insert pet types
 INSERT INTO pet_types (name) VALUES 
 ('Dog'),
@@ -380,6 +404,17 @@ INSERT INTO settings (setting_key, setting_value) VALUES
 ('tax_rate', '7.5'), -- percentage
 ('invoice_prefix', 'INV-'),
 ('default_theme', 'light');
+
+-- Insert sample notifications
+INSERT INTO notifications (user_id, title, message, type, is_read) VALUES
+(1, 'New Appointment', 'You have a new appointment scheduled for tomorrow', 'info', false),
+(1, 'Vaccination Due', 'Max is due for his annual vaccinations', 'warning', false),
+(1, 'Payment Received', 'Payment for INV-001 has been received', 'success', true);
+
+-- Insert user settings for existing users
+INSERT INTO user_settings (user_id, theme, font_size) VALUES
+(1, 'light', 'medium'),
+(2, 'dark', 'large');
 
 -- Create procedures
 DELIMITER //
@@ -468,6 +503,177 @@ BEGIN
     JOIN vets v ON a.vet_id = v.id
     JOIN visit_types vt ON a.visit_type_id = vt.id
     WHERE a.id = LAST_INSERT_ID();
+END//
+
+-- Procedure to add a new consultation
+CREATE PROCEDURE AddConsultation(
+    IN p_pet_id INT,
+    IN p_vet_id INT,
+    IN p_consultation_date DATE,
+    IN p_chief_complaint TEXT,
+    IN p_diagnosis TEXT,
+    IN p_treatment TEXT,
+    IN p_notes TEXT,
+    IN p_charge DECIMAL(10, 2)
+)
+BEGIN
+    -- Insert consultation
+    INSERT INTO consultations (pet_id, vet_id, consultation_date, chief_complaint, diagnosis, treatment, notes, charge)
+    VALUES (p_pet_id, p_vet_id, p_consultation_date, p_chief_complaint, p_diagnosis, p_treatment, p_notes, p_charge);
+    
+    -- Return the new consultation info
+    SELECT 
+        c.id AS consultation_id,
+        p.name AS pet_name,
+        CONCAT(v.first_name, ' ', v.last_name) AS vet_name,
+        c.consultation_date,
+        c.diagnosis,
+        c.charge
+    FROM consultations c
+    JOIN pets p ON c.pet_id = p.id
+    JOIN vets v ON c.vet_id = v.id
+    WHERE c.id = LAST_INSERT_ID();
+END//
+
+-- Procedure to add laboratory test
+CREATE PROCEDURE AddLaboratoryTest(
+    IN p_pet_id INT,
+    IN p_test_type_name VARCHAR(100),
+    IN p_sample_date DATE,
+    IN p_result TEXT,
+    IN p_is_abnormal BOOLEAN,
+    IN p_notes TEXT,
+    IN p_performed_by INT
+)
+BEGIN
+    DECLARE test_type_id_var INT;
+    
+    -- Get test type id
+    SELECT id INTO test_type_id_var FROM lab_test_types WHERE name = p_test_type_name LIMIT 1;
+    
+    -- Insert laboratory test
+    INSERT INTO laboratory_tests (pet_id, test_type_id, sample_date, result_date, result, is_abnormal, notes, performed_by)
+    VALUES (p_pet_id, test_type_id_var, p_sample_date, CURDATE(), p_result, p_is_abnormal, p_notes, p_performed_by);
+    
+    -- Return the new laboratory test info
+    SELECT 
+        lt.id AS test_id,
+        p.name AS pet_name,
+        ltt.name AS test_name,
+        lt.sample_date,
+        lt.result_date,
+        lt.result,
+        lt.is_abnormal
+    FROM laboratory_tests lt
+    JOIN pets p ON lt.pet_id = p.id
+    JOIN lab_test_types ltt ON lt.test_type_id = ltt.id
+    WHERE lt.id = LAST_INSERT_ID();
+END//
+
+-- Procedure to add vaccination
+CREATE PROCEDURE AddVaccination(
+    IN p_pet_id INT,
+    IN p_vaccine_type_name VARCHAR(100),
+    IN p_administered_by INT,
+    IN p_administered_date DATE,
+    IN p_expiry_date DATE,
+    IN p_dose VARCHAR(50),
+    IN p_batch_number VARCHAR(50),
+    IN p_notes TEXT
+)
+BEGIN
+    DECLARE vaccine_type_id_var INT;
+    
+    -- Get vaccine type id
+    SELECT id INTO vaccine_type_id_var FROM vaccine_types WHERE name = p_vaccine_type_name LIMIT 1;
+    
+    -- Insert vaccination
+    INSERT INTO vaccinations (pet_id, vaccine_type_id, administered_by, administered_date, expiry_date, dose, batch_number, notes)
+    VALUES (p_pet_id, vaccine_type_id_var, p_administered_by, p_administered_date, p_expiry_date, p_dose, p_batch_number, p_notes);
+    
+    -- Return the new vaccination info
+    SELECT 
+        v.id AS vaccination_id,
+        p.name AS pet_name,
+        vt.name AS vaccine_name,
+        v.administered_date,
+        v.expiry_date,
+        v.batch_number
+    FROM vaccinations v
+    JOIN pets p ON v.pet_id = p.id
+    JOIN vaccine_types vt ON v.vaccine_type_id = vt.id
+    WHERE v.id = LAST_INSERT_ID();
+END//
+
+-- Procedure to add surgery
+CREATE PROCEDURE AddSurgery(
+    IN p_pet_id INT,
+    IN p_surgery_type_name VARCHAR(100),
+    IN p_performed_by INT,
+    IN p_surgery_date DATE,
+    IN p_start_time TIME,
+    IN p_end_time TIME,
+    IN p_anesthesia VARCHAR(100),
+    IN p_procedure_notes TEXT,
+    IN p_complications TEXT,
+    IN p_post_op_notes TEXT
+)
+BEGIN
+    DECLARE surgery_type_id_var INT;
+    
+    -- Get surgery type id
+    SELECT id INTO surgery_type_id_var FROM surgery_types WHERE name = p_surgery_type_name LIMIT 1;
+    
+    -- Insert surgery
+    INSERT INTO surgeries (pet_id, surgery_type_id, performed_by, surgery_date, start_time, end_time, anesthesia, procedure_notes, complications, post_op_notes)
+    VALUES (p_pet_id, surgery_type_id_var, p_performed_by, p_surgery_date, p_start_time, p_end_time, p_anesthesia, p_procedure_notes, p_complications, p_post_op_notes);
+    
+    -- Return the new surgery info
+    SELECT 
+        s.id AS surgery_id,
+        p.name AS pet_name,
+        st.name AS surgery_type,
+        s.surgery_date,
+        s.start_time,
+        s.end_time,
+        CONCAT(u.name) AS performed_by
+    FROM surgeries s
+    JOIN pets p ON s.pet_id = p.id
+    JOIN surgery_types st ON s.surgery_type_id = st.id
+    LEFT JOIN users u ON s.performed_by = u.id
+    WHERE s.id = LAST_INSERT_ID();
+END//
+
+-- Procedure to update user settings
+CREATE PROCEDURE UpdateUserSettings(
+    IN p_user_id INT,
+    IN p_theme VARCHAR(20),
+    IN p_font_size VARCHAR(10),
+    IN p_notifications_enabled BOOLEAN,
+    IN p_email_notifications BOOLEAN
+)
+BEGIN
+    -- Check if settings exist for user
+    DECLARE settings_exist INT;
+    SELECT COUNT(*) INTO settings_exist FROM user_settings WHERE user_id = p_user_id;
+    
+    -- Insert or update settings
+    IF settings_exist > 0 THEN
+        UPDATE user_settings 
+        SET 
+            theme = p_theme,
+            font_size = p_font_size,
+            notifications_enabled = p_notifications_enabled,
+            email_notifications = p_email_notifications,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE user_id = p_user_id;
+    ELSE
+        INSERT INTO user_settings (user_id, theme, font_size, notifications_enabled, email_notifications)
+        VALUES (p_user_id, p_theme, p_font_size, p_notifications_enabled, p_email_notifications);
+    END IF;
+    
+    -- Return the updated settings
+    SELECT * FROM user_settings WHERE user_id = p_user_id;
 END//
 
 DELIMITER ;
