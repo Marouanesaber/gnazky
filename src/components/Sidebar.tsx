@@ -11,15 +11,19 @@ import {
   Users,
   Settings,
   ShoppingCart,
+  User,
 } from "lucide-react";
+import { useAuth } from "./AuthProvider";
 
 export function Sidebar() {
+  const { userProfile } = useAuth();
+  
   return (
     <aside className="sidebar w-64 h-screen flex flex-col bg-sidebar dark:bg-sidebar backdrop-blur-lg border-r border-border overflow-y-auto shrink-0 theme-transition animate-slide-in">
       <div className="p-4 border-b border-border">
         <div className="flex items-center gap-2">
           <PawPrint className="h-6 w-6 text-clinic-blue" />
-          <span className="font-bold text-xl">Fluffy Care Vet</span>
+          <span className="font-bold text-xl">PetClinic</span>
         </div>
       </div>
       <nav className="flex-1 py-4">
@@ -158,9 +162,22 @@ export function Sidebar() {
         </div>
         <div className="px-3 py-2">
           <h3 className="mb-2 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            System
+            User
           </h3>
           <div className="space-y-1">
+            <NavLink
+              to="/dashboard/profile"
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                }`
+              }
+            >
+              <User className="h-5 w-5" />
+              <span>Profile</span>
+            </NavLink>
             <NavLink
               to="/dashboard/settings"
               className={({ isActive }) =>
@@ -180,7 +197,7 @@ export function Sidebar() {
       <div className="p-4 border-t border-border">
         <div className="rounded-lg bg-sidebar-accent p-3">
           <p className="text-xs text-muted-foreground">
-            Logged in as <span className="font-semibold">Admin</span>
+            Logged in as <span className="font-semibold">{userProfile?.name || "Admin"}</span>
           </p>
         </div>
       </div>

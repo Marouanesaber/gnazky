@@ -1,301 +1,295 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { PenSquare, Plus, Trash2, UserX, UserCheck } from "lucide-react";
-
-// Sample users data
-const usersData = [
-  { id: 1, name: "Admin User", email: "admin@example.com", role: "Admin", status: "Active" },
-  { id: 2, name: "Staff Member", email: "staff@example.com", role: "Staff", status: "Active" },
-  { id: 3, name: "Doctor", email: "doctor@example.com", role: "Doctor", status: "Active" },
-  { id: 4, name: "Receptionist", email: "reception@example.com", role: "Staff", status: "Inactive" },
-];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { Settings, Bell, Lock, Shield, Palette } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const SettingsPage = () => {
-  const [isNewUserOpen, setIsNewUserOpen] = useState(false);
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [smsNotifications, setSmsNotifications] = useState(false);
+  const [appNotifications, setAppNotifications] = useState(true);
+  const { setTheme, theme } = useTheme();
+
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match!");
+      return;
+    }
+    
+    if (!currentPassword || !newPassword) {
+      toast.error("Please fill all password fields!");
+      return;
+    }
+    
+    setIsSaving(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      toast.success("Password changed successfully!");
+    }, 1000);
+  };
+
+  const handleNotificationSave = () => {
+    setIsSaving(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      toast.success("Notification settings updated!");
+    }, 1000);
+  };
+
+  const handleThemeChange = (selectedTheme: string) => {
+    setTheme(selectedTheme);
+    toast.success(`Theme changed to ${selectedTheme}!`);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-      </div>
+      <h1 className="text-2xl font-bold">Settings</h1>
 
       <Tabs defaultValue="account" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="users">User Management</TabsTrigger>
-          <TabsTrigger value="system">System</TabsTrigger>
+        <TabsList className="grid grid-cols-4 mb-6">
+          <TabsTrigger value="account" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            <span>Account</span>
+          </TabsTrigger>
+          <TabsTrigger value="security" className="flex items-center gap-2">
+            <Lock className="h-4 w-4" />
+            <span>Security</span>
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="flex items-center gap-2">
+            <Bell className="h-4 w-4" />
+            <span>Notifications</span>
+          </TabsTrigger>
+          <TabsTrigger value="appearance" className="flex items-center gap-2">
+            <Palette className="h-4 w-4" />
+            <span>Appearance</span>
+          </TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="account" className="space-y-6 animate-fade-in">
-          <div className="clinic-card space-y-6">
-            <div>
-              <h3 className="text-lg font-medium">Profile Information</h3>
-              <p className="text-sm text-muted-foreground">
-                Update your account's profile information.
-              </p>
-            </div>
-            <Separator />
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" defaultValue="Admin User" />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" defaultValue="admin@example.com" />
-              </div>
-            </div>
-            <div>
-              <Button className="bg-clinic-blue hover:bg-clinic-blue/90">
-                Save Changes
-              </Button>
-            </div>
-          </div>
 
-          <div className="clinic-card space-y-6">
-            <div>
-              <h3 className="text-lg font-medium">Change Password</h3>
-              <p className="text-sm text-muted-foreground">
-                Update your password to maintain security.
-              </p>
-            </div>
-            <Separator />
-            <Dialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-clinic-blue hover:bg-clinic-blue/90">
-                  Change Password
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Change Password</DialogTitle>
-                  <DialogDescription>
-                    Enter your current password and a new password to update.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="current-password">Current Password</Label>
-                    <Input id="current-password" type="password" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="new-password">New Password</Label>
-                    <Input id="new-password" type="password" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="confirm-password">Confirm New Password</Label>
-                    <Input id="confirm-password" type="password" />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsChangePasswordOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button className="bg-clinic-blue hover:bg-clinic-blue/90" onClick={() => setIsChangePasswordOpen(false)}>
-                    Update Password
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
+        {/* Account Settings */}
+        <TabsContent value="account" className="space-y-4 animate-fade-in">
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Settings</CardTitle>
+              <CardDescription>Update your account preferences</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input id="username" value="admin" readOnly />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="language">Default Language</Label>
+                <select 
+                  id="language" 
+                  className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="en">English</option>
+                  <option value="fr">French</option>
+                  <option value="es">Spanish</option>
+                  <option value="de">German</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="timezone">Timezone</Label>
+                <select 
+                  id="timezone" 
+                  className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="UTC">UTC (Coordinated Universal Time)</option>
+                  <option value="EST">EST (Eastern Standard Time)</option>
+                  <option value="CST">CST (Central Standard Time)</option>
+                  <option value="PST">PST (Pacific Standard Time)</option>
+                </select>
+              </div>
+              <Button className="w-full md:w-auto">Save Settings</Button>
+            </CardContent>
+          </Card>
         </TabsContent>
-        
-        <TabsContent value="users" className="space-y-6 animate-fade-in">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium">User Management</h3>
-            <Dialog open={isNewUserOpen} onOpenChange={setIsNewUserOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-clinic-blue hover:bg-clinic-blue/90">
-                  <Plus className="h-4 w-4 mr-2" />
-                  New User
+
+        {/* Security Settings */}
+        <TabsContent value="security" className="space-y-4 animate-fade-in">
+          <Card>
+            <CardHeader>
+              <CardTitle>Change Password</CardTitle>
+              <CardDescription>Update your password to keep your account secure</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Input 
+                    id="currentPassword" 
+                    type="password" 
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <Input 
+                    id="newPassword" 
+                    type="password" 
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Input 
+                    id="confirmPassword" 
+                    type="password" 
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+                <Button type="submit" className="w-full md:w-auto" disabled={isSaving}>
+                  {isSaving ? 'Updating...' : 'Update Password'}
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New User</DialogTitle>
-                  <DialogDescription>
-                    Add a new user to the system with specific role and permissions.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="user-name">Name</Label>
-                    <Input id="user-name" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="user-email">Email</Label>
-                    <Input id="user-email" type="email" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="user-role">Role</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="doctor">Doctor</SelectItem>
-                        <SelectItem value="staff">Staff</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="user-password">Temporary Password</Label>
-                    <Input id="user-password" type="password" />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsNewUserOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button className="bg-clinic-blue hover:bg-clinic-blue/90" onClick={() => setIsNewUserOpen(false)}>
-                    Create User
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
+              </form>
+            </CardContent>
+          </Card>
           
-          <div className="clinic-card">
-            <div className="overflow-x-auto">
-              <table className="clinic-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {usersData.map((user) => (
-                    <tr key={user.id} className="hover:bg-muted/30 transition-colors">
-                      <td>{user.id}</td>
-                      <td>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          user.role === "Admin" 
-                            ? "bg-clinic-purple/10 text-clinic-purple" 
-                            : user.role === "Doctor" 
-                            ? "bg-clinic-blue/10 text-clinic-blue" 
-                            : "bg-clinic-teal/10 text-clinic-teal"
-                        }`}>
-                          {user.role}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          user.status === "Active" 
-                            ? "bg-clinic-green/10 text-clinic-green" 
-                            : "bg-clinic-red/10 text-clinic-red"
-                        }`}>
-                          {user.status}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <PenSquare className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            {user.status === "Active" ? (
-                              <UserX className="h-4 w-4 text-clinic-red" />
-                            ) : (
-                              <UserCheck className="h-4 w-4 text-clinic-green" />
-                            )}
-                            <span className="sr-only">
-                              {user.status === "Active" ? "Ban" : "Activate"}
-                            </span>
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-clinic-red">
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">Delete</span>
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Two-Factor Authentication</CardTitle>
+              <CardDescription>Add an extra layer of security to your account</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium">Two-Factor Authentication</h4>
+                  <p className="text-sm text-muted-foreground">Protect your account with 2FA</p>
+                </div>
+                <Switch checked={false} />
+              </div>
+              <Button variant="outline" className="w-full md:w-auto">
+                <Shield className="mr-2 h-4 w-4" />
+                Setup 2FA
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
-        
-        <TabsContent value="system" className="space-y-6 animate-fade-in">
-          <div className="clinic-card space-y-6">
-            <div>
-              <h3 className="text-lg font-medium">Appearance</h3>
-              <p className="text-sm text-muted-foreground">
-                Customize the appearance of the application.
-              </p>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="theme">Theme</Label>
-                <p className="text-sm text-muted-foreground">
-                  Switch between light and dark modes.
-                </p>
-              </div>
-              <ThemeSwitcher />
-            </div>
-          </div>
-          
-          <div className="clinic-card space-y-6">
-            <div>
-              <h3 className="text-lg font-medium">Notifications</h3>
-              <p className="text-sm text-muted-foreground">
-                Configure system notifications.
-              </p>
-            </div>
-            <Separator />
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="email-notifications">Email Notifications</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive notifications via email.
-                  </p>
+
+        {/* Notification Settings */}
+        <TabsContent value="notifications" className="space-y-4 animate-fade-in">
+          <Card>
+            <CardHeader>
+              <CardTitle>Notification Preferences</CardTitle>
+              <CardDescription>Configure how you receive notifications</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Email Notifications</h4>
+                    <p className="text-sm text-muted-foreground">Get notified about appointments via email</p>
+                  </div>
+                  <Switch 
+                    checked={emailNotifications} 
+                    onCheckedChange={setEmailNotifications} 
+                  />
                 </div>
-                <Switch id="email-notifications" defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="appointment-reminders">Appointment Reminders</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Send reminders for upcoming appointments.
-                  </p>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">SMS Notifications</h4>
+                    <p className="text-sm text-muted-foreground">Receive text messages for important updates</p>
+                  </div>
+                  <Switch 
+                    checked={smsNotifications} 
+                    onCheckedChange={setSmsNotifications} 
+                  />
                 </div>
-                <Switch id="appointment-reminders" defaultChecked />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="system-updates">System Updates</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Notifications about system updates and maintenance.
-                  </p>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">App Notifications</h4>
+                    <p className="text-sm text-muted-foreground">Receive in-app notifications</p>
+                  </div>
+                  <Switch 
+                    checked={appNotifications} 
+                    onCheckedChange={setAppNotifications} 
+                  />
                 </div>
-                <Switch id="system-updates" />
               </div>
-            </div>
-            <Button className="bg-clinic-blue hover:bg-clinic-blue/90">
-              Save Preferences
-            </Button>
-          </div>
+              
+              <Button 
+                onClick={handleNotificationSave} 
+                disabled={isSaving}
+                className="w-full md:w-auto"
+              >
+                {isSaving ? 'Saving...' : 'Save Preferences'}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Appearance Settings */}
+        <TabsContent value="appearance" className="space-y-4 animate-fade-in">
+          <Card>
+            <CardHeader>
+              <CardTitle>Theme Settings</CardTitle>
+              <CardDescription>Customize the appearance of PetClinic</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div 
+                  className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${theme === 'light' ? 'ring-2 ring-blue-500' : ''}`}
+                  onClick={() => handleThemeChange('light')}
+                >
+                  <div className="h-24 mb-2 bg-white border rounded-md"></div>
+                  <p className="font-medium text-center">Light Theme</p>
+                </div>
+                
+                <div 
+                  className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${theme === 'dark' ? 'ring-2 ring-blue-500' : ''}`}
+                  onClick={() => handleThemeChange('dark')}
+                >
+                  <div className="h-24 mb-2 bg-gray-900 border rounded-md"></div>
+                  <p className="font-medium text-center">Dark Theme</p>
+                </div>
+                
+                <div 
+                  className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${theme === 'system' ? 'ring-2 ring-blue-500' : ''}`}
+                  onClick={() => handleThemeChange('system')}
+                >
+                  <div className="h-24 mb-2 bg-gradient-to-r from-white to-gray-900 border rounded-md"></div>
+                  <p className="font-medium text-center">System Default</p>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="font-size">Font Size</Label>
+                <select 
+                  id="font-size" 
+                  className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="sm">Small</option>
+                  <option value="md" selected>Medium</option>
+                  <option value="lg">Large</option>
+                </select>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

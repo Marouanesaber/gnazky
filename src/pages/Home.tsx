@@ -12,17 +12,22 @@ const Home = () => {
       <header className="border-b py-4 px-6 bg-white">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center">
-            <Link to="/" className="font-bold text-xl text-blue-600">OutstandenVet</Link>
+            <Link to="/" className="font-bold text-xl text-blue-600">PetClinic</Link>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-sm font-medium text-gray-900 hover:text-blue-600">Home</Link>
-            <Link to="/book-appointment" className="text-sm font-medium text-gray-600 hover:text-blue-600">Book Appointment</Link>
-            <Link to="/services" className="text-sm font-medium text-gray-600 hover:text-blue-600">Services</Link>
-            <Link to="/technicians" className="text-sm font-medium text-gray-600 hover:text-blue-600">Technicians</Link>
-            <Link to="/contact-us" className="text-sm font-medium text-gray-600 hover:text-blue-600">Contact Us</Link>
+            <Link to="/" className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-all">Home</Link>
+            <Link to="/book-appointment" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-all">Book Appointment</Link>
+            <Link to="/services" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-all">Services</Link>
+            <Link to="/technicians" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-all">Technicians</Link>
+            <Link to="/contact-us" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-all">Contact Us</Link>
           </nav>
-          <div>
-            <Link to="/login" className="text-sm font-medium bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-full">Dashboard</Link>
+          <div className="flex gap-2">
+            <Link to="/login" className="text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-all">
+              Login
+            </Link>
+            <Link to="/register" className="text-sm font-medium bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-full transition-all">
+              Sign Up
+            </Link>
           </div>
         </div>
       </header>
@@ -31,20 +36,20 @@ const Home = () => {
       <section className="py-16 px-6 bg-gray-50">
         <div className="container mx-auto flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-10 md:mb-0 pr-0 md:pr-10">
-            <h1 className="text-5xl font-bold mb-4">
+            <h1 className="text-5xl font-bold mb-4 animate-fade-in">
               <span className="text-blue-600">We Care</span> for<br />your animal
             </h1>
-            <p className="text-gray-600 mb-8 max-w-md">
+            <p className="text-gray-600 mb-8 max-w-md animate-fade-in [animation-delay:200ms]">
               Standard modern and efficient, affordable healthcare for your pets and other animals. So you don't have experience. Make an Appointment now!
             </p>
-            <Link to="/book-appointment">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Link to="/book-appointment" className="animate-fade-in [animation-delay:400ms]">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 transform hover:scale-105">
                 Book Now
               </Button>
             </Link>
           </div>
-          <div className="md:w-1/2 relative">
-            <div className="bg-white rounded-2xl shadow-lg p-4 relative z-10">
+          <div className="md:w-1/2 relative animate-fade-in [animation-delay:600ms]">
+            <div className="bg-white rounded-2xl shadow-lg p-4 relative z-10 transform transition-all duration-500 hover:-translate-y-2 hover:shadow-xl">
               <img
                 src="https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&q=80&w=1374"
                 alt="Veterinarian with dog"
@@ -249,11 +254,11 @@ const Home = () => {
       <footer className="bg-blue-900 text-white py-16 px-6 relative">
         <div className="container mx-auto">
           <div className="mb-6">
-            <h3 className="text-lg font-bold text-white mb-1">OutstandenVet</h3>
+            <h3 className="text-lg font-bold text-white mb-1">PetClinic</h3>
             <p className="text-blue-200 text-sm">Providing the best pet healthcare experience</p>
           </div>
           <div className="text-sm text-blue-200">
-            © 2023, OutstandenVet. Powered by Outstanding Technologies.
+            © 2023, PetClinic. Powered by Outstanding Technologies.
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0">
@@ -267,7 +272,7 @@ const Home = () => {
       <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-4 flex justify-center">
         <div className="container max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <h3 className="text-xl font-bold">
-            Join <span className="text-blue-600">OutstandenVet</span> Today
+            Join <span className="text-blue-600">PetClinic</span> Today
           </h3>
           <div className="flex gap-2">
             <Input placeholder="Email" className="w-48 sm:w-auto" />
