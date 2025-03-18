@@ -380,3 +380,94 @@ INSERT INTO settings (setting_key, setting_value) VALUES
 ('tax_rate', '7.5'), -- percentage
 ('invoice_prefix', 'INV-'),
 ('default_theme', 'light');
+
+-- Create procedures
+DELIMITER //
+
+-- Procedure to add a new pet with owner
+CREATE PROCEDURE AddPetWithOwner(
+    IN p_first_name VARCHAR(50),
+    IN p_last_name VARCHAR(50),
+    IN p_email VARCHAR(100),
+    IN p_telephone VARCHAR(20),
+    IN p_pet_name VARCHAR(50),
+    IN p_pet_type VARCHAR(50),
+    IN p_breed VARCHAR(50),
+    IN p_dob DATE,
+    IN p_gender VARCHAR(10)
+)
+BEGIN
+    DECLARE owner_id_var INT;
+    DECLARE pet_type_id_var INT;
+    DECLARE hospital_id_var VARCHAR(20);
+    
+    -- Check if owner exists
+    SELECT id INTO owner_id_var FROM owners WHERE email = p_email LIMIT 1;
+    
+    -- If owner doesn't exist, create new owner
+    IF owner_id_var IS NULL THEN
+        INSERT INTO owners (first_name, last_name, email, telephone)
+        VALUES (p_first_name, p_last_name, p_email, p_telephone);
+        
+        SET owner_id_var = LAST_INSERT_ID();
+    END IF;
+    
+    -- Get pet type id
+    SELECT id INTO pet_type_id_var FROM pet_types WHERE name = p_pet_type LIMIT 1;
+    
+    -- Generate hospital ID (PETCXXXX format)
+    SET hospital_id_var = CONCAT('PETC', LPAD(FLOOR(RAND() * 10000), 4, '0'));
+    
+    -- Insert pet
+    INSERT INTO pets (owner_id, name, type_id, breed, date_of_birth, gender, hospital_id)
+    VALUES (owner_id_var, p_pet_name, pet_type_id_var, p_breed, p_dob, p_gender, hospital_id_var);
+    
+    -- Return the new pet and owner info
+    SELECT 
+        p.id AS pet_id, 
+        p.name AS pet_name, 
+        p.hospital_id,
+        o.id AS owner_id,
+        CONCAT(o.first_name, ' ', o.last_name) AS owner_name
+    FROM pets p
+    JOIN owners o ON p.owner_id = o.id
+    WHERE p.id = LAST_INSERT_ID();
+END//
+
+-- Procedure to schedule an appointment
+CREATE PROCEDURE ScheduleAppointment(
+    IN p_pet_id INT,
+    IN p_vet_id INT,
+    IN p_visit_type VARCHAR(50),
+    IN p_date DATE,
+    IN p_time TIME,
+    IN p_notes TEXT,
+    IN p_created_by INT
+)
+BEGIN
+    DECLARE visit_type_id_var INT;
+    
+    -- Get visit type id
+    SELECT id INTO visit_type_id_var FROM visit_types WHERE name = p_visit_type LIMIT 1;
+    
+    -- Insert appointment
+    INSERT INTO appointments (pet_id, vet_id, visit_type_id, appointment_date, appointment_time, notes, created_by)
+    VALUES (p_pet_id, p_vet_id, visit_type_id_var, p_date, p_time, p_notes, p_created_by);
+    
+    -- Return the new appointment info
+    SELECT 
+        a.id AS appointment_id,
+        p.name AS pet_name,
+        CONCAT(v.first_name, ' ', v.last_name) AS vet_name,
+        vt.name AS visit_type,
+        a.appointment_date,
+        a.appointment_time,
+        a.status
+    FROM appointments a
+    JOIN pets p ON a.pet_id = p.id
+    JOIN vets v ON a.vet_id = v.id
+    JOIN visit_types vt ON a.visit_type_id = vt.id
+    WHERE a.id = LAST_INSERT_ID();
+END//
+
+DELIMITER ;

@@ -10,7 +10,7 @@ import {
   PawPrint,
   Users,
   Settings,
-  ShoppingCart,
+  Globe,
   User,
 } from "lucide-react";
 import { useAuth } from "./AuthProvider";
@@ -50,7 +50,7 @@ export function Sidebar() {
               to="/"
               className="flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
             >
-              <ShoppingCart className="h-5 w-5" />
+              <Globe className="h-5 w-5" />
               <span>Main Page</span>
             </NavLink>
           </div>

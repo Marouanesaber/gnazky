@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthProvider";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +32,18 @@ export function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    toast.success("You have been signed out", {
+      duration: 3000,
+    });
+    navigate("/login");
+  };
+
+  const navigateToProfile = () => {
+    navigate("/dashboard/profile");
+  };
+
+  const navigateToSettings = () => {
+    navigate("/dashboard/settings");
   };
 
   const getInitials = (name: string) => {
@@ -87,8 +99,8 @@ export function Header() {
           <DropdownMenuContent className="w-56 animate-scale-in" align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/dashboard/profile")}>Profile</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>Settings</DropdownMenuItem>
+            <DropdownMenuItem onClick={navigateToProfile}>Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={navigateToSettings}>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-clinic-red" onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>

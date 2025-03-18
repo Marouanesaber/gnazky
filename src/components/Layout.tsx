@@ -24,6 +24,11 @@ const Layout = () => {
     toast.success("You have been signed out", {
       duration: 3000,
     });
+    navigate("/login");
+  };
+
+  // Preserve authentication when navigating to main page
+  const navigateToMainPage = () => {
     navigate("/");
   };
 
@@ -40,12 +45,15 @@ const Layout = () => {
                 Dashboard
               </Button>
             </Link>
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="gap-2 transition-all hover:bg-blue-100 hover:text-blue-700">
-                <ShoppingCart size={16} />
-                Main Page
-              </Button>
-            </Link>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2 transition-all hover:bg-blue-100 hover:text-blue-700"
+              onClick={navigateToMainPage}
+            >
+              <ShoppingCart size={16} />
+              Main Page
+            </Button>
           </div>
           <Button 
             variant="ghost" 

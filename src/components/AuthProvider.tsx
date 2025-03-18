@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface AuthContextType {
@@ -55,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (email: string, keepMeOnline: boolean = false) => {
+  const login = (email: string, keepMeOnline: boolean = true) => {
     setIsAuthenticated(true);
     
     // Create user profile
@@ -66,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setUserProfile(newProfile);
     
-    // Always store the profile, but only mark as logged in if keepMeOnline is true
+    // Always store as logged in to maintain state across the app
     localStorage.setItem("userProfile", JSON.stringify(newProfile));
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("userEmail", email);
