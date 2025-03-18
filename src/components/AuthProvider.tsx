@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface AuthContextType {
@@ -8,7 +7,7 @@ interface AuthContextType {
     email: string;
     profilePicture: string;
   } | null;
-  login: (email: string) => void;
+  login: (email: string, keepMeOnline?: boolean) => void;
   logout: () => void;
   updateProfile: (data: Partial<{ name: string; email: string; profilePicture: string }>) => void;
 }
@@ -56,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (email: string) => {
+  const login = (email: string, keepMeOnline: boolean = false) => {
     setIsAuthenticated(true);
     
     // Create user profile
@@ -66,7 +65,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     
     setUserProfile(newProfile);
+    
+    // Always store the profile, but only mark as logged in if keepMeOnline is true
     localStorage.setItem("userProfile", JSON.stringify(newProfile));
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("userEmail", email);
   };
 
   const logout = () => {

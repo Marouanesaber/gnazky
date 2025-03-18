@@ -5,6 +5,8 @@ import { ThemeSwitcher } from "./theme-switcher";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthProvider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +18,8 @@ import {
 
 export function Header() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const navigate = useNavigate();
+  const { logout, userProfile } = useAuth();
 
   const toggleSidebar = () => {
     const sidebar = document.querySelector(".sidebar");
@@ -23,6 +27,19 @@ export function Header() {
       sidebar.classList.toggle("hidden");
       setSidebarVisible(!sidebarVisible);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map(part => part[0])
+      .join("")
+      .toUpperCase();
   };
 
   return (
@@ -58,20 +75,22 @@ export function Header() {
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">
               <Avatar className="h-9 w-9">
                 <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="Admin"
+                  src={userProfile?.profilePicture || "https://github.com/shadcn.png"}
+                  alt={userProfile?.name || "Admin"}
                 />
-                <AvatarFallback>AD</AvatarFallback>
+                <AvatarFallback>
+                  {userProfile?.name ? getInitials(userProfile.name) : "AD"}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 animate-scale-in" align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/dashboard/profile")}>Profile</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-clinic-red">Logout</DropdownMenuItem>
+            <DropdownMenuItem className="text-clinic-red" onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

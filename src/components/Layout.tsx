@@ -1,8 +1,7 @@
 
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, Link } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import { Link } from "react-router-dom";
 import { Home, ShoppingCart, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "./AuthProvider";

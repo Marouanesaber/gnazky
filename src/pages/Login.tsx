@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useAuth } from "@/components/AuthProvider";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +17,7 @@ const Login = () => {
   const [keepMeOnline, setKeepMeOnline] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,11 +29,8 @@ const Login = () => {
       
       // In a real app, you would validate credentials here
       if (email && password) {
-        // Store login state in localStorage if keepMeOnline is checked
-        if (keepMeOnline) {
-          localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("userEmail", email);
-        }
+        // Call the login function from AuthProvider
+        login(email, keepMeOnline);
         
         // Show success toast
         toast.success("Login successful!", {

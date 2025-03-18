@@ -12,11 +12,15 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  fontSize: string;
+  setFontSize: (size: string) => void;
 };
 
 const initialState: ThemeProviderState = {
   theme: "system",
   setTheme: () => null,
+  fontSize: "md",
+  setFontSize: () => null,
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
@@ -29,6 +33,10 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+  );
+  
+  const [fontSize, setFontSize] = useState<string>(
+    () => localStorage.getItem("ui-font-size") || "md"
   );
 
   useEffect(() => {
@@ -48,12 +56,37 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
+  useEffect(() => {
+    // Apply font size classes
+    const root = window.document.documentElement;
+    root.classList.remove("text-sm", "text-base", "text-lg");
+    
+    switch(fontSize) {
+      case "sm":
+        root.classList.add("text-sm");
+        break;
+      case "md":
+        root.classList.add("text-base");
+        break;
+      case "lg":
+        root.classList.add("text-lg");
+        break;
+      default:
+        root.classList.add("text-base");
+    }
+  }, [fontSize]);
+
   const value = {
     theme,
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },
+    fontSize,
+    setFontSize: (size: string) => {
+      localStorage.setItem("ui-font-size", size);
+      setFontSize(size);
+    }
   };
 
   return (

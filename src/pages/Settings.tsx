@@ -7,8 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Settings, Bell, Lock, Shield, Palette } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Settings as SettingsIcon, Bell, Lock, Shield, Palette } from "lucide-react";
+import { useTheme } from "@/components/theme-provider";
 
 const SettingsPage = () => {
   const [isSaving, setIsSaving] = useState(false);
@@ -18,7 +18,7 @@ const SettingsPage = () => {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(false);
   const [appNotifications, setAppNotifications] = useState(true);
-  const { setTheme, theme } = useTheme();
+  const { theme, setTheme, fontSize, setFontSize } = useTheme();
 
   const handlePasswordChange = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,8 +56,13 @@ const SettingsPage = () => {
   };
 
   const handleThemeChange = (selectedTheme: string) => {
-    setTheme(selectedTheme);
+    setTheme(selectedTheme as "light" | "dark" | "system");
     toast.success(`Theme changed to ${selectedTheme}!`);
+  };
+
+  const handleFontSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFontSize(e.target.value);
+    toast.success(`Font size changed to ${e.target.value}!`);
   };
 
   return (
@@ -67,7 +72,7 @@ const SettingsPage = () => {
       <Tabs defaultValue="account" className="w-full">
         <TabsList className="grid grid-cols-4 mb-6">
           <TabsTrigger value="account" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
+            <SettingsIcon className="h-4 w-4" />
             <span>Account</span>
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
@@ -281,10 +286,12 @@ const SettingsPage = () => {
                 <Label htmlFor="font-size">Font Size</Label>
                 <select 
                   id="font-size" 
+                  value={fontSize}
+                  onChange={handleFontSizeChange}
                   className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   <option value="sm">Small</option>
-                  <option value="md" selected>Medium</option>
+                  <option value="md">Medium</option>
                   <option value="lg">Large</option>
                 </select>
               </div>
