@@ -14,12 +14,14 @@ const Home = () => {
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
       <Navigation />
-      <HeroSection />
-      <PetGallery />
-      <ServicesSection />
-      <TestimonialsSection />
-      <ContactSection />
-      <NewsletterSection />
+      <main className="pt-16">
+        <HeroSection />
+        <PetGallery />
+        <ServicesSection />
+        <TestimonialsSection />
+        <ContactSection />
+        <NewsletterSection />
+      </main>
       <Footer />
       <NewsletterBanner />
     </div>
