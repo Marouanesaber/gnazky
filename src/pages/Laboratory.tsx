@@ -332,16 +332,18 @@ const LaboratoryPage = () => {
                               </div>
                               <div className="grid grid-cols-4 items-center gap-4">
                                 <Label className="text-right">Status</Label>
-                                <Select defaultValue={selectedTest?.status} className="col-span-3">
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select status" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="Pending">Pending</SelectItem>
-                                    <SelectItem value="Completed">Completed</SelectItem>
-                                    <SelectItem value="Cancelled">Cancelled</SelectItem>
-                                  </SelectContent>
-                                </Select>
+                                <div className="col-span-3">
+                                  <Select defaultValue={selectedTest?.status}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="Pending">Pending</SelectItem>
+                                      <SelectItem value="Completed">Completed</SelectItem>
+                                      <SelectItem value="Cancelled">Cancelled</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                               </div>
                             </div>
                             <DialogFooter>
