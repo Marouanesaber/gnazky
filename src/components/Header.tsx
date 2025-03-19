@@ -16,9 +16,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export function Header() {
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const navigate = useNavigate();
   const { logout, userProfile } = useAuth();
 
@@ -54,6 +60,23 @@ export function Header() {
       .toUpperCase();
   };
 
+  // Sample notifications
+  const notifications = [
+    { id: 1, title: "New appointment", message: "You have a new appointment scheduled for tomorrow", time: "5 minutes ago", read: false },
+    { id: 2, title: "Lab results ready", message: "Lab results for patient #OVHMS0003 are ready", time: "1 hour ago", read: false },
+    { id: 3, title: "System maintenance", message: "Scheduled maintenance at 2 AM", time: "3 hours ago", read: true },
+  ];
+
+  const markAsRead = (id: number) => {
+    toast.success("Notification marked as read");
+    setNotificationsOpen(false);
+  };
+
+  const markAllAsRead = () => {
+    toast.success("All notifications marked as read");
+    setNotificationsOpen(false);
+  };
+
   return (
     <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4 flex items-center justify-between theme-transition">
       <div className="flex items-center gap-2">
@@ -77,11 +100,66 @@ export function Header() {
       </div>
       <div className="flex items-center gap-2">
         <ThemeSwitcher />
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="sr-only">Notifications</span>
-          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-clinic-red"></span>
-        </Button>
+        
+        <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative animate-fade-in">
+              <Bell className="h-5 w-5" />
+              <span className="sr-only">Notifications</span>
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-clinic-red animate-pulse"></span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-0" align="end">
+            <div className="p-4 border-b">
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold">Notifications</h4>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs text-blue-600 hover:text-blue-800"
+                  onClick={markAllAsRead}
+                >
+                  Mark all as read
+                </Button>
+              </div>
+            </div>
+            <div className="max-h-[300px] overflow-auto">
+              {notifications.map((notification) => (
+                <div 
+                  key={notification.id} 
+                  className={`p-4 border-b hover:bg-muted/50 transition-colors ${
+                    !notification.read ? 'bg-blue-50 dark:bg-blue-900/10' : ''
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-1">
+                    <h5 className="font-medium text-sm">{notification.title}</h5>
+                    <span className="text-xs text-muted-foreground">{notification.time}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">{notification.message}</p>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-xs text-blue-600 hover:text-blue-800 h-6 px-2"
+                    onClick={() => markAsRead(notification.id)}
+                  >
+                    Mark as read
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="p-2 border-t text-center">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs w-full text-muted-foreground hover:text-foreground"
+                onClick={() => setNotificationsOpen(false)}
+              >
+                View all notifications
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">

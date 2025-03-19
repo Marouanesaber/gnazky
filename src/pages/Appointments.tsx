@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -11,8 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { CalendarDays, Plus, Search, Filter, Clock, MapPin, User, PenSquare, Trash2 } from "lucide-react";
 import { AppointmentCalendar } from "@/components/AppointmentCalendar";
+import { toast } from "sonner";
 
-// Sample appointments data
 const appointmentsData = [
   { 
     id: 1, 
@@ -46,6 +45,24 @@ const appointmentsData = [
 const AppointmentsPage = () => {
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleSchedule = () => {
+    toast.success("New appointment has been scheduled");
+    setIsNewAppointmentOpen(false);
+  };
+
+  const handleEdit = () => {
+    toast.success(`Appointment for ${selectedAppointment?.petName} has been updated`);
+    setIsEditDialogOpen(false);
+  };
+
+  const handleDelete = () => {
+    toast.success(`Appointment for ${selectedAppointment?.petName} has been deleted`);
+    setIsDeleteDialogOpen(false);
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -53,7 +70,7 @@ const AppointmentsPage = () => {
         <h1 className="text-2xl font-bold tracking-tight">Appointments</h1>
         <Dialog open={isNewAppointmentOpen} onOpenChange={setIsNewAppointmentOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-clinic-blue hover:bg-clinic-blue/90">
+            <Button className="bg-clinic-blue hover:bg-clinic-blue/90 animate-fade-in">
               <Plus className="h-4 w-4 mr-2" />
               New Appointment
             </Button>
@@ -169,7 +186,7 @@ const AppointmentsPage = () => {
               </Button>
               <Button 
                 className="bg-clinic-blue hover:bg-clinic-blue/90"
-                onClick={() => setIsNewAppointmentOpen(false)}
+                onClick={handleSchedule}
               >
                 Schedule
               </Button>
@@ -256,14 +273,131 @@ const AppointmentsPage = () => {
                       </td>
                       <td>
                         <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <PenSquare className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-clinic-red">
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">Delete</span>
-                          </Button>
+                          <Dialog open={isEditDialogOpen && selectedAppointment?.id === appointment.id} onOpenChange={(open) => !open && setIsEditDialogOpen(false)}>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0 animate-fade-in"
+                                onClick={() => {
+                                  setSelectedAppointment(appointment);
+                                  setIsEditDialogOpen(true);
+                                }}
+                              >
+                                <PenSquare className="h-4 w-4" />
+                                <span className="sr-only">Edit</span>
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[525px]">
+                              <DialogHeader>
+                                <DialogTitle>Edit Appointment</DialogTitle>
+                                <DialogDescription>
+                                  Update appointment for {appointment.petName}.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right">Pet</Label>
+                                  <div className="col-span-3">
+                                    <Input value={appointment.petName} readOnly />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right">Owner</Label>
+                                  <div className="col-span-3">
+                                    <Input value={appointment.ownerName} readOnly />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right">Type</Label>
+                                  <Select defaultValue={appointment.type}>
+                                    <SelectTrigger className="col-span-3">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="Checkup">Checkup</SelectItem>
+                                      <SelectItem value="Vaccination">Vaccination</SelectItem>
+                                      <SelectItem value="Surgery">Surgery</SelectItem>
+                                      <SelectItem value="Grooming">Grooming</SelectItem>
+                                      <SelectItem value="Dental">Dental</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right">Date</Label>
+                                  <div className="col-span-3">
+                                    <Input 
+                                      type="date" 
+                                      defaultValue={format(appointment.date, "yyyy-MM-dd")} 
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right">Time</Label>
+                                  <div className="col-span-3">
+                                    <Input 
+                                      type="time" 
+                                      defaultValue={format(appointment.date, "HH:mm")} 
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label className="text-right">Status</Label>
+                                  <Select defaultValue={appointment.status}>
+                                    <SelectTrigger className="col-span-3">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="scheduled">Scheduled</SelectItem>
+                                      <SelectItem value="completed">Completed</SelectItem>
+                                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                                  Cancel
+                                </Button>
+                                <Button onClick={handleEdit}>
+                                  Update Appointment
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+
+                          <Dialog open={isDeleteDialogOpen && selectedAppointment?.id === appointment.id} onOpenChange={(open) => !open && setIsDeleteDialogOpen(false)}>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0 text-clinic-red animate-fade-in [animation-delay:100ms]"
+                                onClick={() => {
+                                  setSelectedAppointment(appointment);
+                                  setIsDeleteDialogOpen(true);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Delete</span>
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Delete Appointment</DialogTitle>
+                                <DialogDescription>
+                                  Are you sure you want to delete this appointment? This action cannot be undone.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                                  Cancel
+                                </Button>
+                                <Button variant="destructive" onClick={handleDelete}>
+                                  Delete
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </td>
                     </tr>
@@ -274,6 +408,133 @@ const AppointmentsPage = () => {
           </div>
         </TabsContent>
         <TabsContent value="calendar" className="animate-fade-in">
+          <div className="mb-4">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-clinic-blue hover:bg-clinic-blue/90 animate-fade-in">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Appointment
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[525px]">
+                <DialogHeader>
+                  <DialogTitle>New Appointment</DialogTitle>
+                  <DialogDescription>
+                    Schedule a new appointment for a pet.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="petName" className="text-right">
+                      Pet
+                    </Label>
+                    <Select>
+                      <SelectTrigger className="col-span-3">
+                        <SelectValue placeholder="Select pet" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fluffy">Fluffy</SelectItem>
+                        <SelectItem value="buddy">Buddy</SelectItem>
+                        <SelectItem value="whiskers">Whiskers</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="appointmentType" className="text-right">
+                      Type
+                    </Label>
+                    <Select>
+                      <SelectTrigger className="col-span-3">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="checkup">Checkup</SelectItem>
+                        <SelectItem value="vaccination">Vaccination</SelectItem>
+                        <SelectItem value="surgery">Surgery</SelectItem>
+                        <SelectItem value="grooming">Grooming</SelectItem>
+                        <SelectItem value="dental">Dental</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label className="text-right">Date</Label>
+                    <div className="col-span-3">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarDays className="mr-2 h-4 w-4" />
+                            {date ? format(date, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="time" className="text-right">
+                      Time
+                    </Label>
+                    <Select>
+                      <SelectTrigger className="col-span-3">
+                        <SelectValue placeholder="Select time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="9:00">9:00 AM</SelectItem>
+                        <SelectItem value="9:30">9:30 AM</SelectItem>
+                        <SelectItem value="10:00">10:00 AM</SelectItem>
+                        <SelectItem value="10:30">10:30 AM</SelectItem>
+                        <SelectItem value="11:00">11:00 AM</SelectItem>
+                        <SelectItem value="11:30">11:30 AM</SelectItem>
+                        <SelectItem value="12:00">12:00 PM</SelectItem>
+                        <SelectItem value="12:30">12:30 PM</SelectItem>
+                        <SelectItem value="13:00">1:00 PM</SelectItem>
+                        <SelectItem value="13:30">1:30 PM</SelectItem>
+                        <SelectItem value="14:00">2:00 PM</SelectItem>
+                        <SelectItem value="14:30">2:30 PM</SelectItem>
+                        <SelectItem value="15:00">3:00 PM</SelectItem>
+                        <SelectItem value="15:30">3:30 PM</SelectItem>
+                        <SelectItem value="16:00">4:00 PM</SelectItem>
+                        <SelectItem value="16:30">4:30 PM</SelectItem>
+                        <SelectItem value="17:00">5:00 PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="notes" className="text-right">
+                      Notes
+                    </Label>
+                    <Input
+                      id="notes"
+                      placeholder="Additional notes"
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline">
+                    Cancel
+                  </Button>
+                  <Button 
+                    className="bg-clinic-blue hover:bg-clinic-blue/90"
+                    onClick={handleSchedule}
+                  >
+                    Schedule
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
           <AppointmentCalendar />
         </TabsContent>
       </Tabs>
