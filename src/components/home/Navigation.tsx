@@ -31,8 +31,7 @@ const Navigation = () => {
   };
 
   const handleSignOut = () => {
-    logout();
-    navigate("/");
+    navigate("/logout");
   };
 
   return (
@@ -73,10 +72,10 @@ const Navigation = () => {
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-all hover:scale-105">
+              <Link to="/login" className="text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-all hover:scale-105 flex items-center">
                 Login
               </Link>
-              <Link to="/register" className="text-sm font-medium bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-full transition-all hover:scale-105">
+              <Link to="/register" className="text-sm font-medium bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-full transition-all hover:scale-105 flex items-center">
                 Sign Up
               </Link>
             </>

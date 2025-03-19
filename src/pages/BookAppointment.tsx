@@ -1,182 +1,333 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import Navigation from "@/components/home/Navigation";
+import Footer from "@/components/home/Footer";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { ArrowLeft } from "lucide-react";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 import { toast } from "sonner";
+import { Calendar as CalendarIcon, Clock, MapPin, User, Phone, Mail, PawPrint, FileText, Stethoscope } from "lucide-react";
 
 const BookAppointment = () => {
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  
+  const [date, setDate] = useState<Date>();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [petName, setPetName] = useState("");
+  const [petType, setPetType] = useState("");
+  const [appointmentType, setAppointmentType] = useState("");
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Appointment booked successfully! We'll contact you shortly to confirm.", {
-      description: "Thank you for choosing Fluffy Care Vet Clinic!"
-    });
+    setIsLoading(true);
+    
+    // Simulate form submission
+    setTimeout(() => {
+      setIsLoading(false);
+      setSubmitted(true);
+      
+      // Show success toast
+      toast.success("Appointment scheduled successfully!", {
+        duration: 5000,
+      });
+      
+      // Clear form data
+      setName("");
+      setEmail("");
+      setPhone("");
+      setPetName("");
+      setPetType("");
+      setAppointmentType("");
+      setMessage("");
+      setDate(undefined);
+    }, 1500);
   };
 
+  const appointmentTypes = [
+    { value: "checkup", label: "Regular Check-up" },
+    { value: "vaccination", label: "Vaccination" },
+    { value: "emergency", label: "Emergency Care" },
+    { value: "surgery", label: "Surgery" },
+    { value: "dental", label: "Dental Care" },
+    { value: "consultation", label: "General Consultation" },
+  ];
+
+  const petTypes = [
+    { value: "dog", label: "Dog" },
+    { value: "cat", label: "Cat" },
+    { value: "bird", label: "Bird" },
+    { value: "rabbit", label: "Rabbit" },
+    { value: "reptile", label: "Reptile" },
+    { value: "other", label: "Other" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6">
-      <div className="container mx-auto max-w-4xl">
-        <Link to="/" className="inline-flex items-center text-blue-600 mb-6 transition-all hover:text-blue-800 hover:translate-x-[-5px] duration-300">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
-        </Link>
-        
-        <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-8 animate-fade-in">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Book an Appointment</h1>
-            <p className="text-gray-600 max-w-xl mx-auto">Schedule your pet's visit with our expert veterinarians. Please fill out the form below and we'll confirm your appointment within 24 hours.</p>
-          </div>
+    <div className="flex flex-col min-h-screen">
+      <Navigation />
+      
+      <div className="pt-24 pb-12 container mx-auto px-4 animate-fade-in">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 animate-fade-in">Book an Appointment</h1>
+          <p className="text-gray-600 text-center mb-8 animate-fade-in [animation-delay:200ms]">Schedule a visit for your pet with our experienced veterinarians</p>
           
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Personal Information */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2 group">
-                <Label htmlFor="fullName" className="group-hover:text-blue-600 transition-colors">FULL NAME *</Label>
-                <Input id="fullName" placeholder="Your full name" required 
-                  className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
-              </div>
-              
-              <div className="space-y-2 group">
-                <Label htmlFor="phone" className="group-hover:text-blue-600 transition-colors">PHONE NUMBER *</Label>
-                <Input id="phone" placeholder="Your phone number" required 
-                  className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
-              </div>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2 group">
-                <Label htmlFor="email" className="group-hover:text-blue-600 transition-colors">EMAIL ADDRESS *</Label>
-                <Input id="email" type="email" placeholder="Your email address" required 
-                  className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
-              </div>
-              
-              <div className="space-y-2 group">
-                <Label htmlFor="petName" className="group-hover:text-blue-600 transition-colors">PET'S NAME *</Label>
-                <Input id="petName" placeholder="Your pet's name" required 
-                  className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 hover:border-blue-400" />
-              </div>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2 group">
-                <Label htmlFor="petType" className="group-hover:text-blue-600 transition-colors">TYPE OF PET/ANIMAL *</Label>
-                <Select>
-                  <SelectTrigger id="petType" className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 hover:border-blue-400">
-                    <SelectValue placeholder="Select pet type" />
-                  </SelectTrigger>
-                  <SelectContent className="animate-fade-in">
-                    <SelectItem value="dog">Dog</SelectItem>
-                    <SelectItem value="cat">Cat</SelectItem>
-                    <SelectItem value="bird">Bird</SelectItem>
-                    <SelectItem value="reptile">Reptile</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2 group">
-                <Label htmlFor="appointmentType" className="group-hover:text-blue-600 transition-colors">APPOINTMENT TYPE *</Label>
-                <Select>
-                  <SelectTrigger id="appointmentType" className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 hover:border-blue-400">
-                    <SelectValue placeholder="Select appointment type" />
-                  </SelectTrigger>
-                  <SelectContent className="animate-fade-in">
-                    <SelectItem value="examination">Regular Examination</SelectItem>
-                    <SelectItem value="vaccination">Vaccination</SelectItem>
-                    <SelectItem value="surgery">Surgery</SelectItem>
-                    <SelectItem value="dental">Dental Care</SelectItem>
-                    <SelectItem value="emergency">Emergency</SelectItem>
-                    <SelectItem value="consultation">Consultation</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2 group">
-                <Label className="group-hover:text-blue-600 transition-colors">PREFERRED DATE *</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal transition-all duration-300 focus:ring-2 focus:ring-blue-500 hover:border-blue-400",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      {date ? format(date, "PPP") : "Select appointment date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 animate-fade-in">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                      className="rounded-md border"
+          {!submitted ? (
+            <Card className="border-0 shadow-lg animate-fade-in [animation-delay:300ms]">
+              <CardHeader>
+                <CardTitle>Appointment Request</CardTitle>
+                <CardDescription>Fill out the form below to schedule your pet's appointment</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="flex items-center">
+                        <User className="h-4 w-4 mr-2 text-blue-500" />
+                        Your Name
+                      </Label>
+                      <Input 
+                        id="name" 
+                        placeholder="Full Name" 
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="transition-all focus:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="flex items-center">
+                        <Mail className="h-4 w-4 mr-2 text-blue-500" />
+                        Email Address
+                      </Label>
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="your@email.com" 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="transition-all focus:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="flex items-center">
+                        <Phone className="h-4 w-4 mr-2 text-blue-500" />
+                        Phone Number
+                      </Label>
+                      <Input 
+                        id="phone" 
+                        placeholder="+233 12 345 6789" 
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                        className="transition-all focus:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="petName" className="flex items-center">
+                        <PawPrint className="h-4 w-4 mr-2 text-blue-500" />
+                        Pet's Name
+                      </Label>
+                      <Input 
+                        id="petName" 
+                        placeholder="Name of your pet" 
+                        value={petName}
+                        onChange={(e) => setPetName(e.target.value)}
+                        required
+                        className="transition-all focus:border-blue-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="petType" className="flex items-center">
+                        <PawPrint className="h-4 w-4 mr-2 text-blue-500" />
+                        Pet Type
+                      </Label>
+                      <Select value={petType} onValueChange={setPetType} required>
+                        <SelectTrigger id="petType" className="transition-all focus:border-blue-500">
+                          <SelectValue placeholder="Select pet type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {petTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="appointmentType" className="flex items-center">
+                        <Stethoscope className="h-4 w-4 mr-2 text-blue-500" />
+                        Appointment Type
+                      </Label>
+                      <Select value={appointmentType} onValueChange={setAppointmentType} required>
+                        <SelectTrigger id="appointmentType" className="transition-all focus:border-blue-500">
+                          <SelectValue placeholder="Select appointment type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {appointmentTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="flex items-center">
+                        <CalendarIcon className="h-4 w-4 mr-2 text-blue-500" />
+                        Preferred Date
+                      </Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full justify-start text-left font-normal transition-all focus:border-blue-500",
+                              !date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {date ? format(date, "PPP") : <span>Select date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 pointer-events-auto">
+                          <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                            initialFocus
+                            disabled={(date) => date < new Date()}
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="time" className="flex items-center">
+                        <Clock className="h-4 w-4 mr-2 text-blue-500" />
+                        Preferred Time
+                      </Label>
+                      <Select required>
+                        <SelectTrigger id="time" className="transition-all focus:border-blue-500">
+                          <SelectValue placeholder="Select time slot" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="morning">Morning (9:00 AM - 12:00 PM)</SelectItem>
+                          <SelectItem value="afternoon">Afternoon (1:00 PM - 4:00 PM)</SelectItem>
+                          <SelectItem value="evening">Evening (4:00 PM - 6:00 PM)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="message" className="flex items-center">
+                      <FileText className="h-4 w-4 mr-2 text-blue-500" />
+                      Additional Information
+                    </Label>
+                    <Textarea 
+                      id="message" 
+                      placeholder="Please provide any additional details about your pet's condition" 
+                      className="min-h-[120px] transition-all focus:border-blue-500"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
                     />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              
-              <div className="space-y-2 group">
-                <Label htmlFor="time" className="group-hover:text-blue-600 transition-colors">TIME PREFERENCE *</Label>
-                <Select>
-                  <SelectTrigger id="time" className="transition-all duration-300 focus:ring-2 focus:ring-blue-500 hover:border-blue-400">
-                    <SelectValue placeholder="Select preferred time" />
-                  </SelectTrigger>
-                  <SelectContent className="animate-fade-in">
-                    <SelectItem value="9:00">9:00 AM</SelectItem>
-                    <SelectItem value="10:00">10:00 AM</SelectItem>
-                    <SelectItem value="11:00">11:00 AM</SelectItem>
-                    <SelectItem value="12:00">12:00 PM</SelectItem>
-                    <SelectItem value="13:00">1:00 PM</SelectItem>
-                    <SelectItem value="14:00">2:00 PM</SelectItem>
-                    <SelectItem value="15:00">3:00 PM</SelectItem>
-                    <SelectItem value="16:00">4:00 PM</SelectItem>
-                    <SelectItem value="17:00">5:00 PM</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-blue-600 hover:bg-blue-700 transition-all duration-300"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Booking Appointment..." : "Book Appointment"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="border-0 shadow-lg animate-fade-in text-center">
+              <CardContent className="pt-6 pb-6">
+                <div className="flex justify-center mb-4">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+                </div>
+                <h2 className="text-2xl font-bold mb-2">Appointment Scheduled!</h2>
+                <p className="text-gray-600 mb-4">Thank you for booking an appointment with PetClinic.</p>
+                <p className="text-gray-600 mb-6">We've sent a confirmation email to your inbox with all the details.</p>
+                <Button 
+                  onClick={() => setSubmitted(false)}
+                  className="bg-blue-600 hover:bg-blue-700 transition-all duration-300"
+                >
+                  Book Another Appointment
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+          
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in [animation-delay:500ms]">
+            <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                    <MapPin className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h3 className="font-bold mb-2">Our Location</h3>
+                  <p className="text-gray-600">123 Pet Care Street, Accra, Ghana</p>
+                </div>
+              </CardContent>
+            </Card>
             
-            <div className="space-y-2 group">
-              <Label htmlFor="reason" className="group-hover:text-blue-600 transition-colors">REASON FOR APPOINTMENT *</Label>
-              <textarea 
-                id="reason"
-                className="w-full min-h-[100px] rounded-md border border-input bg-transparent px-3 py-2 text-sm transition-all duration-300 focus:ring-2 focus:ring-blue-500 hover:border-blue-400"
-                placeholder="Please describe the reason for your appointment"
-                required
-              ></textarea>
-            </div>
+            <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                    <Phone className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h3 className="font-bold mb-2">Contact Us</h3>
+                  <p className="text-gray-600">+233 12 345 6789</p>
+                  <p className="text-gray-600">info@petclinic.com</p>
+                </div>
+              </CardContent>
+            </Card>
             
-            <div className="pt-4">
-              <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                Book Appointment
-              </Button>
-              
-              <p className="text-sm text-gray-500 text-center mt-4">
-                By booking an appointment, you agree to our <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
-              </p>
-            </div>
-          </form>
+            <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                    <Clock className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h3 className="font-bold mb-2">Working Hours</h3>
+                  <p className="text-gray-600">Monday - Friday: 9am - 7pm</p>
+                  <p className="text-gray-600">Saturday: 9am - 5pm</p>
+                  <p className="text-gray-600">Sunday: Closed</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };
