@@ -19,8 +19,6 @@ import ProfilePage from "./pages/Profile";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import Logout from "./pages/Logout";
 import Home from "./pages/Home";
 import BookAppointment from "./pages/BookAppointment";
 import Services from "./pages/Services";
@@ -42,8 +40,6 @@ const App = () => (
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/logout" element={<Logout />} />
               <Route path="/book-appointment" element={<BookAppointment />} />
               <Route path="/services" element={<Services />} />
               <Route path="/technicians" element={<Technicians />} />

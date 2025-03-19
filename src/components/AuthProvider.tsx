@@ -62,9 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Create user profile
     const newProfile = { 
       ...defaultUserProfile,
-      email: email || defaultUserProfile.email,
-      name: email.split('@')[0] || defaultUserProfile.name,
-      profilePicture: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=0D8ABC&color=fff`
+      email: email || defaultUserProfile.email
     };
     
     setUserProfile(newProfile);

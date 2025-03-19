@@ -12,7 +12,7 @@ const TestimonialsSection = () => {
         <div className="flex flex-col md:flex-row gap-8 items-center">
           <div className="md:w-1/2">
             <p className="text-gray-600 mb-4">
-              Don't just take our word for it. Here's what some of our satisfied customers have to say about their experience at PetClinic.
+              Don't just take our word for it. Here's what some of our satisfied customers have to say about their experience at OutstandenVet.
             </p>
           </div>
           <div className="md:w-1/2 bg-white p-6 rounded-xl shadow-md">
@@ -35,7 +35,7 @@ const TestimonialsSection = () => {
               </div>
             </div>
             <p className="text-gray-700">
-              "PetClinic is all you can ask for. The perfect fit for all your pet care needs!"
+              "OutstandenVet is all you can ask for. The perfect fit for all your pet care needs!"
             </p>
           </div>
         </div>
