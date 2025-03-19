@@ -4,7 +4,7 @@ import Navigation from "@/components/home/Navigation";
 import Footer from "@/components/home/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LinkedIn, Twitter, Mail, Calendar } from "lucide-react";
+import { Linkedin, Twitter, Mail, Calendar } from "lucide-react";
 
 interface Technician {
   id: number;
@@ -137,7 +137,7 @@ const Technicians = () => {
                           )}
                           {tech.socials.linkedin && (
                             <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/40 text-white">
-                              <LinkedIn className="h-4 w-4" />
+                              <Linkedin className="h-4 w-4" />
                             </Button>
                           )}
                           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/40 text-white">

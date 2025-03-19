@@ -40,12 +40,14 @@ const Logout = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>
+        {`
         @keyframes progress {
           0% { width: 0%; }
           100% { width: 100%; }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };

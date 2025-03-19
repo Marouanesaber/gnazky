@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, parse } from "date-fns";
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, Clock, User, PawPrint, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,12 +64,10 @@ export function AppointmentCalendar() {
       return;
     }
 
-    // Create a date object with the selected date and time
     const [hours, minutes] = appointmentTime.split(':').map(Number);
     const appointmentDateTime = new Date(appointmentDate);
     appointmentDateTime.setHours(hours, minutes, 0, 0);
 
-    // Create new appointment
     const newAppointment: Appointment = {
       id: appointments.length + 1,
       title: appointmentTitle,
@@ -81,13 +78,10 @@ export function AppointmentCalendar() {
       color: getRandomAppointmentColor()
     };
 
-    // Add to appointments array
     setAppointments([...appointments, newAppointment]);
     
-    // Show success toast
     toast.success("Appointment scheduled successfully!");
     
-    // Reset form and close dialog
     resetAppointmentForm();
     setDialogOpen(false);
   };
