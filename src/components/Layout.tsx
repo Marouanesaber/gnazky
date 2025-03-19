@@ -1,3 +1,4 @@
+
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
@@ -23,7 +24,7 @@ const Layout = () => {
     toast.success("You have been signed out", {
       duration: 3000,
     });
-    navigate("/login");
+    navigate("/logout");
   };
 
   // Preserve authentication when navigating to main page

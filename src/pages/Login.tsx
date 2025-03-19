@@ -14,7 +14,6 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [keepMeOnline, setKeepMeOnline] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -30,7 +29,7 @@ const Login = () => {
       // In a real app, you would validate credentials here
       if (email && password) {
         // Call the login function from AuthProvider
-        login(email, keepMeOnline);
+        login(email);
         
         // Show success toast
         toast.success("Login successful!", {
@@ -38,8 +37,8 @@ const Login = () => {
           className: "animate-slide-in-right"
         });
         
-        // Navigate to dashboard after a short delay
-        setTimeout(() => navigate("/dashboard"), 500);
+        // Navigate to home page after a short delay
+        setTimeout(() => navigate("/"), 500);
       } else {
         toast.error("Please enter valid credentials");
       }
@@ -116,19 +115,6 @@ const Login = () => {
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
                       Remember me
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="keepOnline" 
-                      checked={keepMeOnline}
-                      onCheckedChange={(checked) => setKeepMeOnline(checked as boolean)}
-                    />
-                    <label
-                      htmlFor="keepOnline"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Keep me online
                     </label>
                   </div>
                 </div>

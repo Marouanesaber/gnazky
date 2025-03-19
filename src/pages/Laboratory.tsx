@@ -1,471 +1,688 @@
 
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { SearchIcon, Filter, Plus, FileSpreadsheet, FileCheck, CircleAlert, BarChart3, Beaker, Microscope, TestTube } from "lucide-react";
 import { toast } from "sonner";
 
-const laboratoryTests = [
-  { id: 7, petId: "OVHMS0009", test: "Electrolyte Panel", findings: "", by: "Admin Admin", date: "2025-02-08 15:41:00", status: "Pending" },
-  { id: 6, petId: "OVHMS0011", test: "Electrolyte Panel", findings: "szxdcftgyvbhunjko", by: "Admin Admin", date: "2025-01-05 11:41:00", status: "Pending" },
-  { id: 5, petId: "OVHMS0008", test: "Complete Blood Count (CBC)", findings: "", by: "Admin Admin", date: "2024-12-23 14:43:00", status: "Pending" },
-  { id: 4, petId: "OVHMS0003", test: "Complete Blood Count (CBC)", findings: "n mn mn", by: "Admin Admin", date: "2024-05-01 10:03:00", status: "Pending" },
-  { id: 3, petId: "OVHMS0001", test: "Complete Blood Count (CBC)", findings: "", by: "Admin Admin", date: "2024-02-20 12:35:00", status: "Pending" },
-  { id: 2, petId: "OVHMS0001", test: "Antibody Detection", findings: "", by: "Admin Admin", date: "2023-12-14 10:54:00", status: "Pending" },
-  { id: 1, petId: "OVHMS0001", test: "Bacterial Culture and Sensitivity", findings: "", by: "Admin Admin", date: "2023-12-11 15:15:00", status: "Pending" },
+// Sample test types
+const testTypes = [
+  { id: 1, name: "Complete Blood Count (CBC)", category: "hematology", price: 85 },
+  { id: 2, name: "Blood Chemistry Panel", category: "chemistry", price: 120 },
+  { id: 3, name: "Urinalysis", category: "urine", price: 65 },
+  { id: 4, name: "Fecal Examination", category: "parasitology", price: 55 },
+  { id: 5, name: "Thyroid Panel", category: "endocrinology", price: 145 },
+  { id: 6, name: "Heartworm Test", category: "infectious disease", price: 70 },
+  { id: 7, name: "FeLV/FIV Test", category: "infectious disease", price: 80 },
+  { id: 8, name: "Skin Scrape/Cytology", category: "dermatology", price: 90 },
+  { id: 9, name: "Ear Cytology", category: "dermatology", price: 75 },
+  { id: 10, name: "Fine Needle Aspirate", category: "cytology", price: 110 }
+];
+
+// Sample lab tests
+const initialTests = [
+  { id: 1, testId: 1, petName: "Max", petOwner: "John Doe", date: "2023-09-15", status: "completed", results: "Normal", doctor: "Dr. Smith" },
+  { id: 2, testId: 3, petName: "Luna", petOwner: "Jane Smith", date: "2023-09-16", status: "pending", results: "", doctor: "Dr. Jones" },
+  { id: 3, testId: 2, petName: "Buddy", petOwner: "Mike Johnson", date: "2023-09-14", status: "in_progress", results: "", doctor: "Dr. Smith" },
+  { id: 4, testId: 7, petName: "Whiskers", petOwner: "Sarah Williams", date: "2023-09-17", status: "attention", results: "Abnormal values detected", doctor: "Dr. Jones" },
+  { id: 5, testId: 5, petName: "Rocky", petOwner: "David Miller", date: "2023-09-13", status: "completed", results: "Normal", doctor: "Dr. Smith" }
+];
+
+// Sample pets for dropdown
+const pets = [
+  { id: 1, name: "Max", owner: "John Doe", species: "Dog", breed: "Golden Retriever" },
+  { id: 2, name: "Luna", owner: "Jane Smith", species: "Cat", breed: "Siamese" },
+  { id: 3, name: "Buddy", owner: "Mike Johnson", species: "Dog", breed: "German Shepherd" },
+  { id: 4, name: "Whiskers", owner: "Sarah Williams", species: "Cat", breed: "Maine Coon" },
+  { id: 5, name: "Rocky", owner: "David Miller", species: "Dog", breed: "Bulldog" }
 ];
 
 const LaboratoryPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [entriesPerPage, setEntriesPerPage] = useState("25");
-  const [currentLocation, setCurrentLocation] = useState("");
+  const [labTests, setLabTests] = useState(initialTests);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [isNewTestDialogOpen, setIsNewTestDialogOpen] = useState(false);
+  const [isViewResultsDialogOpen, setIsViewResultsDialogOpen] = useState(false);
+  const [isUpdateResultsDialogOpen, setIsUpdateResultsDialogOpen] = useState(false);
   const [selectedTest, setSelectedTest] = useState<any>(null);
-  const [isAddRecordOpen, setIsAddRecordOpen] = useState(false);
-  const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Filter lab tests based on search term
-  const filteredTests = laboratoryTests.filter(test => 
-    test.petId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    test.test.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Form states
+  const [newTest, setNewTest] = useState({
+    petId: "",
+    testId: "",
+    notes: ""
+  });
 
-  const handleDelete = () => {
-    toast.success(`Test #${selectedTest?.id} has been deleted`);
-    setIsDeleteDialogOpen(false);
+  const [testResults, setTestResults] = useState({
+    results: "",
+    notes: ""
+  });
+
+  // Filtered tests based on search and filters
+  const filteredTests = labTests.filter(test => {
+    const matchesSearch = 
+      test.petName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      test.petOwner.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStatus = selectedStatus === "all" || test.status === selectedStatus;
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleAddTest = () => {
+    if (!newTest.petId || !newTest.testId) {
+      toast.error("Please select both a pet and a test type");
+      return;
+    }
+
+    const pet = pets.find(p => p.id.toString() === newTest.petId);
+    const testType = testTypes.find(t => t.id.toString() === newTest.testId);
+
+    if (!pet || !testType) return;
+
+    const newLabTest = {
+      id: labTests.length + 1,
+      testId: parseInt(newTest.testId),
+      petName: pet.name,
+      petOwner: pet.owner,
+      date: new Date().toISOString().split('T')[0],
+      status: "pending",
+      results: "",
+      doctor: "Dr. Smith" // In a real app, this would be the logged-in doctor
+    };
+
+    setLabTests([...labTests, newLabTest]);
+    setIsNewTestDialogOpen(false);
+    setNewTest({ petId: "", testId: "", notes: "" });
+    toast.success("New lab test has been registered");
   };
 
-  const handleAddRecord = () => {
-    toast.success("New record has been added");
-    setIsAddRecordOpen(false);
+  const handleViewResults = (test: any) => {
+    setSelectedTest(test);
+    setIsViewResultsDialogOpen(true);
   };
 
-  const handleAddRequest = () => {
-    toast.success("New request has been added");
-    setIsAddRequestOpen(false);
+  const handleUpdateResults = (test: any) => {
+    setSelectedTest(test);
+    setTestResults({
+      results: test.results || "",
+      notes: ""
+    });
+    setIsUpdateResultsDialogOpen(true);
   };
 
-  const handleEdit = () => {
-    toast.success(`Test #${selectedTest?.id} has been updated`);
-    setIsEditDialogOpen(false);
+  const handleSaveResults = () => {
+    if (!testResults.results) {
+      toast.error("Please enter test results");
+      return;
+    }
+
+    const updatedTests = labTests.map(test => {
+      if (test.id === selectedTest.id) {
+        return {
+          ...test,
+          results: testResults.results,
+          status: "completed"
+        };
+      }
+      return test;
+    });
+
+    setLabTests(updatedTests);
+    setIsUpdateResultsDialogOpen(false);
+    toast.success("Test results have been updated");
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Badge className="bg-yellow-500">Pending</Badge>;
+      case "in_progress":
+        return <Badge className="bg-blue-500">In Progress</Badge>;
+      case "completed":
+        return <Badge className="bg-green-500">Completed</Badge>;
+      case "attention":
+        return <Badge className="bg-red-500">Needs Attention</Badge>;
+      default:
+        return <Badge>Unknown</Badge>;
+    }
+  };
+
+  const getTestIcon = (testId: number) => {
+    const test = testTypes.find(t => t.id === testId);
+    if (!test) return <Beaker className="h-5 w-5" />;
+
+    switch (test.category) {
+      case "hematology":
+        return <TestTube className="h-5 w-5 text-red-500" />;
+      case "chemistry":
+        return <Beaker className="h-5 w-5 text-blue-500" />;
+      case "urine":
+        return <Beaker className="h-5 w-5 text-yellow-500" />;
+      case "parasitology":
+        return <Microscope className="h-5 w-5 text-green-500" />;
+      case "endocrinology":
+        return <BarChart3 className="h-5 w-5 text-purple-500" />;
+      case "infectious disease":
+        return <CircleAlert className="h-5 w-5 text-red-500" />;
+      case "dermatology":
+        return <Microscope className="h-5 w-5 text-orange-500" />;
+      case "cytology":
+        return <Microscope className="h-5 w-5 text-teal-500" />;
+      default:
+        return <Beaker className="h-5 w-5" />;
+    }
   };
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Laboratory</h1>
-        <div className="flex items-center text-sm text-muted-foreground">
-          <span>Dashboard</span>
-          <span className="mx-2">›</span>
-          <span>Laboratory</span>
-        </div>
+        <Button onClick={() => setIsNewTestDialogOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          New Lab Test
+        </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Dialog open={isAddRecordOpen} onOpenChange={setIsAddRecordOpen}>
-          <DialogTrigger asChild>
-            <Button variant="default" className="bg-blue-500 hover:bg-blue-600 transition-all animate-fade-in [animation-delay:100ms]">
-              Add Record
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[550px]">
-            <DialogHeader>
-              <DialogTitle>Add Laboratory Record</DialogTitle>
-              <DialogDescription>
-                Add a new laboratory test record for a pet.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="petId" className="text-right">
-                  Pet ID
-                </Label>
-                <Select>
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select pet ID" />
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle>Lab Tests Management</CardTitle>
+          <CardDescription>
+            View and manage laboratory tests and results
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
+            <div className="relative w-full md:w-auto">
+              <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by pet or owner name..."
+                className="w-full md:w-[350px] pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <div className="w-full md:w-[180px]">
+                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="OVHMS0001">OVHMS0001</SelectItem>
-                    <SelectItem value="OVHMS0003">OVHMS0003</SelectItem>
-                    <SelectItem value="OVHMS0008">OVHMS0008</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="attention">Needs Attention</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="testType" className="text-right">
-                  Test Type
-                </Label>
-                <Select>
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select test type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cbc">Complete Blood Count (CBC)</SelectItem>
-                    <SelectItem value="electrolyte">Electrolyte Panel</SelectItem>
-                    <SelectItem value="antibody">Antibody Detection</SelectItem>
-                    <SelectItem value="bacterial">Bacterial Culture and Sensitivity</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="findings" className="text-right">
-                  Findings
-                </Label>
-                <Textarea className="col-span-3" placeholder="Enter test findings" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="date" className="text-right">
-                  Date & Time
-                </Label>
-                <Input type="datetime-local" className="col-span-3" />
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddRecordOpen(false)}>Cancel</Button>
-              <Button onClick={handleAddRecord}>Save Record</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={isAddRequestOpen} onOpenChange={setIsAddRequestOpen}>
-          <DialogTrigger asChild>
-            <Button variant="default" className="bg-blue-500 hover:bg-blue-600 transition-all animate-fade-in [animation-delay:200ms]">
-              Add Request
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[550px]">
-            <DialogHeader>
-              <DialogTitle>Add Laboratory Request</DialogTitle>
-              <DialogDescription>
-                Request a new laboratory test for a pet.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="petId" className="text-right">
-                  Pet ID
-                </Label>
-                <Select>
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select pet ID" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="OVHMS0001">OVHMS0001</SelectItem>
-                    <SelectItem value="OVHMS0003">OVHMS0003</SelectItem>
-                    <SelectItem value="OVHMS0008">OVHMS0008</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="testType" className="text-right">
-                  Test Type
-                </Label>
-                <Select>
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select test type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cbc">Complete Blood Count (CBC)</SelectItem>
-                    <SelectItem value="electrolyte">Electrolyte Panel</SelectItem>
-                    <SelectItem value="antibody">Antibody Detection</SelectItem>
-                    <SelectItem value="bacterial">Bacterial Culture and Sensitivity</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="urgency" className="text-right">
-                  Urgency
-                </Label>
-                <Select>
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select urgency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="routine">Routine</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
-                    <SelectItem value="emergency">Emergency</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="notes" className="text-right">
-                  Notes
-                </Label>
-                <Textarea className="col-span-3" placeholder="Additional notes" />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddRequestOpen(false)}>Cancel</Button>
-              <Button onClick={handleAddRequest}>Submit Request</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-4 md:items-end justify-between mt-4">
-        <div className="w-full md:w-64">
-          <label htmlFor="location" className="block text-sm text-muted-foreground mb-1">
-            Sort by Current Location
-          </label>
-          <Select value={currentLocation} onValueChange={setCurrentLocation}>
-            <SelectTrigger id="location" className="w-full">
-              <SelectValue placeholder="Current Location" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="location1">Main Clinic</SelectItem>
-              <SelectItem value="location2">Downtown Branch</SelectItem>
-              <SelectItem value="location3">Northside Office</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Show</span>
-          <Select value={entriesPerPage} onValueChange={setEntriesPerPage}>
-            <SelectTrigger className="w-16">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="25">25</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
-          <span className="text-sm text-muted-foreground">entries</span>
-        </div>
-
-        <div className="w-full md:w-64">
-          <label htmlFor="search" className="block text-sm text-muted-foreground mb-1">
-            Search:
-          </label>
-          <Input
-            id="search"
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search..."
-            className="w-full"
-          />
-        </div>
-      </div>
-
-      <Card className="shadow-sm border animate-fade-in [animation-delay:200ms]">
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-muted/40 border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm">#</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Pet Hospital ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Type of Test</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Lab Findings</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Request/ Test By</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Date & Time</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Request Status</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTests.map((test) => (
-                  <tr key={test.id} className="border-b hover:bg-muted/20 transition-colors">
-                    <td className="py-3 px-4">{test.id}</td>
-                    <td className="py-3 px-4">{test.petId}</td>
-                    <td className="py-3 px-4">{test.test}</td>
-                    <td className="py-3 px-4">{test.findings || "-"}</td>
-                    <td className="py-3 px-4">{test.by}</td>
-                    <td className="py-3 px-4">{test.date}</td>
-                    <td className="py-3 px-4">
-                      <span className="inline-block px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">
-                        {test.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-1">
-                        <Dialog open={isEditDialogOpen && selectedTest?.id === test.id} onOpenChange={(open) => !open && setIsEditDialogOpen(false)}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="default" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 bg-blue-500 animate-fade-in"
-                              onClick={() => {
-                                setSelectedTest(test);
-                                setIsEditDialogOpen(true);
-                              }}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Edit Laboratory Test</DialogTitle>
-                              <DialogDescription>
-                                Update the laboratory test information.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right">Pet ID</Label>
-                                <div className="col-span-3">
-                                  <Input value={selectedTest?.petId} readOnly />
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right">Test Type</Label>
-                                <div className="col-span-3">
-                                  <Input value={selectedTest?.test} readOnly />
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right">Findings</Label>
-                                <Textarea 
-                                  className="col-span-3" 
-                                  defaultValue={selectedTest?.findings} 
-                                />
-                              </div>
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right">Status</Label>
-                                <div className="col-span-3">
-                                  <Select defaultValue={selectedTest?.status}>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="Pending">Pending</SelectItem>
-                                      <SelectItem value="Completed">Completed</SelectItem>
-                                      <SelectItem value="Cancelled">Cancelled</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              </div>
-                            </div>
-                            <DialogFooter>
-                              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
-                              <Button onClick={handleEdit}>Save Changes</Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-
-                        <Dialog open={isViewDialogOpen && selectedTest?.id === test.id} onOpenChange={(open) => !open && setIsViewDialogOpen(false)}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="default" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 bg-blue-500 animate-fade-in [animation-delay:100ms]"
-                              onClick={() => {
-                                setSelectedTest(test);
-                                setIsViewDialogOpen(true);
-                              }}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Laboratory Test Details</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4 py-4">
-                              <div className="grid grid-cols-3 gap-2">
-                                <div className="text-sm font-medium">Test ID:</div>
-                                <div className="col-span-2">{selectedTest?.id}</div>
-                              </div>
-                              <div className="grid grid-cols-3 gap-2">
-                                <div className="text-sm font-medium">Pet ID:</div>
-                                <div className="col-span-2">{selectedTest?.petId}</div>
-                              </div>
-                              <div className="grid grid-cols-3 gap-2">
-                                <div className="text-sm font-medium">Test Type:</div>
-                                <div className="col-span-2">{selectedTest?.test}</div>
-                              </div>
-                              <div className="grid grid-cols-3 gap-2">
-                                <div className="text-sm font-medium">Findings:</div>
-                                <div className="col-span-2">{selectedTest?.findings || "No findings recorded"}</div>
-                              </div>
-                              <div className="grid grid-cols-3 gap-2">
-                                <div className="text-sm font-medium">Requested By:</div>
-                                <div className="col-span-2">{selectedTest?.by}</div>
-                              </div>
-                              <div className="grid grid-cols-3 gap-2">
-                                <div className="text-sm font-medium">Date & Time:</div>
-                                <div className="col-span-2">{selectedTest?.date}</div>
-                              </div>
-                              <div className="grid grid-cols-3 gap-2">
-                                <div className="text-sm font-medium">Status:</div>
-                                <div className="col-span-2">
-                                  <span className="inline-block px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">
-                                    {selectedTest?.status}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <DialogFooter>
-                              <Button onClick={() => setIsViewDialogOpen(false)}>Close</Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-
-                        <Dialog open={isDeleteDialogOpen && selectedTest?.id === test.id} onOpenChange={(open) => !open && setIsDeleteDialogOpen(false)}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="default" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 bg-red-500 animate-fade-in [animation-delay:200ms]"
-                              onClick={() => {
-                                setSelectedTest(test);
-                                setIsDeleteDialogOpen(true);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Delete Laboratory Test</DialogTitle>
-                              <DialogDescription>
-                                Are you sure you want to delete this laboratory test? This action cannot be undone.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
-                              <Button variant="destructive" onClick={handleDelete}>Delete</Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
+
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="all">All Tests</TabsTrigger>
+              <TabsTrigger value="pending">Pending</TabsTrigger>
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+              <TabsTrigger value="attention">Needs Attention</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="all" className="mt-4">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">ID</TableHead>
+                      <TableHead>Test</TableHead>
+                      <TableHead>Pet</TableHead>
+                      <TableHead>Owner</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Doctor</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTests.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-4 text-muted-foreground">
+                          No lab tests found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredTests.map((test) => {
+                        const testType = testTypes.find(t => t.id === test.testId);
+                        return (
+                          <TableRow key={test.id} className="hover:bg-muted/30 transition-colors">
+                            <TableCell>{test.id}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {getTestIcon(test.testId)}
+                                <span>{testType?.name || "Unknown Test"}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{test.petName}</TableCell>
+                            <TableCell>{test.petOwner}</TableCell>
+                            <TableCell>{test.date}</TableCell>
+                            <TableCell>{getStatusBadge(test.status)}</TableCell>
+                            <TableCell>{test.doctor}</TableCell>
+                            <TableCell className="text-right space-x-2">
+                              {test.status === "completed" || test.status === "attention" ? (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleViewResults(test)}
+                                >
+                                  <FileCheck className="h-4 w-4 mr-1" />
+                                  View Results
+                                </Button>
+                              ) : (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleUpdateResults(test)}
+                                >
+                                  <FileSpreadsheet className="h-4 w-4 mr-1" />
+                                  Update Results
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="pending" className="mt-4">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">ID</TableHead>
+                      <TableHead>Test</TableHead>
+                      <TableHead>Pet</TableHead>
+                      <TableHead>Owner</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Doctor</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTests.filter(t => t.status === "pending").length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+                          No pending tests found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredTests
+                        .filter(t => t.status === "pending")
+                        .map((test) => {
+                          const testType = testTypes.find(t => t.id === test.testId);
+                          return (
+                            <TableRow key={test.id} className="hover:bg-muted/30 transition-colors">
+                              <TableCell>{test.id}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  {getTestIcon(test.testId)}
+                                  <span>{testType?.name || "Unknown Test"}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>{test.petName}</TableCell>
+                              <TableCell>{test.petOwner}</TableCell>
+                              <TableCell>{test.date}</TableCell>
+                              <TableCell>{test.doctor}</TableCell>
+                              <TableCell className="text-right">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleUpdateResults(test)}
+                                >
+                                  <FileSpreadsheet className="h-4 w-4 mr-1" />
+                                  Update Results
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="completed" className="mt-4">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">ID</TableHead>
+                      <TableHead>Test</TableHead>
+                      <TableHead>Pet</TableHead>
+                      <TableHead>Owner</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Doctor</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTests.filter(t => t.status === "completed").length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+                          No completed tests found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredTests
+                        .filter(t => t.status === "completed")
+                        .map((test) => {
+                          const testType = testTypes.find(t => t.id === test.testId);
+                          return (
+                            <TableRow key={test.id} className="hover:bg-muted/30 transition-colors">
+                              <TableCell>{test.id}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  {getTestIcon(test.testId)}
+                                  <span>{testType?.name || "Unknown Test"}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>{test.petName}</TableCell>
+                              <TableCell>{test.petOwner}</TableCell>
+                              <TableCell>{test.date}</TableCell>
+                              <TableCell>{test.doctor}</TableCell>
+                              <TableCell className="text-right">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleViewResults(test)}
+                                >
+                                  <FileCheck className="h-4 w-4 mr-1" />
+                                  View Results
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="attention" className="mt-4">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">ID</TableHead>
+                      <TableHead>Test</TableHead>
+                      <TableHead>Pet</TableHead>
+                      <TableHead>Owner</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Doctor</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTests.filter(t => t.status === "attention").length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+                          No tests needing attention found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredTests
+                        .filter(t => t.status === "attention")
+                        .map((test) => {
+                          const testType = testTypes.find(t => t.id === test.testId);
+                          return (
+                            <TableRow key={test.id} className="hover:bg-muted/30 transition-colors">
+                              <TableCell>{test.id}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  {getTestIcon(test.testId)}
+                                  <span>{testType?.name || "Unknown Test"}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>{test.petName}</TableCell>
+                              <TableCell>{test.petOwner}</TableCell>
+                              <TableCell>{test.date}</TableCell>
+                              <TableCell>{test.doctor}</TableCell>
+                              <TableCell className="text-right">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleViewResults(test)}
+                                >
+                                  <FileCheck className="h-4 w-4 mr-1" />
+                                  View Results
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <div>Showing 1 to {filteredTests.length} of {filteredTests.length} entries</div>
-        <div className="flex gap-1">
-          <Button variant="outline" size="sm" disabled className="text-sm h-8">
-            Previous
-          </Button>
-          <Button variant="default" size="sm" className="text-sm h-8 bg-blue-500">
-            1
-          </Button>
-          <Button variant="outline" size="sm" disabled className="text-sm h-8">
-            Next
-          </Button>
-        </div>
-      </div>
+      {/* New Lab Test Dialog */}
+      <Dialog open={isNewTestDialogOpen} onOpenChange={setIsNewTestDialogOpen}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>Request New Lab Test</DialogTitle>
+            <DialogDescription>
+              Fill in the details to request a new laboratory test
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="pet" className="text-right">
+                Pet
+              </Label>
+              <Select
+                value={newTest.petId}
+                onValueChange={(value) => setNewTest({...newTest, petId: value})}
+              >
+                <SelectTrigger id="pet" className="col-span-3">
+                  <SelectValue placeholder="Select pet" />
+                </SelectTrigger>
+                <SelectContent>
+                  {pets.map((pet) => (
+                    <SelectItem key={pet.id} value={pet.id.toString()}>
+                      {pet.name} ({pet.species} - {pet.owner})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="test-type" className="text-right">
+                Test Type
+              </Label>
+              <Select
+                value={newTest.testId}
+                onValueChange={(value) => setNewTest({...newTest, testId: value})}
+              >
+                <SelectTrigger id="test-type" className="col-span-3">
+                  <SelectValue placeholder="Select test type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {testTypes.map((test) => (
+                    <SelectItem key={test.id} value={test.id.toString()}>
+                      {test.name} (${test.price})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="notes" className="text-right pt-2">
+                Notes
+              </Label>
+              <Input
+                id="notes"
+                placeholder="Any special instructions or notes"
+                className="col-span-3"
+                value={newTest.notes}
+                onChange={(e) => setNewTest({...newTest, notes: e.target.value})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsNewTestDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddTest}>Submit Test Request</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      <div className="text-xs text-muted-foreground text-center py-4 border-t mt-8">
-        © 2025 All rights reserved. v4.3.8. Software Developed by FusionEdge™ Technologies
-      </div>
+      {/* View Test Results Dialog */}
+      <Dialog open={isViewResultsDialogOpen} onOpenChange={setIsViewResultsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Test Results</DialogTitle>
+            <DialogDescription>
+              {selectedTest && (
+                <>
+                  Test for {selectedTest.petName} ({testTypes.find(t => t.id === selectedTest.testId)?.name || "Unknown Test"})
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {selectedTest && (
+              <>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm font-medium">Pet Name:</p>
+                    <p className="text-sm">{selectedTest.petName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Owner:</p>
+                    <p className="text-sm">{selectedTest.petOwner}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Date:</p>
+                    <p className="text-sm">{selectedTest.date}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium">Test Type:</p>
+                    <p className="text-sm">{testTypes.find(t => t.id === selectedTest.testId)?.name || "Unknown Test"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Status:</p>
+                    <p className="text-sm">{getStatusBadge(selectedTest.status)}</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Results:</p>
+                  <div className="rounded-md border p-3 mt-1 bg-muted/20">
+                    <p className="text-sm whitespace-pre-wrap">{selectedTest.results}</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsViewResultsDialogOpen(false)}>Close</Button>
+            <Button 
+              onClick={() => {
+                setIsViewResultsDialogOpen(false);
+                handleUpdateResults(selectedTest);
+              }}
+            >
+              Edit Results
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Update Test Results Dialog */}
+      <Dialog open={isUpdateResultsDialogOpen} onOpenChange={setIsUpdateResultsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Update Test Results</DialogTitle>
+            <DialogDescription>
+              {selectedTest && (
+                <>
+                  Enter the results for {selectedTest.petName}'s {testTypes.find(t => t.id === selectedTest.testId)?.name || "test"}
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {selectedTest && (
+              <>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm font-medium">Pet Name:</p>
+                    <p className="text-sm">{selectedTest.petName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Owner:</p>
+                    <p className="text-sm">{selectedTest.petOwner}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Date:</p>
+                    <p className="text-sm">{selectedTest.date}</p>
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="results">Test Results</Label>
+                  <Input
+                    id="results"
+                    value={testResults.results}
+                    onChange={(e) => setTestResults({...testResults, results: e.target.value})}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="notes">Additional Notes</Label>
+                  <Input
+                    id="notes"
+                    value={testResults.notes}
+                    onChange={(e) => setTestResults({...testResults, notes: e.target.value})}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="abnormal" />
+                  <label
+                    htmlFor="abnormal"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Flag as abnormal (needs attention)
+                  </label>
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsUpdateResultsDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveResults}>Save Results</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

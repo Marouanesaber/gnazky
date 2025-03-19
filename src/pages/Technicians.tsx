@@ -1,215 +1,180 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Phone, Mail, Award, Stethoscope, GraduationCap, Clock, ChevronRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Mail, Phone, Linkedin, Globe, Calendar } from "lucide-react";
+import Navigation from "@/components/home/Navigation";
+import Footer from "@/components/home/Footer";
+
+const technicianData = [
+  {
+    id: 1,
+    name: "Dr. Sarah Johnson",
+    role: "Chief Veterinarian",
+    speciality: "Surgery, Internal Medicine",
+    experience: "15+ years",
+    education: "DVM, Cornell University",
+    bio: "Dr. Johnson is our senior veterinarian with extensive experience in small animal surgery and internal medicine. She has a special interest in cardiology and orthopedic procedures.",
+    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    email: "sarah.johnson@petclinic.com",
+    phone: "+1 (555) 123-4567",
+    linkedin: "sarahjohnson",
+    availability: "Monday-Thursday"
+  },
+  {
+    id: 2,
+    name: "Dr. Michael Chen",
+    role: "Veterinarian",
+    speciality: "Dermatology, Nutrition",
+    experience: "8 years",
+    education: "DVM, University of California",
+    bio: "Dr. Chen specializes in veterinary dermatology and nutrition. He has helped countless pets overcome allergies, skin conditions, and dietary challenges with his innovative treatment approaches.",
+    image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80",
+    email: "michael.chen@petclinic.com",
+    phone: "+1 (555) 234-5678",
+    linkedin: "michaelchen",
+    availability: "Tuesday-Saturday"
+  },
+  {
+    id: 3,
+    name: "Dr. Emily Rodriguez",
+    role: "Veterinarian",
+    speciality: "Exotic Pets, Avian Medicine",
+    experience: "10 years",
+    education: "DVM, Colorado State University",
+    bio: "Dr. Rodriguez is our exotic animal specialist, with extensive training in the care of birds, reptiles, amphibians, and small mammals. She's passionate about educating pet owners on proper care for these unique companions.",
+    image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    email: "emily.rodriguez@petclinic.com",
+    phone: "+1 (555) 345-6789",
+    linkedin: "emilyrodriguez",
+    availability: "Monday, Wednesday, Friday"
+  },
+  {
+    id: 4,
+    name: "Dr. James Wilson",
+    role: "Veterinary Dentist",
+    speciality: "Dental Surgery, Oral Health",
+    experience: "12 years",
+    education: "DVM, University of Pennsylvania",
+    bio: "Dr. Wilson is our dental specialist, focusing exclusively on pet oral health. From routine cleanings to complex dental surgeries, he's dedicated to ensuring your pet's mouth stays healthy and pain-free.",
+    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    email: "james.wilson@petclinic.com",
+    phone: "+1 (555) 456-7890",
+    linkedin: "jameswilson",
+    availability: "Thursday-Sunday"
+  }
+];
 
 const Technicians = () => {
-  const team = [
-    {
-      name: "Dr. Emily Johnson",
-      role: "Lead Veterinarian",
-      specialization: "Small Animal Medicine",
-      experience: "12 years",
-      education: "University of California, Davis",
-      email: "emily.johnson@fluffycare.com",
-      phone: "(555) 123-4567",
-      color: "bg-blue-100",
-      gradient: "from-blue-500 to-cyan-400",
-      quote: "Helping pets live their best lives is my passion. I believe in preventative care and client education."
-    },
-    {
-      name: "Dr. Michael Chen",
-      role: "Veterinary Surgeon",
-      specialization: "Orthopedic Surgery",
-      experience: "8 years",
-      education: "Cornell University",
-      email: "michael.chen@fluffycare.com",
-      phone: "(555) 234-5678",
-      color: "bg-green-100",
-      gradient: "from-green-500 to-emerald-400",
-      quote: "I specialize in complex surgeries that improve mobility and quality of life for our animal patients."
-    },
-    {
-      name: "Sarah Wilson",
-      role: "Veterinary Technician",
-      specialization: "Emergency Care",
-      experience: "6 years",
-      education: "Purdue University",
-      email: "sarah.wilson@fluffycare.com",
-      phone: "(555) 345-6789",
-      color: "bg-purple-100",
-      gradient: "from-purple-500 to-violet-400",
-      quote: "My goal is to provide calm, compassionate care for pets during their most stressful moments."
-    },
-    {
-      name: "James Rodriguez",
-      role: "Veterinary Assistant",
-      specialization: "Animal Behavior",
-      experience: "4 years",
-      education: "Colorado State University",
-      email: "james.rodriguez@fluffycare.com",
-      phone: "(555) 456-7890",
-      color: "bg-amber-100",
-      gradient: "from-amber-500 to-yellow-400",
-      quote: "Understanding pet behavior helps us provide better care and helps owners build stronger relationships with their pets."
-    },
-    {
-      name: "Dr. Olivia Park",
-      role: "Veterinary Dentist",
-      specialization: "Dental Surgery",
-      experience: "7 years",
-      education: "University of Pennsylvania",
-      email: "olivia.park@fluffycare.com",
-      phone: "(555) 567-8901",
-      color: "bg-red-100",
-      gradient: "from-red-500 to-rose-400",
-      quote: "Dental health is vital to your pet's overall wellbeing. I'm dedicated to providing pain-free dental care."
-    },
-    {
-      name: "Thomas Wright",
-      role: "Pet Nutritionist",
-      specialization: "Dietary Management",
-      experience: "5 years",
-      education: "Ohio State University",
-      email: "thomas.wright@fluffycare.com",
-      phone: "(555) 678-9012",
-      color: "bg-teal-100",
-      gradient: "from-teal-500 to-cyan-400",
-      quote: "Proper nutrition is the foundation of pet health. I love helping pet parents find the right diet for their companions."
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-white to-blue-50">
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,rgba(255,255,255,0.5),rgba(255,255,255,0.8))] -z-10"></div>
-        
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <Link to="/" className="inline-flex items-center text-blue-600 mb-8 transition-all hover:text-blue-800 hover:translate-x-[-5px] duration-300">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Link>
-          
-          <div className="text-center mb-16 animate-fade-in">
-            <Badge variant="outline" className="mb-4 px-3 py-1 text-purple-600 border-purple-200 bg-purple-50">Our Team</Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
-              Meet Our Expert Technicians
-            </h1>
-            <p className="text-slate-600 max-w-3xl mx-auto text-lg">
-              Our team of highly qualified veterinarians and technicians are committed to providing exceptional care for your beloved pets.
+    <div className="flex flex-col min-h-screen">
+      <Navigation />
+      
+      <main className="flex-grow pt-24 animate-fade-in">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-b from-blue-50 to-white py-16 px-6">
+          <div className="container mx-auto text-center max-w-3xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-blue-600 animate-fade-in">Meet Our Veterinary Team</h1>
+            <p className="text-lg text-gray-700 mb-8 animate-fade-in [animation-delay:200ms]">
+              Our highly skilled veterinarians and technicians are dedicated to providing the best possible care for your beloved pets.
             </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {team.map((member, index) => (
-              <Card key={index} className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-slide-in" style={{animationDelay: `${index * 0.1}s`}}>
-                <div className={`h-2 bg-gradient-to-r ${member.gradient}`}></div>
-                <CardHeader className="relative pt-8">
-                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                    <Avatar className="h-16 w-16 border-4 border-white shadow-md">
-                      <AvatarFallback className={`bg-gradient-to-r ${member.gradient} text-white`}>
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div className="text-center pt-4">
-                    <CardTitle className="text-xl mb-1">{member.name}</CardTitle>
-                    <Badge variant="outline" className={`${member.color} border-0 text-gray-700`}>
-                      {member.role}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm italic mb-4 text-center">"{member.quote}"</p>
-                  
-                  <div className="space-y-3 text-gray-700">
-                    <div className="flex items-center gap-2">
-                      <Stethoscope className="h-4 w-4 text-blue-500" />
-                      <p><span className="font-medium">Specialization:</span> {member.specialization}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-blue-500" />
-                      <p><span className="font-medium">Experience:</span> {member.experience}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <GraduationCap className="h-4 w-4 text-blue-500" />
-                      <p><span className="font-medium">Education:</span> {member.education}</p>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between border-t pt-4">
-                  <Button variant="ghost" size="sm" className="text-blue-600 flex items-center gap-1 hover:bg-blue-50">
-                    <Mail className="h-3.5 w-3.5" />
-                    <span>Email</span>
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-blue-600 flex items-center gap-1 hover:bg-blue-50">
-                    <Phone className="h-3.5 w-3.5" />
-                    <span>Call</span>
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-blue-600 flex items-center gap-1 hover:bg-blue-50">
-                    <span>Profile</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-          
-          <div className="bg-white rounded-xl p-8 shadow-lg mb-12 animate-fade-in">
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold mb-4">Why Choose Our Team?</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Our veterinary professionals bring a wealth of experience and specialized knowledge to provide the highest quality care for your pets.
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="border border-gray-100 rounded-lg p-6 text-center hover:shadow-md transition-all">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Award className="h-6 w-6 text-blue-600" />
-                </div>
-                <h3 className="font-semibold mb-2">Certified Experts</h3>
-                <p className="text-sm text-gray-600">All our veterinarians are board-certified with specialized training.</p>
-              </div>
-              
-              <div className="border border-gray-100 rounded-lg p-6 text-center hover:shadow-md transition-all">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="h-6 w-6 text-green-600" />
-                </div>
-                <h3 className="font-semibold mb-2">Years of Experience</h3>
-                <p className="text-sm text-gray-600">Our team has over 40 years of combined veterinary experience.</p>
-              </div>
-              
-              <div className="border border-gray-100 rounded-lg p-6 text-center hover:shadow-md transition-all">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <GraduationCap className="h-6 w-6 text-purple-600" />
-                </div>
-                <h3 className="font-semibold mb-2">Continuing Education</h3>
-                <p className="text-sm text-gray-600">We stay updated with the latest advancements in veterinary medicine.</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-6 sm:gap-0 sm:justify-between items-center bg-gradient-to-r from-purple-600 to-blue-600 p-8 rounded-xl text-white shadow-lg animate-fade-in">
-            <div>
-              <h3 className="text-2xl font-bold mb-2">Want to join our team?</h3>
-              <p className="text-blue-100">We're always looking for talented veterinary professionals to join our growing practice</p>
-            </div>
-            <div className="flex gap-3">
-              <Button className="bg-white text-blue-600 hover:bg-blue-50">
-                <Link to="/contact-us">Contact Us</Link>
+            <div className="flex flex-wrap gap-4 justify-center animate-fade-in [animation-delay:400ms]">
+              <Button className="bg-blue-600">
+                Book an Appointment
               </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white/20">
-                <Link to="/">Return Home</Link>
+              <Button variant="outline">
+                Learn More
               </Button>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+        
+        {/* Technicians Grid */}
+        <section className="py-16 px-6 bg-white">
+          <div className="container mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {technicianData.map((tech, index) => (
+                <Card key={tech.id} className="overflow-hidden transition-transform hover:shadow-lg animate-fade-in" style={{ animationDelay: `${index * 150}ms` }}>
+                  <div className="md:flex">
+                    <div className="md:w-1/3 h-64 md:h-auto relative">
+                      <img 
+                        src={tech.image} 
+                        alt={tech.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="md:w-2/3">
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-xl">{tech.name}</CardTitle>
+                            <CardDescription>{tech.role}</CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span className="font-semibold text-gray-700">Speciality:</span> {tech.speciality}
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span className="font-semibold text-gray-700">Experience:</span> {tech.experience}
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span className="font-semibold text-gray-700">Education:</span> {tech.education}
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-600 line-clamp-3">
+                          {tech.bio}
+                        </p>
+                      </CardContent>
+                      <CardFooter className="flex flex-col items-start gap-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Mail className="h-4 w-4 text-blue-600" />
+                          <a href={`mailto:${tech.email}`} className="text-blue-600 hover:underline">{tech.email}</a>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Phone className="h-4 w-4 text-blue-600" />
+                          <a href={`tel:${tech.phone}`} className="hover:underline">{tech.phone}</a>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Calendar className="h-4 w-4 text-blue-600" />
+                          <span>Available: {tech.availability}</span>
+                        </div>
+                        <div className="flex mt-3 space-x-2">
+                          <Button size="sm" variant="outline" className="gap-1">
+                            <Linkedin className="h-4 w-4" />
+                            LinkedIn
+                          </Button>
+                          <Button size="sm" className="bg-blue-600 gap-1">
+                            Book Appointment
+                          </Button>
+                        </div>
+                      </CardFooter>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* CTA Section */}
+        <section className="py-16 px-6 bg-blue-50">
+          <div className="container mx-auto text-center max-w-3xl">
+            <h2 className="text-3xl font-bold mb-4">Ready to Schedule a Visit?</h2>
+            <p className="text-lg text-gray-700 mb-8">
+              Our veterinary professionals are available to provide excellent care for your pets.
+            </p>
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 font-medium py-2 px-6 rounded-full">
+              Book an Appointment Today
+            </Button>
+          </div>
+        </section>
+      </main>
+      
+      <Footer />
     </div>
   );
 };

@@ -32,7 +32,7 @@ const Navigation = () => {
 
   const handleSignOut = () => {
     logout();
-    navigate("/");
+    navigate("/logout");
   };
 
   return (

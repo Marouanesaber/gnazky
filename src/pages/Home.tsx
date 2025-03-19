@@ -6,6 +6,7 @@ import ServicesSection from "@/components/home/ServicesSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import ContactSection from "@/components/home/ContactSection";
 import NewsletterSection from "@/components/home/NewsletterSection";
+import PetGallery from "@/components/home/PetGallery";
 import Footer from "@/components/home/Footer";
 import NewsletterBanner from "@/components/home/NewsletterBanner";
 
@@ -15,6 +16,7 @@ const Home = () => {
       <Navigation />
       <HeroSection />
       <ServicesSection />
+      <PetGallery />
       <TestimonialsSection />
       <ContactSection />
       <NewsletterSection />
