@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Navigation from "@/components/home/Navigation";
 import Footer from "@/components/home/Footer";
@@ -31,7 +30,6 @@ import {
   Rabbit
 } from "lucide-react";
 import { toast } from "sonner";
-import { ShadowInner } from "lucide-react";
 
 const BookAppointment = () => {
   const [step, setStep] = useState(1);
@@ -66,7 +64,6 @@ const BookAppointment = () => {
       return false;
     }
     
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       toast.error("Please enter a valid email address");
@@ -109,10 +106,9 @@ const BookAppointment = () => {
     
     setIsSubmitting(true);
     
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      setStep(4); // Move to success step
+      setStep(4);
       window.scrollTo(0, 0);
     }, 1500);
   };
@@ -147,7 +143,6 @@ const BookAppointment = () => {
             </div>
           </div>
           
-          {/* Progress Steps */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-2">
               {[1, 2, 3, 4].map((i) => (
@@ -421,7 +416,6 @@ const BookAppointment = () => {
                             disabled={(date) => {
                               const today = new Date();
                               today.setHours(0, 0, 0, 0);
-                              // Disable past dates and Sundays
                               return date < today || date.getDay() === 0;
                             }}
                             initialFocus
@@ -579,7 +573,6 @@ const BookAppointment = () => {
             )}
           </Card>
           
-          {/* Information Cards */}
           {step < 4 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
               <Card className="shadow-sm">
@@ -659,3 +652,4 @@ const BookAppointment = () => {
 };
 
 export default BookAppointment;
+
