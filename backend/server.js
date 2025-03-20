@@ -20,8 +20,8 @@ app.use(express.json());
 // Database connection
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'root',
-  password: 'your_password', // Change this to your MySQL password
+  user: 'root',     // Update this with your MySQL username
+  password: '',     // Update this with your MySQL password
   database: 'pet_clinic'
 });
 
