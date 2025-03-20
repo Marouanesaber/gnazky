@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { LogOut, LayoutDashboard } from "lucide-react";
+import { LogOut, LayoutDashboard, PawPrint } from "lucide-react";
 
 const Navigation = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -39,7 +39,10 @@ const Navigation = () => {
     <header className={`py-4 px-6 fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 shadow-md backdrop-blur-sm' : 'bg-white'}`}>
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center animate-fade-in">
-          <Link to="/" className="font-bold text-xl text-blue-600 transition-all hover:scale-105">PetClinic</Link>
+          <Link to="/" className="font-bold text-xl text-blue-600 transition-all hover:scale-105 flex items-center gap-2">
+            <PawPrint className="h-6 w-6 text-blue-600" />
+            <span>PetClinic</span>
+          </Link>
         </div>
         <nav className="hidden md:flex items-center space-x-6">
           {['Home', 'Book Appointment', 'Services', 'Technicians', 'Contact Us'].map((item, index) => (

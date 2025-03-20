@@ -8,7 +8,6 @@ import ContactSection from "@/components/home/ContactSection";
 import NewsletterSection from "@/components/home/NewsletterSection";
 import PetGallery from "@/components/home/PetGallery";
 import Footer from "@/components/home/Footer";
-import NewsletterBanner from "@/components/home/NewsletterBanner";
 
 const Home = () => {
   return (
@@ -21,7 +20,6 @@ const Home = () => {
       <ContactSection />
       <NewsletterSection />
       <Footer />
-      <NewsletterBanner />
     </div>
   );
 };

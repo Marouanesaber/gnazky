@@ -2,8 +2,9 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Mail, Phone, Linkedin, Globe, Calendar } from "lucide-react";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/home/Navigation";
 import Footer from "@/components/home/Footer";
 
@@ -67,6 +68,28 @@ const technicianData = [
 ];
 
 const Technicians = () => {
+  const navigate = useNavigate();
+
+  const handleBookAppointment = (doctorName: string) => {
+    toast.success(`Booking appointment with ${doctorName}`);
+    navigate("/book-appointment");
+  };
+
+  const handleContactDoctor = (email: string) => {
+    window.location.href = `mailto:${email}`;
+    toast.success("Opening email client");
+  };
+
+  const handleCallDoctor = (phone: string) => {
+    window.location.href = `tel:${phone}`;
+    toast.success("Opening phone dialer");
+  };
+
+  const handleLinkedIn = (username: string) => {
+    window.open(`https://linkedin.com/in/${username}`, "_blank");
+    toast.success("Opening LinkedIn profile");
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navigation />
@@ -80,10 +103,16 @@ const Technicians = () => {
               Our highly skilled veterinarians and technicians are dedicated to providing the best possible care for your beloved pets.
             </p>
             <div className="flex flex-wrap gap-4 justify-center animate-fade-in [animation-delay:400ms]">
-              <Button className="bg-blue-600">
+              <Button 
+                className="bg-blue-600" 
+                onClick={() => navigate("/book-appointment")}
+              >
                 Book an Appointment
               </Button>
-              <Button variant="outline">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/services")}
+              >
                 Learn More
               </Button>
             </div>
@@ -132,22 +161,49 @@ const Technicians = () => {
                       <CardFooter className="flex flex-col items-start gap-2">
                         <div className="flex items-center gap-2 text-sm">
                           <Mail className="h-4 w-4 text-blue-600" />
-                          <a href={`mailto:${tech.email}`} className="text-blue-600 hover:underline">{tech.email}</a>
+                          <a 
+                            href={`mailto:${tech.email}`} 
+                            className="text-blue-600 hover:underline" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleContactDoctor(tech.email);
+                            }}
+                          >
+                            {tech.email}
+                          </a>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <Phone className="h-4 w-4 text-blue-600" />
-                          <a href={`tel:${tech.phone}`} className="hover:underline">{tech.phone}</a>
+                          <a 
+                            href={`tel:${tech.phone}`} 
+                            className="hover:underline"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleCallDoctor(tech.phone);
+                            }}
+                          >
+                            {tech.phone}
+                          </a>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <Calendar className="h-4 w-4 text-blue-600" />
                           <span>Available: {tech.availability}</span>
                         </div>
                         <div className="flex mt-3 space-x-2">
-                          <Button size="sm" variant="outline" className="gap-1">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="gap-1"
+                            onClick={() => handleLinkedIn(tech.linkedin)}
+                          >
                             <Linkedin className="h-4 w-4" />
                             LinkedIn
                           </Button>
-                          <Button size="sm" className="bg-blue-600 gap-1">
+                          <Button 
+                            size="sm" 
+                            className="bg-blue-600 gap-1"
+                            onClick={() => handleBookAppointment(tech.name)}
+                          >
                             Book Appointment
                           </Button>
                         </div>
@@ -167,7 +223,11 @@ const Technicians = () => {
             <p className="text-lg text-gray-700 mb-8">
               Our veterinary professionals are available to provide excellent care for your pets.
             </p>
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 font-medium py-2 px-6 rounded-full">
+            <Button 
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700 font-medium py-2 px-6 rounded-full"
+              onClick={() => navigate("/book-appointment")}
+            >
               Book an Appointment Today
             </Button>
           </div>
