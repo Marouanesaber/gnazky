@@ -2,7 +2,7 @@
 // Owners controller
 
 // Get all owners
-exports.getAllOwners = (req, res) => {
+const getAllOwners = (req, res) => {
   const db = req.db;
   
   db.query('SELECT * FROM owners', (err, results) => {
@@ -16,7 +16,7 @@ exports.getAllOwners = (req, res) => {
 };
 
 // Get a single owner by ID
-exports.getOwnerById = (req, res) => {
+const getOwnerById = (req, res) => {
   const db = req.db;
   const ownerId = req.params.id;
   
@@ -35,7 +35,7 @@ exports.getOwnerById = (req, res) => {
 };
 
 // Get all pets owned by an owner
-exports.getOwnerPets = (req, res) => {
+const getOwnerPets = (req, res) => {
   const db = req.db;
   const ownerId = req.params.id;
   
@@ -50,7 +50,7 @@ exports.getOwnerPets = (req, res) => {
 };
 
 // Create a new owner
-exports.createOwner = (req, res) => {
+const createOwner = (req, res) => {
   const db = req.db;
   const { name, email, phone, address } = req.body;
   
@@ -72,7 +72,7 @@ exports.createOwner = (req, res) => {
 };
 
 // Update an owner
-exports.updateOwner = (req, res) => {
+const updateOwner = (req, res) => {
   const db = req.db;
   const ownerId = req.params.id;
   const { name, email, phone, address } = req.body;
@@ -124,7 +124,7 @@ exports.updateOwner = (req, res) => {
 };
 
 // Delete an owner
-exports.deleteOwner = (req, res) => {
+const deleteOwner = (req, res) => {
   const db = req.db;
   const ownerId = req.params.id;
   
@@ -140,4 +140,13 @@ exports.deleteOwner = (req, res) => {
     
     res.status(200).json({ message: 'Owner deleted successfully' });
   });
+};
+
+export default {
+  getAllOwners,
+  getOwnerById,
+  getOwnerPets,
+  createOwner,
+  updateOwner,
+  deleteOwner
 };

@@ -2,7 +2,7 @@
 // Pets controller
 
 // Get all pets
-exports.getAllPets = (req, res) => {
+const getAllPets = (req, res) => {
   const db = req.db;
   
   db.query('SELECT * FROM pets', (err, results) => {
@@ -16,7 +16,7 @@ exports.getAllPets = (req, res) => {
 };
 
 // Get a single pet by ID
-exports.getPetById = (req, res) => {
+const getPetById = (req, res) => {
   const db = req.db;
   const petId = req.params.id;
   
@@ -35,7 +35,7 @@ exports.getPetById = (req, res) => {
 };
 
 // Create a new pet
-exports.createPet = (req, res) => {
+const createPet = (req, res) => {
   const db = req.db;
   const { name, species, breed, age, gender, owner_id } = req.body;
   
@@ -57,7 +57,7 @@ exports.createPet = (req, res) => {
 };
 
 // Update a pet
-exports.updatePet = (req, res) => {
+const updatePet = (req, res) => {
   const db = req.db;
   const petId = req.params.id;
   const { name, species, breed, age, gender } = req.body;
@@ -114,7 +114,7 @@ exports.updatePet = (req, res) => {
 };
 
 // Delete a pet
-exports.deletePet = (req, res) => {
+const deletePet = (req, res) => {
   const db = req.db;
   const petId = req.params.id;
   
@@ -130,4 +130,12 @@ exports.deletePet = (req, res) => {
     
     res.status(200).json({ message: 'Pet deleted successfully' });
   });
+};
+
+export default {
+  getAllPets,
+  getPetById,
+  createPet,
+  updatePet,
+  deletePet
 };
