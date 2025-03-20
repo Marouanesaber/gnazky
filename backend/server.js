@@ -1,14 +1,14 @@
 
-const express = require('express');
-const cors = require('cors');
-const mysql = require('mysql2');
-const petRoutes = require('./routes/pets');
-const ownerRoutes = require('./routes/owners');
-const appointmentRoutes = require('./routes/appointments');
-const consultationRoutes = require('./routes/consultations');
-const laboratoryRoutes = require('./routes/laboratory');
-const vaccinationRoutes = require('./routes/vaccinations');
-const surgeryRoutes = require('./routes/surgery');
+import express from 'express';
+import cors from 'cors';
+import mysql from 'mysql2';
+import petRoutes from './routes/pets.js';
+import ownerRoutes from './routes/owners.js';
+import appointmentRoutes from './routes/appointments.js';
+import consultationRoutes from './routes/consultations.js';
+import laboratoryRoutes from './routes/laboratory.js';
+import vaccinationRoutes from './routes/vaccinations.js';
+import surgeryRoutes from './routes/surgery.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;

@@ -1,7 +1,8 @@
 
-const express = require('express');
+import express from 'express';
+import petsController from '../controllers/petsController.js';
+
 const router = express.Router();
-const petsController = require('../controllers/petsController');
 
 // GET all pets
 router.get('/', petsController.getAllPets);
@@ -18,4 +19,4 @@ router.put('/:id', petsController.updatePet);
 // DELETE a pet
 router.delete('/:id', petsController.deletePet);
 
-module.exports = router;
+export default router;

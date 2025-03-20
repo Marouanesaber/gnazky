@@ -1,7 +1,8 @@
 
-const express = require('express');
+import express from 'express';
+import ownersController from '../controllers/ownersController.js';
+
 const router = express.Router();
-const ownersController = require('../controllers/ownersController');
 
 // GET all owners
 router.get('/', ownersController.getAllOwners);
@@ -21,4 +22,4 @@ router.put('/:id', ownersController.updateOwner);
 // DELETE an owner
 router.delete('/:id', ownersController.deleteOwner);
 
-module.exports = router;
+export default router;

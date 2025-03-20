@@ -1,5 +1,5 @@
 
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Placeholder for vaccinations controller
@@ -30,4 +30,4 @@ router.delete('/:id', (req, res) => {
   res.json({ message: `Delete vaccination with ID: ${req.params.id}` });
 });
 
-module.exports = router;
+export default router;

@@ -1,5 +1,5 @@
 
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Placeholder for appointments controller
@@ -30,4 +30,4 @@ router.delete('/:id', (req, res) => {
   res.json({ message: `Delete appointment with ID: ${req.params.id}` });
 });
 
-module.exports = router;
+export default router;
