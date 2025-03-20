@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Navigation from "@/components/home/Navigation";
 import Footer from "@/components/home/Footer";
@@ -45,48 +46,92 @@ const BookAppointment = () => {
     preferredTime: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
+    
+    // Clear error for the field when user types
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: "" });
+    }
   };
 
   const validateStep1 = () => {
-    if (!formData.petName || !formData.petType || !formData.ownerName) {
-      toast.error("Please fill in all required fields");
-      return false;
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.petName.trim()) {
+      newErrors.petName = "Pet name is required";
     }
-    return true;
+    
+    if (!formData.petType) {
+      newErrors.petType = "Pet type is required";
+    }
+    
+    if (!formData.ownerName.trim()) {
+      newErrors.ownerName = "Owner's name is required";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const validateStep2 = () => {
-    if (!formData.email || !formData.phone) {
-      toast.error("Please fill in all required fields");
-      return false;
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = "Please enter a valid email address";
+      }
     }
     
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
-      return false;
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else {
+      const phoneRegex = /^(\+\d{1,3})?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+      if (!phoneRegex.test(formData.phone)) {
+        newErrors.phone = "Please enter a valid phone number";
+      }
     }
     
-    return true;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const validateStep3 = () => {
-    if (!formData.appointmentType || !date || !formData.preferredTime) {
-      toast.error("Please select appointment type, date and preferred time");
-      return false;
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.appointmentType) {
+      newErrors.appointmentType = "Appointment type is required";
     }
-    return true;
+    
+    if (!date) {
+      newErrors.date = "Date is required";
+    }
+    
+    if (!formData.preferredTime) {
+      newErrors.preferredTime = "Preferred time is required";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
-    if (step === 1 && !validateStep1()) return;
-    if (step === 2 && !validateStep2()) return;
-    if (step === 3 && !validateStep3()) return;
+    let isValid = false;
     
-    if (step < 4) {
+    if (step === 1) {
+      isValid = validateStep1();
+    } else if (step === 2) {
+      isValid = validateStep2();
+    } else if (step === 3) {
+      isValid = validateStep3();
+    }
+    
+    if (isValid && step < 4) {
       setStep(step + 1);
       window.scrollTo(0, 0);
     }
@@ -106,10 +151,33 @@ const BookAppointment = () => {
     
     setIsSubmitting(true);
     
+    // Save the data to localStorage to persist it
+    localStorage.setItem('appointmentData', JSON.stringify({
+      ...formData,
+      date: date ? format(date, 'yyyy-MM-dd') : '',
+      status: 'pending'
+    }));
+    
     setTimeout(() => {
       setIsSubmitting(false);
       setStep(4);
       window.scrollTo(0, 0);
+      
+      // Store in localStorage for display in the dashboard
+      const existingAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+      const newAppointment = {
+        id: `appt-${Date.now()}`,
+        petName: formData.petName,
+        ownerName: formData.ownerName,
+        date: date ? format(date, 'yyyy-MM-dd') : '',
+        time: formData.preferredTime,
+        type: formData.appointmentType,
+        status: 'pending',
+        notes: formData.symptoms
+      };
+      
+      localStorage.setItem('appointments', JSON.stringify([...existingAppointments, newAppointment]));
+      
     }, 1500);
   };
 
@@ -198,9 +266,10 @@ const BookAppointment = () => {
                             placeholder="Max"
                             value={formData.petName}
                             onChange={(e) => handleChange("petName", e.target.value)}
-                            className="pl-10"
+                            className={cn("pl-10", errors.petName ? "border-red-500" : "")}
                             required
                           />
+                          {errors.petName && <p className="text-red-500 text-xs mt-1">{errors.petName}</p>}
                         </div>
                       </div>
                       
@@ -210,7 +279,7 @@ const BookAppointment = () => {
                           value={formData.petType}
                           onValueChange={(value) => handleChange("petType", value)}
                         >
-                          <SelectTrigger id="petType" className="w-full">
+                          <SelectTrigger id="petType" className={cn("w-full", errors.petType ? "border-red-500" : "")}>
                             <SelectValue placeholder="Select pet type" />
                           </SelectTrigger>
                           <SelectContent>
@@ -246,6 +315,7 @@ const BookAppointment = () => {
                             </SelectItem>
                           </SelectContent>
                         </Select>
+                        {errors.petType && <p className="text-red-500 text-xs mt-1">{errors.petType}</p>}
                       </div>
                     </div>
                     
@@ -258,9 +328,10 @@ const BookAppointment = () => {
                           placeholder="John Doe"
                           value={formData.ownerName}
                           onChange={(e) => handleChange("ownerName", e.target.value)}
-                          className="pl-10"
+                          className={cn("pl-10", errors.ownerName ? "border-red-500" : "")}
                           required
                         />
+                        {errors.ownerName && <p className="text-red-500 text-xs mt-1">{errors.ownerName}</p>}
                       </div>
                     </div>
                   </div>
@@ -305,9 +376,10 @@ const BookAppointment = () => {
                             placeholder="johndoe@example.com"
                             value={formData.email}
                             onChange={(e) => handleChange("email", e.target.value)}
-                            className="pl-10"
+                            className={cn("pl-10", errors.email ? "border-red-500" : "")}
                             required
                           />
+                          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                         </div>
                       </div>
                       
@@ -320,9 +392,10 @@ const BookAppointment = () => {
                             placeholder="+1 (555) 123-4567"
                             value={formData.phone}
                             onChange={(e) => handleChange("phone", e.target.value)}
-                            className="pl-10"
+                            className={cn("pl-10", errors.phone ? "border-red-500" : "")}
                             required
                           />
+                          {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                         </div>
                       </div>
                     </div>
@@ -379,7 +452,7 @@ const BookAppointment = () => {
                         value={formData.appointmentType}
                         onValueChange={(value) => handleChange("appointmentType", value)}
                       >
-                        <SelectTrigger id="appointmentType">
+                        <SelectTrigger id="appointmentType" className={cn(errors.appointmentType ? "border-red-500" : "")}>
                           <SelectValue placeholder="Select appointment type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -391,6 +464,7 @@ const BookAppointment = () => {
                           <SelectItem value="grooming">Grooming</SelectItem>
                         </SelectContent>
                       </Select>
+                      {errors.appointmentType && <p className="text-red-500 text-xs mt-1">{errors.appointmentType}</p>}
                     </div>
                     
                     <div className="space-y-2">
@@ -401,7 +475,8 @@ const BookAppointment = () => {
                             variant={"outline"}
                             className={cn(
                               "w-full justify-start text-left font-normal",
-                              !date && "text-muted-foreground"
+                              !date && "text-muted-foreground",
+                              errors.date ? "border-red-500" : ""
                             )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -423,6 +498,7 @@ const BookAppointment = () => {
                           />
                         </PopoverContent>
                       </Popover>
+                      {errors.date && <p className="text-red-500 text-xs mt-1">{errors.date}</p>}
                     </div>
                   </div>
                   
@@ -434,7 +510,7 @@ const BookAppointment = () => {
                         value={formData.preferredTime}
                         onValueChange={(value) => handleChange("preferredTime", value)}
                       >
-                        <SelectTrigger id="preferredTime" className="w-full pl-10">
+                        <SelectTrigger id="preferredTime" className={cn("w-full pl-10", errors.preferredTime ? "border-red-500" : "")}>
                           <SelectValue placeholder="Select preferred time" />
                         </SelectTrigger>
                         <SelectContent>
@@ -448,6 +524,7 @@ const BookAppointment = () => {
                           <SelectItem value="17:00">5:00 PM</SelectItem>
                         </SelectContent>
                       </Select>
+                      {errors.preferredTime && <p className="text-red-500 text-xs mt-1">{errors.preferredTime}</p>}
                     </div>
                   </div>
                   
@@ -652,4 +729,3 @@ const BookAppointment = () => {
 };
 
 export default BookAppointment;
-

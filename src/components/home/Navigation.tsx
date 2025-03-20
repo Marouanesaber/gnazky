@@ -40,8 +40,14 @@ const Navigation = () => {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center animate-fade-in">
           <Link to="/" className="font-bold text-xl text-blue-600 transition-all hover:scale-105 flex items-center gap-2">
-            <PawPrint className="h-6 w-6 text-blue-600" />
-            <span>PetClinic</span>
+            <div className="relative">
+              <PawPrint className="h-8 w-8 text-blue-600" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-200 rounded-full animate-pulse"></span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-serif tracking-wide">PetClinic</span>
+              <span className="text-xs text-blue-400 font-normal -mt-1">Professional Pet Care</span>
+            </div>
           </Link>
         </div>
         <nav className="hidden md:flex items-center space-x-6">

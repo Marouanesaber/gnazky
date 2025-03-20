@@ -5,7 +5,6 @@ import HeroSection from "@/components/home/HeroSection";
 import ServicesSection from "@/components/home/ServicesSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import ContactSection from "@/components/home/ContactSection";
-import NewsletterSection from "@/components/home/NewsletterSection";
 import PetGallery from "@/components/home/PetGallery";
 import Footer from "@/components/home/Footer";
 
@@ -18,7 +17,6 @@ const Home = () => {
       <PetGallery />
       <TestimonialsSection />
       <ContactSection />
-      <NewsletterSection />
       <Footer />
     </div>
   );

@@ -41,7 +41,7 @@ export function Header() {
     toast.success("You have been signed out", {
       duration: 3000,
     });
-    navigate("/login");
+    navigate("/logout");
   };
 
   const navigateToProfile = () => {
@@ -69,7 +69,8 @@ export function Header() {
 
   const markAsRead = (id: number) => {
     toast.success("Notification marked as read");
-    setNotificationsOpen(false);
+    // In a real app, you would update the notification state
+    // For now we just show a toast
   };
 
   const markAllAsRead = () => {
@@ -83,8 +84,9 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
           onClick={toggleSidebar}
+          className="h-10 w-10 rounded-full"
+          title={sidebarVisible ? "Hide sidebar" : "Show sidebar"}
         >
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle Menu</span>
@@ -103,7 +105,7 @@ export function Header() {
         
         <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative animate-fade-in">
+            <Button variant="ghost" size="icon" className="relative animate-fade-in h-10 w-10 rounded-full">
               <Bell className="h-5 w-5" />
               <span className="sr-only">Notifications</span>
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-clinic-red animate-pulse"></span>

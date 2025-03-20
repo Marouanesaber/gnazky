@@ -8,11 +8,16 @@ const HeroSection = () => {
     <section className="py-24 px-6 bg-gradient-to-b from-blue-50 to-white">
       <div className="container mx-auto flex flex-col md:flex-row items-center">
         <div className="md:w-1/2 mb-10 md:mb-0 pr-0 md:pr-10 space-y-6">
-          <h1 className="text-5xl font-bold mb-4 animate-fade-in">
-            <span className="text-blue-600 relative">
+          <h1 className="text-5xl font-bold mb-4 animate-fade-in font-serif">
+            <span className="text-blue-600 relative inline-block animate-pulse overflow-hidden">
               We Care
-              <span className="absolute -bottom-2 left-0 w-full h-1 bg-blue-300 animate-pulse"></span>
-            </span> for<br />your animal
+              <span className="absolute -bottom-2 left-0 w-full h-1 bg-blue-300"></span>
+            </span>
+            <span className="ml-2 animate-fade-in [animation-delay:400ms]">for</span><br />
+            <span className="animate-fade-in [animation-delay:600ms] relative inline-block">
+              your animal
+              <span className="absolute -bottom-2 left-0 w-full h-1 bg-blue-300 origin-left transform scale-x-0 transition-transform duration-1000 animate-[grow_1.5s_ease-out_forwards_1s]"></span>
+            </span>
           </h1>
           <p className="text-gray-600 mb-8 max-w-md animate-fade-in [animation-delay:200ms]">
             Standard modern and efficient, affordable healthcare for your pets and other animals. So you don't have experience. Make an Appointment now!
@@ -47,7 +52,6 @@ const HeroSection = () => {
               className="rounded-xl w-full"
             />
           </div>
-          {/* Decorative elements with animations */}
           <div className="absolute top-[-20px] right-[-20px] w-20 h-20 bg-blue-200 rounded-lg z-0 animate-pulse"></div>
           <div className="absolute bottom-[-20px] left-[-20px] w-16 h-16 bg-blue-100 rounded-lg z-0 animate-bounce"></div>
           <div className="absolute bottom-[40px] right-[-30px] w-12 h-12 bg-yellow-200 rounded-full z-0 animate-ping opacity-75"></div>
