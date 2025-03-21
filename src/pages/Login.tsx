@@ -18,31 +18,30 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error("Please enter both email and password");
+      return;
+    }
+    
     setIsLoading(true);
     
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const success = await login(email, password, rememberMe);
       
-      // In a real app, you would validate credentials here
-      if (email && password) {
-        // Call the login function from AuthProvider
-        login(email);
-        
-        // Show success toast
+      if (success) {
         toast.success("Login successful!", {
           duration: 3000,
           className: "animate-slide-in-right"
         });
         
-        // Navigate to home page after a short delay
-        setTimeout(() => navigate("/"), 500);
-      } else {
-        toast.error("Please enter valid credentials");
+        setTimeout(() => navigate("/dashboard"), 500);
       }
-    }, 1000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

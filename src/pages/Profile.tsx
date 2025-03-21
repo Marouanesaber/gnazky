@@ -17,17 +17,21 @@ const ProfilePage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
 
-    setTimeout(() => {
-      updateProfile({ name, email });
+    try {
+      const success = await updateProfile({ name, email });
+      
+      if (success) {
+        toast.success("Profile updated successfully!", {
+          duration: 3000,
+        });
+      }
+    } finally {
       setIsSaving(false);
-      toast.success("Profile updated successfully!", {
-        duration: 3000,
-      });
-    }, 1000);
+    }
   };
 
   const handleImageClick = () => {
@@ -36,7 +40,7 @@ const ProfilePage = () => {
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -48,14 +52,30 @@ const ProfilePage = () => {
 
     setIsUploading(true);
 
-    // Convert file to base64
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      updateProfile({ profilePicture: reader.result as string });
+    try {
+      // Convert file to base64
+      const base64 = await convertToBase64(file);
+      
+      const success = await updateProfile({ profilePicture: base64 as string });
+      
+      if (success) {
+        toast.success("Profile picture updated!");
+      }
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      toast.error('Failed to update profile picture');
+    } finally {
       setIsUploading(false);
-      toast.success("Profile picture updated!");
-    };
-    reader.readAsDataURL(file);
+    }
+  };
+
+  const convertToBase64 = (file: File): Promise<string | ArrayBuffer | null> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(file);
+    });
   };
 
   const getInitials = (name: string) => {

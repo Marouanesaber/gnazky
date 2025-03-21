@@ -20,7 +20,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -35,9 +35,22 @@ const Register = () => {
     
     setIsLoading(true);
     
-    // Simulate registration process
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || 'Registration failed');
+        setIsLoading(false);
+        return;
+      }
       
       // Show success toast
       toast.success("Account created successfully!", {
@@ -47,7 +60,12 @@ const Register = () => {
       
       // Navigate to login after a short delay
       setTimeout(() => navigate("/login"), 500);
-    }, 1000);
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Server error. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
