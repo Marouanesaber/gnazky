@@ -55,7 +55,7 @@ router.post('/register', async (req, res) => {
     const [result] = await db.promise().query(query, [name, email, hashedPassword, defaultProfilePic, role]);
     
     // Generate token
-    const token = jwt.sign({ id: result.insertId, email, role }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: result.insertId, email, role }, JWT_SECRET, { expiresIn: '24h' });
     
     res.status(201).json({ 
       id: result.insertId,
@@ -100,8 +100,8 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     
-    // Generate token
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+    // Generate token with extended expiration
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
     
     // Return user info (excluding password)
     const userInfo = {
@@ -158,6 +158,16 @@ router.put('/profile', verifyToken, async (req, res) => {
   const { name, email, profilePicture } = req.body;
   
   try {
+    // First, let's modify the users table to ensure profile_picture can handle larger data
+    // This only needs to be run once, but we'll check first if we need to alter the table
+    const [columns] = await db.promise().query("SHOW COLUMNS FROM users LIKE 'profile_picture'");
+    
+    // If the profile_picture field is not MEDIUMTEXT, alter it
+    if (columns.length > 0 && columns[0].Type !== 'MEDIUMTEXT') {
+      await db.promise().query("ALTER TABLE users MODIFY profile_picture MEDIUMTEXT");
+      console.log("Modified profile_picture column to MEDIUMTEXT");
+    }
+    
     // Build the query based on provided fields
     let query = 'UPDATE users SET ';
     const values = [];

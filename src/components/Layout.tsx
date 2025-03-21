@@ -13,7 +13,7 @@ const Layout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to login if not authenticated
+    // Redirect to login if not authenticated and not flagged as logged in
     if (!isAuthenticated && !localStorage.getItem("isLoggedIn")) {
       navigate("/login");
     }
