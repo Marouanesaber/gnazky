@@ -29,6 +29,7 @@ router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
   
   try {
+    // Validation
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email and password are required' });
     }
@@ -59,11 +60,18 @@ router.post('/register', async (req, res) => {
     res.status(201).json({ 
       id: result.insertId,
       token,
+      user: {
+        id: result.insertId,
+        name,
+        email,
+        profilePicture: defaultProfilePic,
+        role
+      },
       message: 'User registered successfully'
     });
   } catch (error) {
     console.error('Error during registration:', error);
-    res.status(500).json({ error: 'Error during registration' });
+    res.status(500).json({ error: 'Error during registration: ' + error.message });
   }
 });
 
@@ -112,7 +120,7 @@ router.post('/login', async (req, res) => {
     
   } catch (error) {
     console.error('Error during login:', error);
-    res.status(500).json({ error: 'Error during login' });
+    res.status(500).json({ error: 'Error during login: ' + error.message });
   }
 });
 
@@ -128,10 +136,18 @@ router.get('/profile', verifyToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    res.status(200).json(users[0]);
+    const user = users[0];
+    
+    res.status(200).json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      profilePicture: user.profile_picture,
+      role: user.role
+    });
   } catch (error) {
     console.error('Error fetching user profile:', error);
-    res.status(500).json({ error: 'Error fetching profile' });
+    res.status(500).json({ error: 'Error fetching profile: ' + error.message });
   }
 });
 
@@ -178,13 +194,21 @@ router.put('/profile', verifyToken, async (req, res) => {
     // Get updated user profile
     const [users] = await db.promise().query('SELECT id, name, email, profile_picture, role FROM users WHERE id = ?', [userId]);
     
+    const user = users[0];
+    
     res.status(200).json({
       message: 'Profile updated successfully',
-      user: users[0]
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        profilePicture: user.profile_picture,
+        role: user.role
+      }
     });
   } catch (error) {
     console.error('Error updating profile:', error);
-    res.status(500).json({ error: 'Error updating profile' });
+    res.status(500).json({ error: 'Error updating profile: ' + error.message });
   }
 });
 

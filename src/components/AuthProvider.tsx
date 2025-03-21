@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -14,6 +15,7 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   token: string | null;
   login: (email: string, password: string, keepMeOnline?: boolean) => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateProfile: (data: Partial<{ name: string; email: string; profilePicture: string }>) => Promise<boolean>;
 }
@@ -23,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   userProfile: null,
   token: null,
   login: async () => false,
+  register: async () => false,
   logout: () => {},
   updateProfile: async () => false
 });
@@ -45,6 +48,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserProfile(JSON.parse(storedUserProfile));
     }
   }, []);
+
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || 'Registration failed');
+        return false;
+      }
+
+      setIsAuthenticated(true);
+      setUserProfile(data.user);
+      setToken(data.token);
+      
+      // Save to localStorage
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("userProfile", JSON.stringify(data.user));
+      
+      toast.success('Registration successful! Welcome to Pet Clinic.');
+      return true;
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Server error. Please try again later.');
+      return false;
+    }
+  };
 
   const login = async (email: string, password: string, keepMeOnline: boolean = true): Promise<boolean> => {
     try {
@@ -122,7 +159,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userProfile, token, login, logout, updateProfile }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      userProfile, 
+      token, 
+      login, 
+      register,
+      logout, 
+      updateProfile 
+    }}>
       {children}
     </AuthContext.Provider>
   );
