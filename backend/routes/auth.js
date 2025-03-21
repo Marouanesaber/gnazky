@@ -55,7 +55,7 @@ router.post('/register', async (req, res) => {
     const [result] = await db.promise().query(query, [name, email, hashedPassword, defaultProfilePic, role]);
     
     // Generate token
-    const token = jwt.sign({ id: result.insertId, email, role }, JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id: result.insertId, email, role }, JWT_SECRET, { expiresIn: '7d' });
     
     res.status(201).json({ 
       id: result.insertId,
@@ -121,6 +121,50 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Error during login: ' + error.message });
+  }
+});
+
+// Verify token and refresh user session
+router.get('/verify', async (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const db = req.db;
+    
+    // Get fresh user data
+    const [users] = await db.promise().query('SELECT id, name, email, profile_picture, role FROM users WHERE id = ?', [decoded.id]);
+    
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const user = users[0];
+    
+    // Generate a new token to extend the session
+    const newToken = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    
+    res.status(200).json({
+      valid: true,
+      token: newToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        profilePicture: user.profile_picture,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    res.status(401).json({ valid: false, error: 'Invalid token' });
   }
 });
 

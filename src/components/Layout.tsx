@@ -9,15 +9,22 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 const Layout = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, checkAuthStatus } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to login if not authenticated and not flagged as logged in
-    if (!isAuthenticated && !localStorage.getItem("isLoggedIn")) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, navigate]);
+    // Check authentication status when the component mounts
+    const checkAuth = async () => {
+      const isAuth = await checkAuthStatus();
+      
+      // Redirect to login if not authenticated and not flagged as logged in
+      if (!isAuth && !localStorage.getItem("isLoggedIn")) {
+        navigate("/login");
+      }
+    };
+    
+    checkAuth();
+  }, [checkAuthStatus, navigate]);
 
   const handleSignOut = () => {
     logout();

@@ -66,10 +66,23 @@ const createPet = (req, res) => {
     (err, result) => {
       if (err) {
         console.error('Error creating pet:', err);
-        return res.status(500).json({ error: 'Error creating pet' });
+        return res.status(500).json({ error: 'Error creating pet: ' + err.message });
       }
       
-      res.status(201).json({ id: result.insertId, message: 'Pet created successfully' });
+      // Return the newly created pet data
+      db.query('SELECT * FROM pets WHERE id = ?', [result.insertId], (err, pets) => {
+        if (err || pets.length === 0) {
+          return res.status(201).json({ 
+            id: result.insertId, 
+            message: 'Pet created successfully' 
+          });
+        }
+        
+        res.status(201).json({ 
+          ...pets[0],
+          message: 'Pet created successfully' 
+        });
+      });
     }
   );
 };
@@ -135,6 +148,9 @@ const updatePet = (req, res) => {
     values.push(notes);
   }
   
+  // Add last updated timestamp
+  updates.push('updated_at = CURRENT_TIMESTAMP');
+  
   if (updates.length === 0) {
     return res.status(400).json({ error: 'No fields to update' });
   }
@@ -145,14 +161,26 @@ const updatePet = (req, res) => {
   db.query(query, values, (err, result) => {
     if (err) {
       console.error('Error updating pet:', err);
-      return res.status(500).json({ error: 'Error updating pet' });
+      return res.status(500).json({ error: 'Error updating pet: ' + err.message });
     }
     
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Pet not found' });
     }
     
-    res.status(200).json({ message: 'Pet updated successfully' });
+    // Return the updated pet data
+    db.query('SELECT * FROM pets WHERE id = ?', [petId], (err, pets) => {
+      if (err || pets.length === 0) {
+        return res.status(200).json({ 
+          message: 'Pet updated successfully' 
+        });
+      }
+      
+      res.status(200).json({ 
+        ...pets[0],
+        message: 'Pet updated successfully' 
+      });
+    });
   });
 };
 
@@ -164,14 +192,17 @@ const deletePet = (req, res) => {
   db.query('DELETE FROM pets WHERE id = ?', [petId], (err, result) => {
     if (err) {
       console.error('Error deleting pet:', err);
-      return res.status(500).json({ error: 'Error deleting pet' });
+      return res.status(500).json({ error: 'Error deleting pet: ' + err.message });
     }
     
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Pet not found' });
     }
     
-    res.status(200).json({ message: 'Pet deleted successfully' });
+    res.status(200).json({ 
+      id: petId,
+      message: 'Pet deleted successfully'
+    });
   });
 };
 

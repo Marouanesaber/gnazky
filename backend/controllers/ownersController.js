@@ -8,7 +8,7 @@ const getAllOwners = (req, res) => {
   db.query('SELECT * FROM owners ORDER BY name ASC', (err, results) => {
     if (err) {
       console.error('Error fetching owners:', err);
-      return res.status(500).json({ error: 'Error fetching owners' });
+      return res.status(500).json({ error: 'Error fetching owners: ' + err.message });
     }
     
     res.status(200).json(results);
@@ -23,7 +23,7 @@ const getOwnerById = (req, res) => {
   db.query('SELECT * FROM owners WHERE id = ?', [ownerId], (err, results) => {
     if (err) {
       console.error('Error fetching owner:', err);
-      return res.status(500).json({ error: 'Error fetching owner' });
+      return res.status(500).json({ error: 'Error fetching owner: ' + err.message });
     }
     
     if (results.length === 0) {
@@ -42,7 +42,7 @@ const getOwnerPets = (req, res) => {
   db.query('SELECT * FROM pets WHERE owner_id = ?', [ownerId], (err, results) => {
     if (err) {
       console.error('Error fetching owner pets:', err);
-      return res.status(500).json({ error: 'Error fetching owner pets' });
+      return res.status(500).json({ error: 'Error fetching owner pets: ' + err.message });
     }
     
     res.status(200).json(results);
@@ -65,10 +65,23 @@ const createOwner = (req, res) => {
   db.query(query, [name, email, phone, address, notes, userId], (err, result) => {
     if (err) {
       console.error('Error creating owner:', err);
-      return res.status(500).json({ error: 'Error creating owner' });
+      return res.status(500).json({ error: 'Error creating owner: ' + err.message });
     }
     
-    res.status(201).json({ id: result.insertId, message: 'Owner created successfully' });
+    // Return the newly created owner data
+    db.query('SELECT * FROM owners WHERE id = ?', [result.insertId], (err, owners) => {
+      if (err || owners.length === 0) {
+        return res.status(201).json({ 
+          id: result.insertId, 
+          message: 'Owner created successfully' 
+        });
+      }
+      
+      res.status(201).json({ 
+        ...owners[0],
+        message: 'Owner created successfully' 
+      });
+    });
   });
 };
 
@@ -108,6 +121,9 @@ const updateOwner = (req, res) => {
     values.push(notes);
   }
   
+  // Add updated timestamp
+  updates.push('updated_at = CURRENT_TIMESTAMP');
+  
   if (updates.length === 0) {
     return res.status(400).json({ error: 'No fields to update' });
   }
@@ -118,14 +134,26 @@ const updateOwner = (req, res) => {
   db.query(query, values, (err, result) => {
     if (err) {
       console.error('Error updating owner:', err);
-      return res.status(500).json({ error: 'Error updating owner' });
+      return res.status(500).json({ error: 'Error updating owner: ' + err.message });
     }
     
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Owner not found' });
     }
     
-    res.status(200).json({ message: 'Owner updated successfully' });
+    // Return the updated owner data
+    db.query('SELECT * FROM owners WHERE id = ?', [ownerId], (err, owners) => {
+      if (err || owners.length === 0) {
+        return res.status(200).json({ 
+          message: 'Owner updated successfully' 
+        });
+      }
+      
+      res.status(200).json({ 
+        ...owners[0],
+        message: 'Owner updated successfully' 
+      });
+    });
   });
 };
 
@@ -137,14 +165,17 @@ const deleteOwner = (req, res) => {
   db.query('DELETE FROM owners WHERE id = ?', [ownerId], (err, result) => {
     if (err) {
       console.error('Error deleting owner:', err);
-      return res.status(500).json({ error: 'Error deleting owner' });
+      return res.status(500).json({ error: 'Error deleting owner: ' + err.message });
     }
     
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Owner not found' });
     }
     
-    res.status(200).json({ message: 'Owner deleted successfully' });
+    res.status(200).json({ 
+      id: ownerId,
+      message: 'Owner deleted successfully'
+    });
   });
 };
 

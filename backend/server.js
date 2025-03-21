@@ -10,9 +10,11 @@ import laboratoryRoutes from './routes/laboratory.js';
 import vaccinationRoutes from './routes/vaccinations.js';
 import surgeryRoutes from './routes/surgery.js';
 import authRoutes from './routes/auth.js';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 // Middleware
 app.use(cors());
@@ -35,11 +37,35 @@ db.connect(err => {
   console.log('Connected to MySQL database');
 });
 
+// Authentication middleware
+const verifyToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  
+  if (!token) {
+    // Allow request to proceed without user info if no token
+    req.user = null;
+    return next();
+  }
+
+  try {
+    const verified = jwt.verify(token, JWT_SECRET);
+    req.user = verified;
+    next();
+  } catch (error) {
+    // If token is invalid, proceed without user info
+    req.user = null;
+    next();
+  }
+};
+
 // Make db connection available to routes
 app.use((req, res, next) => {
   req.db = db;
   next();
 });
+
+// Apply the auth middleware to all routes
+app.use(verifyToken);
 
 // Routes
 app.use('/api/pets', petRoutes);
@@ -53,7 +79,7 @@ app.use('/api/auth', authRoutes);
 
 // Test route
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Backend API is working!' });
+  res.json({ message: 'Backend API is working!', user: req.user || 'Not authenticated' });
 });
 
 // Start server
