@@ -1,8 +1,27 @@
 
 import express from 'express';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied. No token provided.' });
+  }
+
+  try {
+    const verified = jwt.verify(token, JWT_SECRET);
+    req.user = verified;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -26,15 +45,20 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
     // Create new user
-    const query = `INSERT INTO users (name, email, password, profile_picture) 
-                  VALUES (?, ?, ?, ?)`;
+    const query = `INSERT INTO users (name, email, password, profile_picture, role) 
+                  VALUES (?, ?, ?, ?, ?)`;
     
     const defaultProfilePic = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff`;
+    const role = 'user'; // Default role
     
-    const [result] = await db.promise().query(query, [name, email, hashedPassword, defaultProfilePic]);
+    const [result] = await db.promise().query(query, [name, email, hashedPassword, defaultProfilePic, role]);
+    
+    // Generate token
+    const token = jwt.sign({ id: result.insertId, email, role }, JWT_SECRET, { expiresIn: '1h' });
     
     res.status(201).json({ 
       id: result.insertId,
+      token,
       message: 'User registered successfully'
     });
   } catch (error) {
@@ -68,16 +92,21 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     
+    // Generate token
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+    
     // Return user info (excluding password)
     const userInfo = {
       id: user.id,
       name: user.name,
       email: user.email,
-      profilePicture: user.profile_picture
+      profilePicture: user.profile_picture,
+      role: user.role
     };
     
     res.status(200).json({ 
       message: 'Login successful',
+      token,
       user: userInfo
     });
     
@@ -88,16 +117,12 @@ router.post('/login', async (req, res) => {
 });
 
 // Get user profile
-router.get('/profile', async (req, res) => {
+router.get('/profile', verifyToken, async (req, res) => {
   const db = req.db;
-  const userId = req.query.userId;
+  const userId = req.user.id;
   
   try {
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID is required' });
-    }
-    
-    const [users] = await db.promise().query('SELECT id, name, email, profile_picture FROM users WHERE id = ?', [userId]);
+    const [users] = await db.promise().query('SELECT id, name, email, profile_picture, role FROM users WHERE id = ?', [userId]);
     
     if (users.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -111,15 +136,12 @@ router.get('/profile', async (req, res) => {
 });
 
 // Update user profile
-router.put('/profile', async (req, res) => {
+router.put('/profile', verifyToken, async (req, res) => {
   const db = req.db;
-  const { userId, name, email, profilePicture } = req.body;
+  const userId = req.user.id;
+  const { name, email, profilePicture } = req.body;
   
   try {
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID is required' });
-    }
-    
     // Build the query based on provided fields
     let query = 'UPDATE users SET ';
     const values = [];
@@ -153,7 +175,13 @@ router.put('/profile', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    res.status(200).json({ message: 'Profile updated successfully' });
+    // Get updated user profile
+    const [users] = await db.promise().query('SELECT id, name, email, profile_picture, role FROM users WHERE id = ?', [userId]);
+    
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: users[0]
+    });
   } catch (error) {
     console.error('Error updating profile:', error);
     res.status(500).json({ error: 'Error updating profile' });

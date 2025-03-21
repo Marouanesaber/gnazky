@@ -5,7 +5,12 @@
 const getAllPets = (req, res) => {
   const db = req.db;
   
-  db.query('SELECT * FROM pets', (err, results) => {
+  db.query(`
+    SELECT p.*, o.name as owner_name 
+    FROM pets p
+    JOIN owners o ON p.owner_id = o.id
+    ORDER BY p.created_at DESC
+  `, (err, results) => {
     if (err) {
       console.error('Error fetching pets:', err);
       return res.status(500).json({ error: 'Error fetching pets' });
@@ -20,7 +25,12 @@ const getPetById = (req, res) => {
   const db = req.db;
   const petId = req.params.id;
   
-  db.query('SELECT * FROM pets WHERE id = ?', [petId], (err, results) => {
+  db.query(`
+    SELECT p.*, o.name as owner_name 
+    FROM pets p
+    JOIN owners o ON p.owner_id = o.id
+    WHERE p.id = ?
+  `, [petId], (err, results) => {
     if (err) {
       console.error('Error fetching pet:', err);
       return res.status(500).json({ error: 'Error fetching pet' });
@@ -37,30 +47,38 @@ const getPetById = (req, res) => {
 // Create a new pet
 const createPet = (req, res) => {
   const db = req.db;
-  const { name, species, breed, age, gender, owner_id } = req.body;
+  const { name, species, breed, age, gender, weight, color, microchip_id, owner_id, notes } = req.body;
+  const userId = req.user?.id || null; // Get user ID from JWT token if available
   
   if (!name || !species || !owner_id) {
     return res.status(400).json({ error: 'Required fields: name, species, owner_id' });
   }
   
-  const query = `INSERT INTO pets (name, species, breed, age, gender, owner_id) 
-                VALUES (?, ?, ?, ?, ?, ?)`;
+  const query = `
+    INSERT INTO pets (
+      name, species, breed, age, gender, weight, color, microchip_id, owner_id, notes, created_by
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
   
-  db.query(query, [name, species, breed, age, gender, owner_id], (err, result) => {
-    if (err) {
-      console.error('Error creating pet:', err);
-      return res.status(500).json({ error: 'Error creating pet' });
+  db.query(
+    query, 
+    [name, species, breed, age, gender, weight, color, microchip_id, owner_id, notes, userId], 
+    (err, result) => {
+      if (err) {
+        console.error('Error creating pet:', err);
+        return res.status(500).json({ error: 'Error creating pet' });
+      }
+      
+      res.status(201).json({ id: result.insertId, message: 'Pet created successfully' });
     }
-    
-    res.status(201).json({ id: result.insertId, message: 'Pet created successfully' });
-  });
+  );
 };
 
 // Update a pet
 const updatePet = (req, res) => {
   const db = req.db;
   const petId = req.params.id;
-  const { name, species, breed, age, gender } = req.body;
+  const { name, species, breed, age, gender, weight, color, microchip_id, owner_id, notes } = req.body;
   
   // Build the query based on provided fields
   let query = 'UPDATE pets SET ';
@@ -90,6 +108,31 @@ const updatePet = (req, res) => {
   if (gender) {
     updates.push('gender = ?');
     values.push(gender);
+  }
+  
+  if (weight) {
+    updates.push('weight = ?');
+    values.push(weight);
+  }
+  
+  if (color) {
+    updates.push('color = ?');
+    values.push(color);
+  }
+  
+  if (microchip_id) {
+    updates.push('microchip_id = ?');
+    values.push(microchip_id);
+  }
+  
+  if (owner_id) {
+    updates.push('owner_id = ?');
+    values.push(owner_id);
+  }
+  
+  if (notes) {
+    updates.push('notes = ?');
+    values.push(notes);
   }
   
   if (updates.length === 0) {

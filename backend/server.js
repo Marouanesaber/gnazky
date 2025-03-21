@@ -21,8 +21,8 @@ app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
 // Database connection
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'root',     // Updated with provided username
-  password: 'root', // Updated with provided password
+  user: 'root',
+  password: 'root',
   database: 'pet_clinic'
 });
 

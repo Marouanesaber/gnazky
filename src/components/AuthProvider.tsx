@@ -6,11 +6,13 @@ interface UserProfile {
   name: string;
   email: string;
   profilePicture: string;
+  role?: string;
 }
 
 interface AuthContextType {
   isAuthenticated: boolean;
   userProfile: UserProfile | null;
+  token: string | null;
   login: (email: string, password: string, keepMeOnline?: boolean) => Promise<boolean>;
   logout: () => void;
   updateProfile: (data: Partial<{ name: string; email: string; profilePicture: string }>) => Promise<boolean>;
@@ -19,6 +21,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   userProfile: null,
+  token: null,
   login: async () => false,
   logout: () => {},
   updateProfile: async () => false
@@ -29,14 +32,16 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if user is logged in from localStorage
-    const storedLoggedIn = localStorage.getItem("isLoggedIn");
+    const storedToken = localStorage.getItem("authToken");
     const storedUserProfile = localStorage.getItem("userProfile");
     
-    if (storedLoggedIn === "true" && storedUserProfile) {
+    if (storedToken && storedUserProfile) {
       setIsAuthenticated(true);
+      setToken(storedToken);
       setUserProfile(JSON.parse(storedUserProfile));
     }
   }, []);
@@ -60,10 +65,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setIsAuthenticated(true);
       setUserProfile(data.user);
+      setToken(data.token);
       
       // Save to localStorage if keepMeOnline is true
       if (keepMeOnline) {
-        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("authToken", data.token);
         localStorage.setItem("userProfile", JSON.stringify(data.user));
       }
       
@@ -78,34 +84,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setIsAuthenticated(false);
     setUserProfile(null);
-    localStorage.removeItem("isLoggedIn");
+    setToken(null);
+    localStorage.removeItem("authToken");
     localStorage.removeItem("userProfile");
   };
 
   const updateProfile = async (data: Partial<{ name: string; email: string; profilePicture: string }>): Promise<boolean> => {
-    if (!userProfile) return false;
+    if (!userProfile || !token) return false;
     
     try {
       const response = await fetch('http://localhost:5000/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          userId: userProfile.id,
-          ...data
-        }),
+        body: JSON.stringify(data),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to update profile');
+        toast.error(responseData.error || 'Failed to update profile');
         return false;
       }
 
-      const updatedProfile = { ...userProfile, ...data };
+      const updatedProfile = responseData.user;
       setUserProfile(updatedProfile);
       localStorage.setItem("userProfile", JSON.stringify(updatedProfile));
+      toast.success("Profile updated successfully!");
       return true;
     } catch (error) {
       console.error('Update profile error:', error);
@@ -115,7 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userProfile, login, logout, updateProfile }}>
+    <AuthContext.Provider value={{ isAuthenticated, userProfile, token, login, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,7 +5,7 @@
 const getAllOwners = (req, res) => {
   const db = req.db;
   
-  db.query('SELECT * FROM owners', (err, results) => {
+  db.query('SELECT * FROM owners ORDER BY name ASC', (err, results) => {
     if (err) {
       console.error('Error fetching owners:', err);
       return res.status(500).json({ error: 'Error fetching owners' });
@@ -52,16 +52,17 @@ const getOwnerPets = (req, res) => {
 // Create a new owner
 const createOwner = (req, res) => {
   const db = req.db;
-  const { name, email, phone, address } = req.body;
+  const { name, email, phone, address, notes } = req.body;
+  const userId = req.user?.id || null; // Get user ID from JWT token if available
   
   if (!name || !email || !phone) {
     return res.status(400).json({ error: 'Required fields: name, email, phone' });
   }
   
-  const query = `INSERT INTO owners (name, email, phone, address) 
-                VALUES (?, ?, ?, ?)`;
+  const query = `INSERT INTO owners (name, email, phone, address, notes, created_by) 
+                VALUES (?, ?, ?, ?, ?, ?)`;
   
-  db.query(query, [name, email, phone, address], (err, result) => {
+  db.query(query, [name, email, phone, address, notes, userId], (err, result) => {
     if (err) {
       console.error('Error creating owner:', err);
       return res.status(500).json({ error: 'Error creating owner' });
@@ -75,7 +76,7 @@ const createOwner = (req, res) => {
 const updateOwner = (req, res) => {
   const db = req.db;
   const ownerId = req.params.id;
-  const { name, email, phone, address } = req.body;
+  const { name, email, phone, address, notes } = req.body;
   
   // Build the query based on provided fields
   let query = 'UPDATE owners SET ';
@@ -100,6 +101,11 @@ const updateOwner = (req, res) => {
   if (address) {
     updates.push('address = ?');
     values.push(address);
+  }
+  
+  if (notes) {
+    updates.push('notes = ?');
+    values.push(notes);
   }
   
   if (updates.length === 0) {
