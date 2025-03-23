@@ -77,6 +77,14 @@ app.use('/api/vaccinations', vaccinationRoutes);
 app.use('/api/surgery', surgeryRoutes);
 app.use('/api/auth', authRoutes);
 
+// Token verification endpoint
+app.get('/api/auth/verify', verifyToken, (req, res) => {
+  if (req.user) {
+    return res.status(200).json({ valid: true, user: req.user });
+  }
+  return res.status(401).json({ valid: false, message: 'Invalid or expired token' });
+});
+
 // Test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend API is working!', user: req.user || 'Not authenticated' });

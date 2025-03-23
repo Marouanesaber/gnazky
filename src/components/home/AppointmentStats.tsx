@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from "react";
+import { apiRequest } from "@/utils/api";
 
 const AppointmentStats = () => {
   const [stats, setStats] = useState({
@@ -11,13 +12,22 @@ const AppointmentStats = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // First check if the backend is accessible
-        const testResponse = await fetch('http://localhost:5000/api/test');
-        if (!testResponse.ok) throw new Error('Backend connection failed');
+        // Test if the backend is accessible
+        const testResponse = await apiRequest('/test');
         
-        // You could add more specific API calls here once your backend routes are fully implemented
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Fetch appointments for today
+        const appointments = await apiRequest('/appointments');
+        
+        // Filter appointments for today
+        const todaysAppointments = appointments.filter(
+          (appointment: any) => appointment.date === today
+        );
+        
         setStats({
-          count: Math.floor(Math.random() * 50) + 20, // Placeholder random data
+          count: todaysAppointments.length,
           loading: false,
           error: null
         });

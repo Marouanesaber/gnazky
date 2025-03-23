@@ -1,33 +1,22 @@
 
 import express from 'express';
+import appointmentsController from '../controllers/appointmentsController.js';
+
 const router = express.Router();
 
-// Placeholder for appointments controller
-// This will be implemented in the future
-
 // GET all appointments
-router.get('/', (req, res) => {
-  res.json({ message: 'Get all appointments endpoint' });
-});
+router.get('/', appointmentsController.getAllAppointments);
 
 // GET a single appointment by ID
-router.get('/:id', (req, res) => {
-  res.json({ message: `Get appointment with ID: ${req.params.id}` });
-});
+router.get('/:id', appointmentsController.getAppointmentById);
 
 // POST a new appointment
-router.post('/', (req, res) => {
-  res.json({ message: 'Create new appointment endpoint' });
-});
+router.post('/', appointmentsController.createAppointment);
 
 // PUT/UPDATE an appointment
-router.put('/:id', (req, res) => {
-  res.json({ message: `Update appointment with ID: ${req.params.id}` });
-});
+router.put('/:id', appointmentsController.updateAppointment);
 
 // DELETE an appointment
-router.delete('/:id', (req, res) => {
-  res.json({ message: `Delete appointment with ID: ${req.params.id}` });
-});
+router.delete('/:id', appointmentsController.deleteAppointment);
 
 export default router;

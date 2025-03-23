@@ -18,6 +18,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateProfile: (data: Partial<{ name: string; email: string; profilePicture: string }>) => Promise<boolean>;
+  checkAuthStatus: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -27,7 +28,8 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => false,
   register: async () => false,
   logout: () => {},
-  updateProfile: async () => false
+  updateProfile: async () => false,
+  checkAuthStatus: async () => false
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -50,6 +52,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem("isLoggedIn", "true");
     }
   }, []);
+
+  const checkAuthStatus = async (): Promise<boolean> => {
+    // First check if we already have authentication state in memory
+    if (isAuthenticated && token && userProfile) {
+      return true;
+    }
+    
+    // Then check localStorage
+    const storedToken = localStorage.getItem("authToken");
+    const storedUserProfile = localStorage.getItem("userProfile");
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    
+    if (storedToken && storedUserProfile) {
+      try {
+        // Validate token by making a request to the backend
+        const response = await fetch('http://localhost:5000/api/auth/verify', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${storedToken}`
+          }
+        });
+        
+        if (response.ok) {
+          // Token is valid
+          setIsAuthenticated(true);
+          setToken(storedToken);
+          setUserProfile(JSON.parse(storedUserProfile));
+          return true;
+        } else {
+          // Token is invalid, clear auth state
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("userProfile");
+          localStorage.removeItem("isLoggedIn");
+          setIsAuthenticated(false);
+          setToken(null);
+          setUserProfile(null);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error verifying token:', error);
+        
+        // If server is down but we have isLoggedIn flag, assume user is authenticated
+        if (isLoggedIn === "true") {
+          setIsAuthenticated(true);
+          setToken(storedToken);
+          setUserProfile(JSON.parse(storedUserProfile));
+          return true;
+        }
+        
+        return false;
+      }
+    }
+    
+    return false;
+  };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
@@ -242,7 +299,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       login, 
       register,
       logout, 
-      updateProfile 
+      updateProfile,
+      checkAuthStatus
     }}>
       {children}
     </AuthContext.Provider>
