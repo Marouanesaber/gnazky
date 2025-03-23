@@ -15,6 +15,68 @@ const getAllAppointments = (req, res) => {
   });
 };
 
+// Get appointment statistics
+const getAppointmentStats = (req, res) => {
+  const db = req.db;
+  
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Query for today's appointments count
+  const todayQuery = 'SELECT COUNT(*) as todayCount FROM appointments WHERE date = ?';
+  
+  // Query for upcoming appointments (next 7 days)
+  const upcomingQuery = `
+    SELECT COUNT(*) as upcomingCount 
+    FROM appointments 
+    WHERE date BETWEEN ? AND DATE_ADD(?, INTERVAL 7 DAY)
+  `;
+  
+  // Query for status counts
+  const statusQuery = `
+    SELECT status, COUNT(*) as count 
+    FROM appointments 
+    GROUP BY status
+  `;
+  
+  // Execute today's count query
+  db.query(todayQuery, [today], (err, todayResults) => {
+    if (err) {
+      console.error('Error fetching today\'s appointment count:', err);
+      return res.status(500).json({ error: 'Error fetching appointment stats: ' + err.message });
+    }
+    
+    // Execute upcoming count query
+    db.query(upcomingQuery, [today, today], (err, upcomingResults) => {
+      if (err) {
+        console.error('Error fetching upcoming appointment count:', err);
+        return res.status(500).json({ error: 'Error fetching appointment stats: ' + err.message });
+      }
+      
+      // Execute status counts query
+      db.query(statusQuery, (err, statusResults) => {
+        if (err) {
+          console.error('Error fetching appointment status counts:', err);
+          return res.status(500).json({ error: 'Error fetching appointment stats: ' + err.message });
+        }
+        
+        // Transform status results into an object
+        const statusCounts = {};
+        statusResults.forEach(status => {
+          statusCounts[status.status] = status.count;
+        });
+        
+        // Return all stats
+        res.status(200).json({
+          todayCount: todayResults[0].todayCount,
+          upcomingCount: upcomingResults[0].upcomingCount,
+          statusCounts: statusCounts
+        });
+      });
+    });
+  });
+};
+
 // Get a single appointment by ID
 const getAppointmentById = (req, res) => {
   const db = req.db;
@@ -197,5 +259,6 @@ export default {
   getAppointmentById,
   createAppointment,
   updateAppointment,
-  deleteAppointment
+  deleteAppointment,
+  getAppointmentStats
 };
