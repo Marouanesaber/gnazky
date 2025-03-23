@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "@/utils/api";
+import { Calendar } from "lucide-react";
 
 const AppointmentStats = () => {
   const [stats, setStats] = useState({
@@ -12,22 +13,11 @@ const AppointmentStats = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Test if the backend is accessible
-        const testResponse = await apiRequest('/test');
-        
-        // Get today's date in YYYY-MM-DD format
-        const today = new Date().toISOString().split('T')[0];
-        
-        // Fetch appointments for today
-        const appointments = await apiRequest('/appointments');
-        
-        // Filter appointments for today
-        const todaysAppointments = appointments.filter(
-          (appointment: any) => appointment.date === today
-        );
+        // Use the dedicated stats endpoint instead of filtering appointments client-side
+        const response = await apiRequest('/appointments/stats');
         
         setStats({
-          count: todaysAppointments.length,
+          count: response.todayCount || 0,
           loading: false,
           error: null
         });
@@ -46,7 +36,13 @@ const AppointmentStats = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-lg font-semibold mb-2">Today's Appointments</h3>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="rounded-full p-2 bg-clinic-blue/10">
+          <Calendar className="h-5 w-5 text-clinic-blue" />
+        </div>
+        <h3 className="text-lg font-semibold">Today's Appointments</h3>
+      </div>
+      
       {stats.loading ? (
         <div className="animate-pulse">Loading stats...</div>
       ) : stats.error ? (

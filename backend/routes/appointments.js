@@ -7,6 +7,9 @@ const router = express.Router();
 // GET all appointments
 router.get('/', appointmentsController.getAllAppointments);
 
+// GET appointment statistics (counts, etc.)
+router.get('/stats', appointmentsController.getAppointmentStats);
+
 // GET a single appointment by ID
 router.get('/:id', appointmentsController.getAppointmentById);
 

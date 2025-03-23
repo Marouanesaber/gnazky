@@ -17,7 +17,11 @@ const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins for development
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
 
 // Database connection
@@ -85,9 +89,26 @@ app.get('/api/auth/verify', verifyToken, (req, res) => {
   return res.status(401).json({ valid: false, message: 'Invalid or expired token' });
 });
 
-// Test route
+// Test route - improved to provide more details
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Backend API is working!', user: req.user || 'Not authenticated' });
+  // Check database connection
+  db.query('SELECT 1', (err, result) => {
+    if (err) {
+      return res.status(500).json({ 
+        message: 'Backend API is working but database connection failed!',
+        error: err.message,
+        user: req.user || 'Not authenticated',
+        dbStatus: 'Error'
+      });
+    }
+    
+    res.json({ 
+      message: 'Backend API is working!', 
+      user: req.user || 'Not authenticated',
+      dbStatus: 'Connected',
+      serverTime: new Date().toISOString()
+    });
+  });
 });
 
 // Start server
