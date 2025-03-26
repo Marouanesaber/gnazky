@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import Navigation from "@/components/home/Navigation";
+import { Navigation } from "@/components/home/Navigation";
 import Footer from "@/components/home/Footer";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,7 +50,6 @@ const BookAppointment = () => {
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
     
-    // Clear error for the field when user types
     if (errors[field]) {
       setErrors({ ...errors, [field]: "" });
     }
@@ -151,7 +149,6 @@ const BookAppointment = () => {
     
     setIsSubmitting(true);
     
-    // Save the data to localStorage to persist it
     localStorage.setItem('appointmentData', JSON.stringify({
       ...formData,
       date: date ? format(date, 'yyyy-MM-dd') : '',
@@ -163,7 +160,6 @@ const BookAppointment = () => {
       setStep(4);
       window.scrollTo(0, 0);
       
-      // Store in localStorage for display in the dashboard
       const existingAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
       const newAppointment = {
         id: `appt-${Date.now()}`,

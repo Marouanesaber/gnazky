@@ -1,11 +1,10 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, Phone, Linkedin, Globe, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import Navigation from "@/components/home/Navigation";
+import { Navigation } from "@/components/home/Navigation";
 import Footer from "@/components/home/Footer";
 
 const technicianData = [
