@@ -1,12 +1,13 @@
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Pencil, FileText, Syringe } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableHeader, TableRow, TableHead, TableBody } from "@/components/ui/table";
 import { toast } from "sonner";
+import { PetTableRow } from "./pets-admin/PetTableRow";
+import { PetsPagination } from "./pets-admin/PetsPagination";
+import { PetEditDialog } from "./pets-admin/PetEditDialog";
+import { VaccinationDialog } from "./pets-admin/VaccinationDialog";
+import { PetRecordsDialog } from "./pets-admin/PetRecordsDialog";
+import { AdminPet } from "./pets-admin/types";
 
 // Sample data for pets registered by admin
 const initialAdminPetsData = [
@@ -18,12 +19,12 @@ const initialAdminPetsData = [
 ];
 
 export function AdminPetsTable() {
-  const [adminPetsData, setAdminPetsData] = useState(initialAdminPetsData);
+  const [adminPetsData, setAdminPetsData] = useState<AdminPet[]>(initialAdminPetsData);
   const [currentPage, setCurrentPage] = useState(1);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isVaccinationDialogOpen, setIsVaccinationDialogOpen] = useState(false);
   const [isPetRecordsDialogOpen, setIsPetRecordsDialogOpen] = useState(false);
-  const [currentPet, setCurrentPet] = useState<null | typeof adminPetsData[0]>(null);
+  const [currentPet, setCurrentPet] = useState<null | AdminPet>(null);
   
   const [editForm, setEditForm] = useState({
     name: "",
@@ -64,7 +65,7 @@ export function AdminPetsTable() {
   const endIndex = startIndex + itemsPerPage;
   const currentData = adminPetsData.slice(startIndex, endIndex);
 
-  const handleEditClick = (pet: typeof adminPetsData[0]) => {
+  const handleEditClick = (pet: AdminPet) => {
     setCurrentPet(pet);
     setEditForm({
       name: pet.name,
@@ -73,7 +74,7 @@ export function AdminPetsTable() {
     setIsEditDialogOpen(true);
   };
 
-  const handleVaccinationClick = (pet: typeof adminPetsData[0]) => {
+  const handleVaccinationClick = (pet: AdminPet) => {
     setCurrentPet(pet);
     setNewVaccination({
       name: "",
@@ -82,7 +83,7 @@ export function AdminPetsTable() {
     setIsVaccinationDialogOpen(true);
   };
 
-  const handlePetRecordsClick = (pet: typeof adminPetsData[0]) => {
+  const handlePetRecordsClick = (pet: AdminPet) => {
     setCurrentPet(pet);
     setNewRecord({
       type: "",
@@ -90,6 +91,18 @@ export function AdminPetsTable() {
       notes: ""
     });
     setIsPetRecordsDialogOpen(true);
+  };
+
+  const handleEditFormChange = (field: string, value: string) => {
+    setEditForm({...editForm, [field]: value});
+  };
+
+  const handleNewVaccinationChange = (field: string, value: string) => {
+    setNewVaccination({...newVaccination, [field]: value});
+  };
+
+  const handleNewRecordChange = (field: string, value: string) => {
+    setNewRecord({...newRecord, [field]: value});
   };
 
   const handleSaveEdit = () => {
@@ -176,304 +189,71 @@ export function AdminPetsTable() {
   return (
     <div className="clinic-card animate-fade-in">
       <div className="overflow-x-auto">
-        <table className="clinic-table">
-          <thead>
-            <tr>
-              <th className="w-12">ID</th>
-              <th>Chip ID</th>
-              <th>Name</th>
-              <th>Registered By</th>
-              <th>Vaccination Records</th>
-              <th>Pet Records</th>
-              <th className="text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">ID</TableHead>
+              <TableHead>Chip ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Registered By</TableHead>
+              <TableHead>Vaccination Records</TableHead>
+              <TableHead>Pet Records</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {currentData.map((pet) => (
-              <tr key={pet.id} className="hover:bg-muted/30 transition-colors">
-                <td>{pet.id}</td>
-                <td>{pet.chipId}</td>
-                <td>{pet.name}</td>
-                <td>{pet.registeredBy}</td>
-                <td>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-clinic-blue"
-                    onClick={() => handleVaccinationClick(pet)}
-                  >
-                    <Syringe className="h-4 w-4 mr-1" />
-                    View ({pet.vaccinationRecords.length})
-                  </Button>
-                </td>
-                <td>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-clinic-blue"
-                    onClick={() => handlePetRecordsClick(pet)}
-                  >
-                    <FileText className="h-4 w-4 mr-1" />
-                    View ({pet.petRecords.length})
-                  </Button>
-                </td>
-                <td className="text-right">
-                  <Button 
-                    size="sm" 
-                    className="bg-clinic-blue hover:bg-clinic-blue/90"
-                    onClick={() => handleEditClick(pet)}
-                  >
-                    <Pencil className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-                </td>
-              </tr>
+              <PetTableRow
+                key={pet.id}
+                pet={pet}
+                onEditClick={handleEditClick}
+                onVaccinationClick={handleVaccinationClick}
+                onPetRecordsClick={handlePetRecordsClick}
+              />
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
       
       {/* Pagination */}
-      <div className="flex items-center justify-between mt-4 text-sm">
-        <div>
-          Showing {startIndex + 1} to {Math.min(endIndex, adminPetsData.length)} of {adminPetsData.length} entries
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" onClick={handlePreviousPage} disabled={currentPage === 1}>
-            <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Previous</span>
-          </Button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <Button
-              key={page}
-              variant={page === currentPage ? "default" : "outline"}
-              size="sm"
-              onClick={() => handlePageChange(page)}
-            >
-              {page}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-          >
-            <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">Next</span>
-          </Button>
-        </div>
-      </div>
+      <PetsPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        totalItems={adminPetsData.length}
+        onPageChange={handlePageChange}
+        onPreviousPage={handlePreviousPage}
+        onNextPage={handleNextPage}
+      />
 
-      {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Edit Pet Information</DialogTitle>
-            <DialogDescription>
-              Update the details for this pet
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-name" className="text-right">
-                Pet Name
-              </Label>
-              <Input
-                id="edit-name"
-                value={editForm.name}
-                onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-chipId" className="text-right">
-                Chip ID
-              </Label>
-              <Input
-                id="edit-chipId"
-                value={editForm.chipId}
-                onChange={(e) => setEditForm({...editForm, chipId: e.target.value})}
-                className="col-span-3"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveEdit}>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Dialogs */}
+      <PetEditDialog
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        currentPet={currentPet}
+        editForm={editForm}
+        onEditFormChange={handleEditFormChange}
+        onSave={handleSaveEdit}
+      />
 
-      {/* Vaccination Records Dialog */}
-      <Dialog open={isVaccinationDialogOpen} onOpenChange={setIsVaccinationDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>
-              Vaccination Records for {currentPet?.name}
-            </DialogTitle>
-            <DialogDescription>
-              View and manage vaccination records
-            </DialogDescription>
-          </DialogHeader>
-          <Tabs defaultValue="records">
-            <TabsList className="grid grid-cols-2">
-              <TabsTrigger value="records">Existing Records</TabsTrigger>
-              <TabsTrigger value="add">Add New Vaccination</TabsTrigger>
-            </TabsList>
-            <TabsContent value="records" className="pt-4">
-              {currentPet?.vaccinationRecords.length === 0 ? (
-                <p className="text-center py-4 text-muted-foreground">No vaccination records found</p>
-              ) : (
-                <div className="border rounded-md overflow-hidden">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vaccination</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {currentPet?.vaccinationRecords.map((record, index) => (
-                        <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.date}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </TabsContent>
-            <TabsContent value="add" className="pt-4">
-              <div className="space-y-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="vaccination-name" className="text-right">
-                    Vaccination
-                  </Label>
-                  <Input
-                    id="vaccination-name"
-                    placeholder="e.g., Rabies, Distemper"
-                    value={newVaccination.name}
-                    onChange={(e) => setNewVaccination({...newVaccination, name: e.target.value})}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="vaccination-date" className="text-right">
-                    Date
-                  </Label>
-                  <Input
-                    id="vaccination-date"
-                    type="date"
-                    value={newVaccination.date}
-                    onChange={(e) => setNewVaccination({...newVaccination, date: e.target.value})}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="flex justify-end pt-4">
-                  <Button onClick={handleAddVaccination}>Add Vaccination</Button>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsVaccinationDialogOpen(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <VaccinationDialog
+        isOpen={isVaccinationDialogOpen}
+        onOpenChange={setIsVaccinationDialogOpen}
+        currentPet={currentPet}
+        newVaccination={newVaccination}
+        onNewVaccinationChange={handleNewVaccinationChange}
+        onAddVaccination={handleAddVaccination}
+      />
 
-      {/* Pet Records Dialog */}
-      <Dialog open={isPetRecordsDialogOpen} onOpenChange={setIsPetRecordsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>
-              Medical Records for {currentPet?.name}
-            </DialogTitle>
-            <DialogDescription>
-              View and manage pet medical records
-            </DialogDescription>
-          </DialogHeader>
-          <Tabs defaultValue="records">
-            <TabsList className="grid grid-cols-2">
-              <TabsTrigger value="records">Existing Records</TabsTrigger>
-              <TabsTrigger value="add">Add New Record</TabsTrigger>
-            </TabsList>
-            <TabsContent value="records" className="pt-4">
-              {currentPet?.petRecords.length === 0 ? (
-                <p className="text-center py-4 text-muted-foreground">No medical records found</p>
-              ) : (
-                <div className="border rounded-md overflow-hidden">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {currentPet?.petRecords.map((record, index) => (
-                        <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.type}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.date}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.notes}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </TabsContent>
-            <TabsContent value="add" className="pt-4">
-              <div className="space-y-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="record-type" className="text-right">
-                    Record Type
-                  </Label>
-                  <Input
-                    id="record-type"
-                    placeholder="e.g., Checkup, Surgery"
-                    value={newRecord.type}
-                    onChange={(e) => setNewRecord({...newRecord, type: e.target.value})}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="record-date" className="text-right">
-                    Date
-                  </Label>
-                  <Input
-                    id="record-date"
-                    type="date"
-                    value={newRecord.date}
-                    onChange={(e) => setNewRecord({...newRecord, date: e.target.value})}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="record-notes" className="text-right">
-                    Notes
-                  </Label>
-                  <Input
-                    id="record-notes"
-                    placeholder="Any additional details"
-                    value={newRecord.notes}
-                    onChange={(e) => setNewRecord({...newRecord, notes: e.target.value})}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="flex justify-end pt-4">
-                  <Button onClick={handleAddRecord}>Add Record</Button>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsPetRecordsDialogOpen(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PetRecordsDialog
+        isOpen={isPetRecordsDialogOpen}
+        onOpenChange={setIsPetRecordsDialogOpen}
+        currentPet={currentPet}
+        newRecord={newRecord}
+        onNewRecordChange={handleNewRecordChange}
+        onAddRecord={handleAddRecord}
+      />
     </div>
   );
 }
