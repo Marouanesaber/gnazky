@@ -120,3 +120,19 @@ export const surgeryApi = {
   update: (id: string | number, data: any) => apiRequest(`/surgery/${id}`, { method: 'PUT', body: data }),
   delete: (id: string | number) => apiRequest(`/surgery/${id}`, { method: 'DELETE' }),
 };
+
+// New API services for shop functionality
+export const shopApi = {
+  getProducts: () => apiRequest('/shop/products'),
+  getProductById: (id: string | number) => apiRequest(`/shop/products/${id}`),
+  getCart: () => apiRequest('/shop/cart'),
+  addToCart: (data: { productId: number, quantity: number }) => 
+    apiRequest('/shop/cart/add', { method: 'POST', body: data }),
+  updateCartItem: (data: { itemId: number, quantity: number }) => 
+    apiRequest('/shop/cart/update', { method: 'PUT', body: data }),
+  removeCartItem: (itemId: number) => 
+    apiRequest('/shop/cart/remove', { method: 'DELETE', body: { itemId } }),
+  checkout: () => apiRequest('/shop/checkout', { method: 'POST' }),
+  getOrders: () => apiRequest('/shop/orders'),
+  getOrderById: (id: string | number) => apiRequest(`/shop/orders/${id}`),
+};

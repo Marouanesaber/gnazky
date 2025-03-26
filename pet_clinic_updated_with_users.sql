@@ -1,5 +1,5 @@
 
--- Schema for the pet_clinic database with user authentication
+-- Schema for the pet_clinic database with user authentication and shop features
 
 -- Drop database if exists and create a new one
 DROP DATABASE IF EXISTS pet_clinic;
@@ -14,6 +14,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   profile_picture VARCHAR(1000),
   role VARCHAR(20) DEFAULT 'user',
+  language VARCHAR(10) DEFAULT 'en',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -188,6 +189,122 @@ CREATE TABLE billing (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
+-- New shop-related tables
+-- Product categories
+CREATE TABLE product_categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  image VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Products table
+CREATE TABLE products (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  category_id INT NOT NULL,
+  image VARCHAR(255),
+  stock INT NOT NULL DEFAULT 0,
+  sku VARCHAR(50),
+  weight DECIMAL(8,2),
+  dimensions VARCHAR(100),
+  is_featured BOOLEAN DEFAULT FALSE,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (category_id) REFERENCES product_categories(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Shopping cart table
+CREATE TABLE cart_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- Orders table
+CREATE TABLE orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  status VARCHAR(50) DEFAULT 'pending',
+  subtotal DECIMAL(10,2) NOT NULL,
+  tax DECIMAL(10,2) DEFAULT 0,
+  shipping DECIMAL(10,2) DEFAULT 0,
+  total DECIMAL(10,2) NOT NULL,
+  shipping_address TEXT,
+  billing_address TEXT,
+  payment_method VARCHAR(50),
+  payment_status VARCHAR(50) DEFAULT 'pending',
+  tracking_number VARCHAR(100),
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Order items table
+CREATE TABLE order_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  price DECIMAL(10,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- Coupon codes
+CREATE TABLE coupons (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(50) NOT NULL UNIQUE,
+  type ENUM('percentage', 'fixed') NOT NULL,
+  value DECIMAL(10,2) NOT NULL,
+  minimum_order DECIMAL(10,2),
+  expiry_date DATE,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Reviews for products
+CREATE TABLE product_reviews (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  user_id INT NOT NULL,
+  rating INT NOT NULL,
+  comment TEXT,
+  is_approved BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Wishlists
+CREATE TABLE wishlist_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  product_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  UNIQUE KEY (user_id, product_id)
+);
+
 -- Insert sample data for owners
 INSERT INTO owners (name, email, phone, address) VALUES
 ('John Smith', 'john@example.com', '555-123-4567', '123 Main St, City'),
@@ -242,3 +359,20 @@ INSERT INTO settings (setting_name, setting_value) VALUES
 ('clinic_email', 'info@pethealthclinic.com'),
 ('clinic_hours', 'Monday-Friday: 8:00 AM - 6:00 PM, Saturday: 9:00 AM - 3:00 PM, Sunday: Closed'),
 ('appointment_duration', '30');
+
+-- Insert product categories
+INSERT INTO product_categories (name, description) VALUES
+('Food', 'Nutritious food for all types of pets'),
+('Toys', 'Fun and engaging toys for pets'),
+('Medicine', 'Healthcare products and medicines'),
+('Accessories', 'Collars, leashes, beds and more'),
+('Grooming', 'Grooming supplies for pets');
+
+-- Insert sample products
+INSERT INTO products (name, description, price, category_id, stock, is_featured, is_active) VALUES
+('Premium Dog Food', 'High-quality nutrition for adult dogs', 29.99, 1, 50, TRUE, TRUE),
+('Cat Scratching Post', 'Durable scratching post with soft perch', 39.99, 4, 25, TRUE, TRUE),
+('Pet Shampoo', 'Gentle formula for all pets', 12.99, 5, 100, FALSE, TRUE),
+('Interactive Dog Toy', 'Keeps dogs entertained for hours', 15.99, 2, 35, TRUE, TRUE),
+('Cat Dental Treats', 'Helps maintain dental health', 8.99, 1, 80, FALSE, TRUE),
+('Flea and Tick Medicine', 'Monthly treatment for pets', 45.99, 3, 40, TRUE, TRUE);

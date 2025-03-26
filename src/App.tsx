@@ -26,6 +26,8 @@ import BookAppointment from "./pages/BookAppointment";
 import Services from "./pages/Services";
 import Technicians from "./pages/Technicians";
 import ContactUs from "./pages/ContactUs";
+import Shop from "./pages/Shop";
+import Cart from "./pages/Cart";
 import { AuthProvider } from "./components/AuthProvider";
 
 const queryClient = new QueryClient();
@@ -48,6 +50,8 @@ const App = () => (
               <Route path="/services" element={<Services />} />
               <Route path="/technicians" element={<Technicians />} />
               <Route path="/contact-us" element={<ContactUs />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/cart" element={<Cart />} />
               <Route path="/dashboard" element={<Layout />}>
                 <Route index element={<Index />} />
                 <Route path="appointments" element={<AppointmentsPage />} />

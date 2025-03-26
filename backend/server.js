@@ -10,6 +10,7 @@ import laboratoryRoutes from './routes/laboratory.js';
 import vaccinationRoutes from './routes/vaccinations.js';
 import surgeryRoutes from './routes/surgery.js';
 import authRoutes from './routes/auth.js';
+import shopRoutes from './routes/shop.js';
 import jwt from 'jsonwebtoken';
 
 const app = express();
@@ -80,6 +81,7 @@ app.use('/api/laboratory', laboratoryRoutes);
 app.use('/api/vaccinations', vaccinationRoutes);
 app.use('/api/surgery', surgeryRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/shop', shopRoutes);
 
 // Token verification endpoint
 app.get('/api/auth/verify', verifyToken, (req, res) => {

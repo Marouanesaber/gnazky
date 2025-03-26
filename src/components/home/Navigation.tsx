@@ -1,99 +1,151 @@
 
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/components/AuthProvider";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, LayoutDashboard, PawPrint } from "lucide-react";
+import { PawPrint, Menu, X, ShoppingCart } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
-const Navigation = () => {
-  const { isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY;
-      if (offset > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  const handleDashboard = () => {
-    navigate("/dashboard");
-  };
-
-  const handleSignOut = () => {
-    logout();
-    navigate("/logout");
-  };
+export function Navigation() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   return (
-    <header className={`py-4 px-6 fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 shadow-md backdrop-blur-sm' : 'bg-white'}`}>
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex items-center animate-fade-in">
-          <Link to="/" className="font-bold text-xl text-blue-600 transition-all hover:scale-105 flex items-center gap-2">
-            <div className="relative">
-              <PawPrint className="h-8 w-8 text-blue-600" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-200 rounded-full animate-pulse"></span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif tracking-wide">PetClinic</span>
-              <span className="text-xs text-blue-400 font-normal -mt-1">Professional Pet Care</span>
-            </div>
+    <nav className="py-4 bg-white/80 backdrop-blur-sm sticky top-0 z-40 w-full border-b border-gray-200">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex items-center justify-between">
+          <Link
+            to="/"
+            className="flex items-center space-x-2"
+            aria-label="PetClinic Home"
+          >
+            <PawPrint className="h-6 w-6 text-primary" />
+            <span className="font-bold text-xl md:text-2xl">PetClinic</span>
           </Link>
-        </div>
-        <nav className="hidden md:flex items-center space-x-6">
-          {['Home', 'Book Appointment', 'Services', 'Technicians', 'Contact Us'].map((item, index) => (
-            <Link 
-              key={item} 
-              to={item === 'Home' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`} 
-              className="text-sm font-medium text-gray-900 hover:text-blue-600 transition-all relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-blue-600 after:transition-all"
-              style={{"animationDelay": `${(index + 1) * 100}ms`}}
+          
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
             >
-              {item}
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-gray-700 hover:text-primary transition-colors">
+              Home
             </Link>
-          ))}
-        </nav>
-        <div className="flex gap-2 animate-fade-in [animation-delay:600ms]">
-          {isAuthenticated ? (
-            <>
-              <Button 
-                onClick={handleDashboard} 
-                className="text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-all hover:scale-105"
-              >
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                Dashboard
-              </Button>
-              <Button 
-                onClick={handleSignOut} 
-                className="text-sm font-medium bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-all hover:scale-105"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-all hover:scale-105">
-                Login
-              </Link>
-              <Link to="/register" className="text-sm font-medium bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-full transition-all hover:scale-105">
-                Sign Up
-              </Link>
-            </>
-          )}
+            <Link to="/services" className="text-gray-700 hover:text-primary transition-colors">
+              Services
+            </Link>
+            <Link to="/shop" className="text-gray-700 hover:text-primary transition-colors">
+              Shop
+            </Link>
+            <Link to="/technicians" className="text-gray-700 hover:text-primary transition-colors">
+              Technicians
+            </Link>
+            <Link to="/contact-us" className="text-gray-700 hover:text-primary transition-colors">
+              Contact
+            </Link>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitcher />
+            
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard">
+                  <Button variant="ghost">Dashboard</Button>
+                </Link>
+                <Link to="/cart">
+                  <Button variant="outline" size="icon" className="relative">
+                    <ShoppingCart className="h-5 w-5" />
+                    <span className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                      0
+                    </span>
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost">Sign In</Button>
+                </Link>
+                <Link to="/register">
+                  <Button>Sign Up</Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
+        
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <div className="md:hidden pt-4 pb-2">
+            <div className="flex flex-col space-y-4">
+              <Link 
+                to="/"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Home
+              </Link>
+              <Link
+                to="/services"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Services
+              </Link>
+              <Link
+                to="/shop"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Shop
+              </Link>
+              <Link
+                to="/technicians"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Technicians
+              </Link>
+              <Link
+                to="/contact-us"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contact Us
+              </Link>
+              <div className="pt-2 border-t border-gray-200">
+                {isAuthenticated ? (
+                  <div className="flex space-x-2">
+                    <Link to="/dashboard" className="flex-1">
+                      <Button className="w-full" variant="ghost" onClick={() => setIsMenuOpen(false)}>Dashboard</Button>
+                    </Link>
+                    <Link to="/cart" className="flex-1">
+                      <Button className="w-full" variant="outline" onClick={() => setIsMenuOpen(false)}>Cart</Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="flex space-x-2">
+                    <Link to="/login" className="flex-1">
+                      <Button className="w-full" variant="ghost" onClick={() => setIsMenuOpen(false)}>Sign In</Button>
+                    </Link>
+                    <Link to="/register" className="flex-1">
+                      <Button className="w-full" onClick={() => setIsMenuOpen(false)}>Sign Up</Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </header>
+    </nav>
   );
-};
-
-export default Navigation;
+}
