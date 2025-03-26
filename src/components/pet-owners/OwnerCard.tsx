@@ -10,7 +10,7 @@ interface OwnerCardProps {
     id: number;
     name: string;
     address: string;
-    contact: string;
+    phone: string; // Changed from 'contact' to 'phone' to match the data structure
     email: string;
     petsCount: number;
   };
@@ -50,7 +50,7 @@ export function OwnerCard({ owner, onViewProfile, onViewPets }: OwnerCardProps) 
           </div>
           <div className="flex items-center gap-2">
             <Phone className="h-4 w-4 text-muted-foreground" />
-            <a href={`tel:${owner.contact}`} className="hover:underline">{owner.contact}</a>
+            <a href={`tel:${owner.phone}`} className="hover:underline">{owner.phone}</a>
           </div>
           <div className="flex items-start gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
