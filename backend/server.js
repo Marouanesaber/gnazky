@@ -84,6 +84,28 @@ app.use('/api/surgery', surgeryRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/shop', shopRoutes);
 
+// Add stats endpoint for appointments
+app.get('/api/appointments/stats', verifyToken, (req, res) => {
+  // Get current date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+  
+  db.query(
+    'SELECT COUNT(*) as count FROM appointments WHERE DATE(appointment_date) = ?',
+    [today],
+    (err, results) => {
+      if (err) {
+        console.error('Error fetching appointment stats:', err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+      
+      res.json({ 
+        todayCount: results[0].count,
+        date: today
+      });
+    }
+  );
+});
+
 // Token verification endpoint
 app.get('/api/auth/verify', verifyToken, (req, res) => {
   if (req.user) {

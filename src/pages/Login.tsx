@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthProvider";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
 import { AuthAnimation } from "@/components/auth/AuthAnimation";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/components/LanguageSwitcher";
@@ -43,6 +42,7 @@ const Login = () => {
       
       if (success) {
         setShowSuccessAnimation(true);
+        toast.success("Login successful!");
         setTimeout(() => {
           navigate(from || '/');
         }, 1000);
@@ -76,30 +76,30 @@ const Login = () => {
       >
         <Card>
           <CardHeader className="space-y-1">
-            <h4 className="text-xl font-semibold">Login</h4>
+            <h4 className="text-xl font-semibold">{t('login')}</h4>
             <p className="text-sm text-muted-foreground">
-              Enter your email and password to login
+              {t('enterCredentials')}
             </p>
           </CardHeader>
           <CardContent className="grid gap-4">
             <form onSubmit={handleLogin}>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('enterEmail')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+              <div className="grid gap-2 mt-2">
+                <Label htmlFor="password">{t('password')}</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={t('enterPassword')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -109,13 +109,13 @@ const Login = () => {
                 <p className="text-red-500 text-sm mt-2">{error}</p>
               )}
               <Button type="submit" className="w-full mt-4" disabled={loading}>
-                {loading ? "Logging in..." : "Login"}
+                {loading ? t('loggingIn') : t('login')}
               </Button>
             </form>
             <div className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              {t('dontHaveAccount')}{" "}
               <Link to="/register" className="text-primary hover:underline">
-                Sign up
+                {t('signUp')}
               </Link>
             </div>
           </CardContent>
