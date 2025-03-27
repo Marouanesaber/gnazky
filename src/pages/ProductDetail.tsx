@@ -10,7 +10,7 @@ import { ArrowLeft, Plus, Minus, ShoppingCart, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/components/AuthProvider';
 import { Navigation } from '@/components/home/Navigation';
-import { Footer } from '@/components/home/Footer';
+import Footer from '@/components/home/Footer';
 import { useLanguage } from '@/components/LanguageSwitcher';
 
 interface Product {

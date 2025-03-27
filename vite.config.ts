@@ -7,7 +7,7 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5000, // Changed from 8080 to 5000 to match backend
+    port: 8080, // Using port 8080 as instructed
   },
   resolve: {
     alias: {

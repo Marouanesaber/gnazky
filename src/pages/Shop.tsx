@@ -1,9 +1,8 @@
-
 import React, { useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import { Navigation } from "@/components/home/Navigation";
-import { Footer } from "@/components/home/Footer";
-import ProductCategory from "@/components/shop/ProductCategory";
+import Footer from "@/components/home/Footer";
+import { ProductCategory } from "@/components/shop/ProductCategory";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/utils/api";
@@ -92,18 +91,15 @@ const Shop = () => {
     queryKey: ['products'],
     queryFn: async () => {
       try {
-        // Try to get products from API
         const data = await apiRequest('/shop/products');
         return data;
       } catch (err) {
-        // Fall back to mock data if API fails
         console.error("Failed to fetch products, using mock data:", err);
         return getMockProducts();
       }
     }
   });
 
-  // Group products by category
   const getProductsByCategory = () => {
     if (!products) return [];
     
@@ -125,18 +121,14 @@ const Shop = () => {
     return Object.values(categories);
   };
 
-  // Handle successful add to cart
   const handleAddedToCart = () => {
-    // Emit event to update cart count in Navigation component
     emitEvent('cart-updated');
   };
 
   useEffect(() => {
-    // Listen for cart-updated events from ProductDetail or other components
     const cleanupFn = window.addEventListener('cart-updated', handleAddedToCart);
     
     return () => {
-      // Cleanup event listener on component unmount
       window.removeEventListener('cart-updated', handleAddedToCart);
     };
   }, []);
@@ -156,7 +148,7 @@ const Shop = () => {
                     <BreadcrumbLink href="/">{t('home')}</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/shop" isActive>{t('shop')}</BreadcrumbLink>
+                    <BreadcrumbLink href="/shop" className="font-semibold">{t('shop')}</BreadcrumbLink>
                   </BreadcrumbItem>
                 </Breadcrumb>
               </div>
@@ -180,7 +172,6 @@ const Shop = () => {
             <div className="text-center py-12">
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">{t('somethingWentWrong')}</h2>
               <p className="text-gray-600 mb-6">{t('couldNotLoadProducts')}</p>
-              {/* Using toast for error messages */}
               {toast.error(t('errorLoadingProducts'))}
             </div>
           ) : (
