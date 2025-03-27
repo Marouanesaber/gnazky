@@ -9,7 +9,7 @@ import { translations } from "@/utils/translations";
 export type TranslationKey = keyof typeof translations.en;
 
 // Language type
-export type Language = "en" | "es" | "fr" | "de";
+export type Language = "en" | "es" | "fr" | "de" | "zh";
 
 // Create a context for language
 interface LanguageContextType {
@@ -31,7 +31,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Load language preference from localStorage
     const savedLanguage = localStorage.getItem("language") as Language;
-    if (savedLanguage && ["en", "es", "fr", "de"].includes(savedLanguage)) {
+    if (savedLanguage && ["en", "es", "fr", "de", "zh"].includes(savedLanguage)) {
       setLanguage(savedLanguage);
       document.documentElement.lang = savedLanguage;
     }
@@ -73,7 +73,8 @@ export function LanguageSwitcher() {
             language === "en" ? "English" : 
             language === "es" ? "Español" :
             language === "fr" ? "Français" : 
-            "Deutsch"
+            language === "de" ? "Deutsch" :
+            "中文"
           }</span>
         </Button>
       </DropdownMenuTrigger>
@@ -89,6 +90,9 @@ export function LanguageSwitcher() {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => changeLanguage("de")}>
           <span className={language === "de" ? "font-bold" : ""}>Deutsch</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => changeLanguage("zh")}>
+          <span className={language === "zh" ? "font-bold" : ""}>中文</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

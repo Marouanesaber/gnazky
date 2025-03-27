@@ -1,4 +1,3 @@
-
 export const translations = {
   en: {
     // General
@@ -371,6 +370,99 @@ export const translations = {
     contactDetails: "Kontaktdaten",
     appointmentDetails: "Termindetails",
     confirmation: "Bestätigung"
+  },
+  zh: {
+    // General
+    login: "登录",
+    petClinic: "宠物诊所",
+    home: "首页",
+    services: "服务",
+    appointments: "预约",
+    shop: "商店",
+    contact: "联系我们",
+    logout: "退出登录",
+    signUp: "注册",
+    profile: "个人资料", 
+    dashboard: "仪表板",
+    bookAppointment: "预约",
+    continueShoppingText: "继续购物",
+    
+    // ProductCard translations
+    loginToAddToCart: "请登录以添加商品到购物车",
+    productOutOfStock: "此商品缺货",
+    addedToCart: "商品已添加到购物车",
+    errorAddingToCart: "添加商品到购物车时出错",
+    viewDetails: "查看详情",
+    addToCart: "添加到购物车",
+    
+    // Login translations
+    enterCredentials: "请输入您的登录凭证",
+    email: "电子邮箱",
+    enterEmail: "输入您的电子邮箱",
+    password: "密码",
+    enterPassword: "输入您的密码",
+    loggingIn: "登录中...",
+    dontHaveAccount: "没有账户？",
+    
+    // ProductDetail translations
+    productNotFound: "未找到商品",
+    productNotFoundDesc: "您查找的商品不存在或已被移除。",
+    backToShop: "返回商店",
+    category: "类别",
+    availability: "库存状态",
+    inStock: "有库存",
+    outOfStock: "缺货",
+    adding: "添加中...",
+    productDetails: "商品详情",
+    description: "描述",
+    specifications: "规格",
+    weight: "重量",
+    dimensions: "尺寸",
+    
+    // Shop translations
+    petShop: "宠物商店",
+    somethingWentWrong: "出现问题",
+    couldNotLoadProducts: "无法加载商品。请稍后再试。",
+    errorLoadingProducts: "加载商品时出错",
+    quantity: "数量",
+    
+    // Cart translations
+    petClinicShop: "宠物诊所商店",
+    yourCart: "您的购物车",
+    cartEmpty: "您的购物车是空的",
+    cartEmptyDesc: "看来您还没有添加任何商品到购物车",
+    startShopping: "开始购物",
+    subtotal: "小计",
+    shipping: "运费",
+    free: "免费",
+    freeShipping: "订单超过$50免运费",
+    total: "总计",
+    promoCode: "优惠码",
+    enterCode: "输入优惠码",
+    apply: "应用",
+    processing: "��理中...",
+    checkout: "结账",
+    
+    // Profile translations
+    profileSettings: "个人资料设置",
+    profilePicture: "头像",
+    clickAvatar: "点击头像更换图片",
+    uploadImage: "上传图片文件 (.jpg, .png)",
+    maxSize: "最大文件大小：5MB",
+    personalInfo: "个人信息",
+    updateAccount: "更新您的账户详情",
+    fullName: "全名",
+    emailAddress: "电子邮箱地址",
+    saving: "保存中...",
+    saveChanges: "保存更改",
+    
+    // Booking translations
+    bookVetAppointment: "预约兽医服务",
+    scheduleVisit: "为您的宠物安排与我们经验丰富的兽医的访问",
+    petInfo: "宠物信息",
+    contactDetails: "联系方式",
+    appointmentDetails: "预约详情",
+    confirmation: "确认"
   }
 };
 
