@@ -1,6 +1,7 @@
+
 export const translations = {
   en: {
-    // Existing translations
+    // General
     login: "Login",
     petClinic: "Pet Clinic",
     home: "Home",
@@ -15,7 +16,7 @@ export const translations = {
     bookAppointment: "Book Appointment",
     continueShoppingText: "Continue Shopping",
     
-    // Add missing translations for ProductCard.tsx
+    // ProductCard translations
     loginToAddToCart: "Please login to add items to your cart",
     productOutOfStock: "This product is out of stock",
     addedToCart: "Product added to cart",
@@ -23,7 +24,7 @@ export const translations = {
     viewDetails: "View Details",
     addToCart: "Add to Cart",
     
-    // Add missing translations for Login.tsx
+    // Login translations
     enterCredentials: "Enter your credentials to login",
     email: "Email",
     enterEmail: "Enter your email",
@@ -32,7 +33,7 @@ export const translations = {
     loggingIn: "Logging in...",
     dontHaveAccount: "Don't have an account?",
     
-    // Add missing translations for ProductDetail.tsx
+    // ProductDetail translations
     productNotFound: "Product Not Found",
     productNotFoundDesc: "The product you're looking for doesn't exist or has been removed.",
     backToShop: "Back to Shop",
@@ -47,15 +48,53 @@ export const translations = {
     weight: "Weight",
     dimensions: "Dimensions",
     
-    // Add missing translations for Shop.tsx
+    // Shop translations
     petShop: "Pet Shop",
     somethingWentWrong: "Something Went Wrong",
     couldNotLoadProducts: "Could not load products. Please try again later.",
     errorLoadingProducts: "Error loading products",
     quantity: "Quantity",
+    
+    // Cart translations
+    petClinicShop: "Pet Clinic Shop",
+    yourCart: "Your Cart",
+    cartEmpty: "Your cart is empty",
+    cartEmptyDesc: "Looks like you haven't added any items to your cart yet",
+    startShopping: "Start Shopping",
+    subtotal: "Subtotal",
+    shipping: "Shipping",
+    free: "Free",
+    freeShipping: "Free shipping on orders over $50",
+    total: "Total",
+    promoCode: "Promo Code",
+    enterCode: "Enter code",
+    apply: "Apply",
+    processing: "Processing...",
+    checkout: "Checkout",
+    
+    // Profile translations
+    profileSettings: "Profile Settings",
+    profilePicture: "Profile Picture",
+    clickAvatar: "Click on the avatar to change your picture",
+    uploadImage: "Upload an image file (.jpg, .png)",
+    maxSize: "Maximum file size: 5MB",
+    personalInfo: "Personal Information",
+    updateAccount: "Update your account details",
+    fullName: "Full Name",
+    emailAddress: "Email Address",
+    saving: "Saving...",
+    saveChanges: "Save Changes",
+    
+    // Booking translations
+    bookVetAppointment: "Book a Veterinary Appointment",
+    scheduleVisit: "Schedule a visit for your pet with our experienced veterinarians",
+    petInfo: "Pet Info",
+    contactDetails: "Contact Details",
+    appointmentDetails: "Appointment Details",
+    confirmation: "Confirmation"
   },
   es: {
-    // Spanish translations (add the same keys as English)
+    // General
     login: "Iniciar Sesión",
     petClinic: "Clínica de Mascotas",
     home: "Inicio",
@@ -70,7 +109,7 @@ export const translations = {
     bookAppointment: "Reservar Cita",
     continueShoppingText: "Continuar Comprando",
     
-    // Add missing translations for ProductCard.tsx in Spanish
+    // ProductCard translations
     loginToAddToCart: "Inicie sesión para agregar artículos a su carrito",
     productOutOfStock: "Este producto está agotado",
     addedToCart: "Producto añadido al carrito",
@@ -78,7 +117,7 @@ export const translations = {
     viewDetails: "Ver Detalles",
     addToCart: "Añadir al Carrito",
     
-    // Add missing translations for Login.tsx in Spanish
+    // Login translations
     enterCredentials: "Ingrese sus credenciales para iniciar sesión",
     email: "Correo electrónico",
     enterEmail: "Ingrese su correo electrónico",
@@ -87,7 +126,7 @@ export const translations = {
     loggingIn: "Iniciando sesión...",
     dontHaveAccount: "¿No tiene una cuenta?",
     
-    // Add missing translations for ProductDetail.tsx in Spanish
+    // ProductDetail translations
     productNotFound: "Producto No Encontrado",
     productNotFoundDesc: "El producto que busca no existe o ha sido eliminado.",
     backToShop: "Volver a la Tienda",
@@ -102,14 +141,53 @@ export const translations = {
     weight: "Peso",
     dimensions: "Dimensiones",
     
-    // Add missing translations for Shop.tsx in Spanish
+    // Shop translations
     petShop: "Tienda de Mascotas",
     somethingWentWrong: "Algo Salió Mal",
     couldNotLoadProducts: "No se pudieron cargar los productos. Inténtelo de nuevo más tarde.",
     errorLoadingProducts: "Error al cargar productos",
     quantity: "Cantidad",
+    
+    // Cart translations
+    petClinicShop: "Tienda Clínica de Mascotas",
+    yourCart: "Su Carrito",
+    cartEmpty: "Su carrito está vacío",
+    cartEmptyDesc: "Parece que aún no ha añadido ningún artículo a su carrito",
+    startShopping: "Comenzar a Comprar",
+    subtotal: "Subtotal",
+    shipping: "Envío",
+    free: "Gratis",
+    freeShipping: "Envío gratis en pedidos superiores a $50",
+    total: "Total",
+    promoCode: "Código Promocional",
+    enterCode: "Introducir código",
+    apply: "Aplicar",
+    processing: "Procesando...",
+    checkout: "Pagar",
+    
+    // Profile translations
+    profileSettings: "Configuración del Perfil",
+    profilePicture: "Imagen de Perfil",
+    clickAvatar: "Haga clic en el avatar para cambiar su imagen",
+    uploadImage: "Sube un archivo de imagen (.jpg, .png)",
+    maxSize: "Tamaño máximo de archivo: 5MB",
+    personalInfo: "Información Personal",
+    updateAccount: "Actualiza los detalles de tu cuenta",
+    fullName: "Nombre Completo",
+    emailAddress: "Dirección de Correo Electrónico",
+    saving: "Guardando...",
+    saveChanges: "Guardar Cambios",
+    
+    // Booking translations
+    bookVetAppointment: "Reservar una Cita Veterinaria",
+    scheduleVisit: "Programe una visita para su mascota con nuestros veterinarios experimentados",
+    petInfo: "Información de la Mascota",
+    contactDetails: "Datos de Contacto",
+    appointmentDetails: "Detalles de la Cita",
+    confirmation: "Confirmación"
   },
   fr: {
+    // General
     login: "Connexion",
     petClinic: "Clinique Vétérinaire",
     home: "Accueil",
@@ -162,8 +240,47 @@ export const translations = {
     couldNotLoadProducts: "Impossible de charger les produits. Veuillez réessayer plus tard.",
     errorLoadingProducts: "Erreur lors du chargement des produits",
     quantity: "Quantité",
+    
+    // Cart translations
+    petClinicShop: "Boutique Clinique Vétérinaire",
+    yourCart: "Votre Panier",
+    cartEmpty: "Votre panier est vide",
+    cartEmptyDesc: "Il semble que vous n'ayez pas encore ajouté d'articles à votre panier",
+    startShopping: "Commencer vos Achats",
+    subtotal: "Sous-total",
+    shipping: "Livraison",
+    free: "Gratuit",
+    freeShipping: "Livraison gratuite pour les commandes de plus de 50$",
+    total: "Total",
+    promoCode: "Code Promo",
+    enterCode: "Entrer le code",
+    apply: "Appliquer",
+    processing: "Traitement en cours...",
+    checkout: "Commander",
+    
+    // Profile translations
+    profileSettings: "Paramètres du Profil",
+    profilePicture: "Photo de Profil",
+    clickAvatar: "Cliquez sur l'avatar pour changer votre photo",
+    uploadImage: "Télécharger un fichier image (.jpg, .png)",
+    maxSize: "Taille maximale du fichier : 5 Mo",
+    personalInfo: "Informations Personnelles",
+    updateAccount: "Mettre à jour les détails de votre compte",
+    fullName: "Nom Complet",
+    emailAddress: "Adresse Email",
+    saving: "Enregistrement...",
+    saveChanges: "Enregistrer les Modifications",
+    
+    // Booking translations
+    bookVetAppointment: "Prendre un Rendez-vous Vétérinaire",
+    scheduleVisit: "Planifiez une visite pour votre animal avec nos vétérinaires expérimentés",
+    petInfo: "Informations sur l'Animal",
+    contactDetails: "Coordonnées",
+    appointmentDetails: "Détails du Rendez-vous",
+    confirmation: "Confirmation"
   },
   de: {
+    // General
     login: "Anmelden",
     petClinic: "Tierklinik",
     home: "Startseite",
@@ -216,5 +333,46 @@ export const translations = {
     couldNotLoadProducts: "Produkte konnten nicht geladen werden. Bitte versuchen Sie es später erneut.",
     errorLoadingProducts: "Fehler beim Laden der Produkte",
     quantity: "Menge",
+    
+    // Cart translations
+    petClinicShop: "Tierklinik Shop",
+    yourCart: "Ihr Warenkorb",
+    cartEmpty: "Ihr Warenkorb ist leer",
+    cartEmptyDesc: "Es scheint, dass Sie noch keine Artikel in Ihren Warenkorb gelegt haben",
+    startShopping: "Einkauf starten",
+    subtotal: "Zwischensumme",
+    shipping: "Versand",
+    free: "Kostenlos",
+    freeShipping: "Kostenloser Versand bei Bestellungen über 50$",
+    total: "Gesamtsumme",
+    promoCode: "Gutscheincode",
+    enterCode: "Code eingeben",
+    apply: "Anwenden",
+    processing: "Verarbeitung...",
+    checkout: "Zur Kasse",
+    
+    // Profile translations
+    profileSettings: "Profileinstellungen",
+    profilePicture: "Profilbild",
+    clickAvatar: "Klicken Sie auf den Avatar, um Ihr Bild zu ändern",
+    uploadImage: "Bilddatei hochladen (.jpg, .png)",
+    maxSize: "Maximale Dateigröße: 5MB",
+    personalInfo: "Persönliche Informationen",
+    updateAccount: "Aktualisieren Sie Ihre Kontodaten",
+    fullName: "Vollständiger Name",
+    emailAddress: "E-Mail-Adresse",
+    saving: "Wird gespeichert...",
+    saveChanges: "Änderungen speichern",
+    
+    // Booking translations
+    bookVetAppointment: "Tierärztlichen Termin buchen",
+    scheduleVisit: "Planen Sie einen Besuch für Ihr Haustier bei unseren erfahrenen Tierärzten",
+    petInfo: "Haustier-Informationen",
+    contactDetails: "Kontaktdaten",
+    appointmentDetails: "Termindetails",
+    confirmation: "Bestätigung"
   }
 };
+
+// Add TypeScript type definition for all translation keys
+export type TranslationKey = keyof typeof translations.en;
