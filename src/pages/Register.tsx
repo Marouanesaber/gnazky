@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { toast } from "sonner";
 import { AuthAnimation } from "@/components/auth/AuthAnimation";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/components/LanguageSwitcher";
+import { useAuth } from "@/components/AuthProvider";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -24,6 +26,7 @@ const Register = () => {
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { register } = useAuth();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
