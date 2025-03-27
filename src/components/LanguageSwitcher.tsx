@@ -1,13 +1,28 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext, useContext, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Globe } from "lucide-react";
+import { translations, TranslationKey } from "@/utils/translations";
 
-// Simple language context to be expanded with proper i18n library as needed
+// Language type
 export type Language = "en" | "zh";
 
-export function LanguageSwitcher() {
+// Create a context for language
+interface LanguageContextType {
+  language: Language;
+  t: (key: TranslationKey) => string;
+  changeLanguage: (newLanguage: Language) => void;
+}
+
+const LanguageContext = createContext<LanguageContextType>({
+  language: "en",
+  t: (key) => key,
+  changeLanguage: () => {},
+});
+
+// Language provider component
+export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
 
   useEffect(() => {
@@ -23,11 +38,28 @@ export function LanguageSwitcher() {
     setLanguage(newLanguage);
     localStorage.setItem("language", newLanguage);
     document.documentElement.lang = newLanguage;
-    
-    // Reload the page to apply language changes
-    // In a real implementation, this would use a proper i18n library
-    window.location.reload();
   };
+
+  // Translation function
+  const t = (key: TranslationKey): string => {
+    return translations[language]?.[key] || translations.en[key] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, t, changeLanguage }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+// Hook to use the language context
+export function useLanguage() {
+  return useContext(LanguageContext);
+}
+
+// Language switcher component
+export function LanguageSwitcher() {
+  const { language, changeLanguage } = useLanguage();
 
   return (
     <DropdownMenu>

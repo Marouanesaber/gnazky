@@ -1,151 +1,124 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, Lock, ArrowLeft } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthProvider";
+import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { AuthAnimation } from "@/components/auth/AuthAnimation";
+import { motion } from "framer-motion";
+import { useLanguage } from "@/components/LanguageSwitcher";
 
 const Login = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { from } = navigate.location.state || { from: { pathname: "/" } };
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const { t } = useLanguage();
+
+  useEffect(() => {
+    // Redirect if already logged in
+    if (login.isAuthenticated) {
+      navigate("/");
+    }
+  }, [login.isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
-      toast.error("Please enter both email and password");
-      return;
-    }
-    
-    setIsLoading(true);
+    setLoading(true);
+    setError("");
     
     try {
-      const success = await login(email, password, rememberMe);
+      const success = await login(email, password);
       
       if (success) {
-        toast.success("Login successful!", {
-          duration: 3000,
-          className: "animate-slide-in-right"
-        });
-        
-        setTimeout(() => navigate("/dashboard"), 500);
+        setShowSuccessAnimation(true);
+        setTimeout(() => {
+          navigate(from || '/');
+        }, 1000);
       }
+    } catch (err: any) {
+      setError(err.message || "Login failed. Please check your credentials.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    // Simulate animation completion
+    const timer = setTimeout(() => {
+      setAnimationComplete(true);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="min-h-screen w-full flex">
-      {/* Left side - Image */}
-      <div className="hidden md:flex md:w-1/2 relative">
-        <img 
-          src="/lovable-uploads/53e5364f-8c3a-4ab4-a79a-201ef7f981b4.png" 
-          alt="Dog with sunglasses" 
-          className="w-full h-full object-cover animate-fade-in"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/30"></div>
-        <div className="absolute bottom-8 left-8 text-white">
-          <h1 className="text-4xl font-bold mb-2 animate-fade-in [animation-delay:200ms]">PetClinic</h1>
-          <p className="text-xl animate-fade-in [animation-delay:400ms]">Caring for your pets' health</p>
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4 relative overflow-hidden">
+      {!animationComplete && <AuthAnimation isLogin={true} />}
+      {showSuccessAnimation && <AuthAnimation isSuccess={true} />}
       
-      {/* Right side - Login Form */}
-      <div className="w-full md:w-1/2 bg-gray-100 flex items-center justify-center p-4">
-        <div className="w-full max-w-md animate-fade-in [animation-delay:200ms]">
-          <Card className="shadow-lg border-0">
-            <CardHeader className="space-y-1 text-center">
-              <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
-              <CardDescription>
-                Login using your registered credentials
-              </CardDescription>
-            </CardHeader>
+      <motion.div 
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
+        <Card>
+          <CardHeader className="space-y-1">
+            <h4 className="text-xl font-semibold">Login</h4>
+            <p className="text-sm text-muted-foreground">
+              Enter your email and password to login
+            </p>
+          </CardHeader>
+          <CardContent className="grid gap-4">
             <form onSubmit={handleLogin}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">EMAIL ADDRESS</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      placeholder="name@example.com"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 transition-all duration-300 border-gray-300 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">PASSWORD</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 transition-all duration-300 border-gray-300 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="remember" 
-                      checked={rememberMe}
-                      onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                    />
-                    <label
-                      htmlFor="remember"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Remember me
-                    </label>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <Link to="/forgot-password" className="text-sm text-blue-500 hover:underline">
-                    Forgot Password?
-                  </Link>
-                </div>
-              </CardContent>
-              <CardFooter className="flex flex-col space-y-4">
-                <Button 
-                  type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700 transition-all duration-300"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Logging in..." : "Log In"}
-                </Button>
-                <div className="text-center text-sm mt-2">
-                  <span>New Client? </span>
-                  <Link to="/register" className="text-blue-500 hover:underline">
-                    Create an account
-                  </Link>
-                </div>
-                <Link to="/" className="text-center text-sm text-blue-500 hover:underline flex items-center justify-center mt-4">
-                  <ArrowLeft className="mr-1 h-4 w-4" /> 
-                  Back to website
-                </Link>
-              </CardFooter>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              {error && (
+                <p className="text-red-500 text-sm mt-2">{error}</p>
+              )}
+              <Button type="submit" className="w-full mt-4" disabled={loading}>
+                {loading ? "Logging in..." : "Login"}
+              </Button>
             </form>
-          </Card>
-        </div>
-      </div>
+            <div className="text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-primary hover:underline">
+                Sign up
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

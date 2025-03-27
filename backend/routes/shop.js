@@ -25,7 +25,7 @@ const authenticateUser = (req, res, next) => {
 router.get('/products', async (req, res) => {
   try {
     const [rows] = await req.db.promise().query(`
-      SELECT p.*, pc.name as category_name 
+      SELECT p.*, pc.name as category
       FROM products p
       JOIN product_categories pc ON p.category_id = pc.id
       WHERE p.is_active = TRUE
@@ -39,7 +39,7 @@ router.get('/products', async (req, res) => {
       description: product.description,
       price: parseFloat(product.price),
       image: product.image || `https://placehold.co/300x300?text=${encodeURIComponent(product.name)}`,
-      category: product.category_name,
+      category: product.category,
       stock: product.stock
     }));
     
@@ -54,7 +54,7 @@ router.get('/products', async (req, res) => {
 router.get('/products/:id', async (req, res) => {
   try {
     const [rows] = await req.db.promise().query(`
-      SELECT p.*, pc.name as category_name 
+      SELECT p.*, pc.name as category 
       FROM products p
       JOIN product_categories pc ON p.category_id = pc.id
       WHERE p.id = ? AND p.is_active = TRUE
@@ -72,7 +72,7 @@ router.get('/products/:id', async (req, res) => {
       description: product.description,
       price: parseFloat(product.price),
       image: product.image || `https://placehold.co/300x300?text=${encodeURIComponent(product.name)}`,
-      category: product.category_name,
+      category: product.category,
       stock: product.stock,
       sku: product.sku,
       weight: product.weight,

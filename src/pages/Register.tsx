@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,9 @@ import { Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { AuthAnimation } from "@/components/auth/AuthAnimation";
+import { motion } from "framer-motion";
+import { useLanguage } from "@/components/LanguageSwitcher";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -18,7 +20,10 @@ const Register = () => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,56 +41,40 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.error || 'Registration failed');
-        setIsLoading(false);
-        return;
+      const success = await register(name, email, password);
+      
+      if (success) {
+        setShowSuccessAnimation(true);
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
       }
-      
-      // Show success toast
-      toast.success("Account created successfully!", {
-        duration: 3000,
-        className: "animate-slide-in-right"
-      });
-      
-      // Navigate to login after a short delay
-      setTimeout(() => navigate("/login"), 500);
-    } catch (error) {
-      console.error('Registration error:', error);
-      toast.error('Server error. Please try again later.');
+    } catch (err: any) {
+      toast.error(err.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimationComplete(true);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="min-h-screen w-full flex">
-      {/* Left side - Image */}
-      <div className="hidden md:flex md:w-1/2 relative">
-        <img 
-          src="/lovable-uploads/53e5364f-8c3a-4ab4-a79a-201ef7f981b4.png" 
-          alt="Dog with sunglasses" 
-          className="w-full h-full object-cover animate-fade-in"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/30"></div>
-        <div className="absolute bottom-8 left-8 text-white">
-          <h1 className="text-4xl font-bold mb-2 animate-fade-in [animation-delay:200ms]">PetClinic</h1>
-          <p className="text-xl animate-fade-in [animation-delay:400ms]">Join our pet care community</p>
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4 relative overflow-hidden">
+      {!animationComplete && <AuthAnimation isLogin={false} />}
+      {showSuccessAnimation && <AuthAnimation isSuccess={true} />}
       
-      {/* Right side - Registration Form */}
-      <div className="w-full md:w-1/2 bg-gray-100 flex items-center justify-center p-4">
+      <motion.div 
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
         <div className="w-full max-w-md animate-fade-in [animation-delay:200ms]">
           <Card className="shadow-lg border-0">
             <CardHeader className="space-y-1 text-center">
@@ -199,9 +188,8 @@ const Register = () => {
             </form>
           </Card>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Terms and Conditions Dialog */}
       <Dialog open={isTermsOpen} onOpenChange={setIsTermsOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,49 +28,56 @@ import ContactUs from "./pages/ContactUs";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
 import { AuthProvider } from "./components/AuthProvider";
+import { LanguageProvider } from "@/components/LanguageSwitcher";
+import ProductDetail from "./pages/ProductDetail";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="light" storageKey="pet-clinic-theme">
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/logout" element={<Logout />} />
-              <Route path="/book-appointment" element={<BookAppointment />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/technicians" element={<Technicians />} />
-              <Route path="/contact-us" element={<ContactUs />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/dashboard" element={<Layout />}>
-                <Route index element={<Index />} />
-                <Route path="appointments" element={<AppointmentsPage />} />
-                <Route path="consultations" element={<ConsultationsPage />} />
-                <Route path="vaccinations" element={<VaccinationsPage />} />
-                <Route path="laboratory" element={<LaboratoryPage />} />
-                <Route path="surgery" element={<SurgeryPage />} />
-                <Route path="pets" element={<PetsPage />} />
-                <Route path="owners" element={<OwnersPage />} />
-                <Route path="settings" element={<SettingsPage />} />
-                <Route path="profile" element={<ProfilePage />} />
-                <Route path="*" element={<NotFound />} />
-              </Route>
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <LanguageProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="light" storageKey="pet-clinic-theme">
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/logout" element={<Logout />} />
+                  <Route path="/book-appointment" element={<BookAppointment />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/technicians" element={<Technicians />} />
+                  <Route path="/contact-us" element={<ContactUs />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/shop/product/:productId" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/dashboard" element={<Layout />}>
+                    <Route index element={<Index />} />
+                    <Route path="appointments" element={<AppointmentsPage />} />
+                    <Route path="consultations" element={<ConsultationsPage />} />
+                    <Route path="vaccinations" element={<VaccinationsPage />} />
+                    <Route path="laboratory" element={<LaboratoryPage />} />
+                    <Route path="surgery" element={<SurgeryPage />} />
+                    <Route path="pets" element={<PetsPage />} />
+                    <Route path="owners" element={<OwnersPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                    <Route path="profile" element={<ProfilePage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Route>
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </LanguageProvider>
+  );
+}
 
 export default App;

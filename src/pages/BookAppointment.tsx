@@ -5,8 +5,11 @@ import Footer from "@/components/home/Footer";
 import { Container } from "@/components/ui/container";
 import { AppointmentForm } from "@/components/booking/AppointmentForm";
 import { BookingInfoCards } from "@/components/booking/BookingInfoCards";
+import { useLanguage } from "@/components/LanguageSwitcher";
 
 const BookAppointment = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Navigation />
@@ -14,10 +17,10 @@ const BookAppointment = () => {
       <main className="flex-grow pt-24 pb-16 px-4 animate-fade-in">
         <Container className="max-w-4xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-blue-600">Book a Veterinary Appointment</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-blue-600">{t("bookVetAppointment")}</h1>
             <div className="flex justify-center">
               <p className="text-gray-600 max-w-2xl mx-auto border-b-2 border-blue-200 pb-4">
-                Schedule a visit with our veterinary professionals to ensure your pet receives the best care possible.
+                {t("scheduleVisit")}
               </p>
             </div>
           </div>

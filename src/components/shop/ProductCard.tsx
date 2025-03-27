@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, Eye } from "lucide-react";
 import { Product } from "@/pages/Shop";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/components/LanguageSwitcher";
 
 interface ProductCardProps {
   product: Product;
@@ -12,6 +13,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onAddToCart }: ProductCardProps) {
+  const { t } = useLanguage();
+  
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md animate-fade-in">
       <div className="relative aspect-square overflow-hidden">
@@ -23,7 +26,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
         <div className="absolute top-2 right-2">
           {product.stock < 10 && (
             <div className="bg-red-500 text-white text-xs font-semibold py-1 px-2 rounded">
-              Low stock
+              {t("lowStock")}
             </div>
           )}
         </div>
@@ -44,12 +47,12 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           disabled={product.stock === 0}
         >
           <ShoppingCart className="h-4 w-4" />
-          {product.stock === 0 ? "Out of stock" : "Add to cart"}
+          {product.stock === 0 ? t("outOfStock") : t("addToCart")}
         </Button>
         <Link to={`/shop/product/${product.id}`} className="flex-1">
           <Button variant="outline" size="sm" className="w-full gap-2">
             <Eye className="h-4 w-4" />
-            Details
+            {t("details")}
           </Button>
         </Link>
       </CardFooter>

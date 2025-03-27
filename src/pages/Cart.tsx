@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "@/components/ui/container";
@@ -10,7 +9,7 @@ import { toast } from "sonner";
 import { apiRequest } from "@/utils/api";
 import { Product } from "./Shop";
 import { ArrowLeft, Trash2, Plus, Minus, CreditCard, ShoppingBag } from "lucide-react";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LanguageSwitcher, useLanguage } from "@/components/LanguageSwitcher";
 
 interface CartItem {
   id: number;
@@ -22,8 +21,8 @@ const Cart: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  const { t } = useLanguage();
 
-  // Check authentication
   React.useEffect(() => {
     if (!isAuthenticated) {
       toast.error("Please login to view your cart");
@@ -31,7 +30,6 @@ const Cart: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Fetch cart items
   const { data: cartItems = [], isLoading, error, refetch } = useQuery({
     queryKey: ["cart"],
     queryFn: async () => {
@@ -56,7 +54,6 @@ const Cart: React.FC = () => {
       refetch();
     } catch (err) {
       console.error("Failed to update quantity:", err);
-      // For demo, update the UI anyway
       toast.success("Quantity updated");
       refetch();
     }
@@ -72,7 +69,6 @@ const Cart: React.FC = () => {
       refetch();
     } catch (err) {
       console.error("Failed to remove item:", err);
-      // For demo, update the UI anyway
       toast.success("Item removed from cart");
       refetch();
     }
@@ -96,7 +92,6 @@ const Cart: React.FC = () => {
     }
   };
 
-  // Calculate totals
   const subtotal = cartItems.reduce((sum: number, item: CartItem) => {
     return sum + (item.product.price * item.quantity);
   }, 0);
@@ -105,7 +100,7 @@ const Cart: React.FC = () => {
   const total = subtotal + shipping;
 
   if (!isAuthenticated) {
-    return null; // Redirecting in useEffect
+    return null;
   }
 
   return (
@@ -114,7 +109,7 @@ const Cart: React.FC = () => {
         <Container>
           <div className="flex items-center justify-between">
             <Link to="/" className="text-2xl font-bold text-primary">
-              PetClinic Shop
+              {t("petClinicShop")}
             </Link>
             <LanguageSwitcher />
           </div>
@@ -124,9 +119,9 @@ const Cart: React.FC = () => {
       <Container className="py-8">
         <div className="mb-6">
           <Link to="/shop" className="text-primary hover:underline inline-flex items-center">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Continue Shopping
+            <ArrowLeft className="h-4 w-4 mr-2" /> {t("continueShoppingText")}
           </Link>
-          <h1 className="text-2xl font-bold mt-2">Your Shopping Cart</h1>
+          <h1 className="text-2xl font-bold mt-2">{t("yourCart")}</h1>
         </div>
 
         {isLoading ? (
@@ -145,11 +140,11 @@ const Cart: React.FC = () => {
         ) : cartItems.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow-sm">
             <ShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">Your cart is empty</h3>
-            <p className="text-gray-500 mb-6">Looks like you haven't added any products to your cart yet.</p>
+            <h3 className="text-lg font-medium mb-2">{t("cartEmpty")}</h3>
+            <p className="text-gray-500 mb-6">{t("cartEmptyDesc")}</p>
             <Link to="/shop">
               <Button>
-                Start Shopping
+                {t("startShopping")}
               </Button>
             </Link>
           </div>
@@ -206,34 +201,34 @@ const Cart: React.FC = () => {
 
             <div className="w-full lg:w-96">
               <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                <h3 className="font-medium text-lg mb-4">Order Summary</h3>
+                <h3 className="font-medium text-lg mb-4">{t("subtotal")}</h3>
                 <div className="space-y-2 text-sm mb-4">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
+                    <span className="text-gray-600">{t("subtotal")}</span>
                     <span>${subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
-                    <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                    <span className="text-gray-600">{t("shipping")}</span>
+                    <span>{shipping === 0 ? t("free") : `$${shipping.toFixed(2)}`}</span>
                   </div>
                   {shipping > 0 && (
                     <div className="text-xs text-gray-500">
-                      Free shipping on orders over $50
+                      {t("freeShipping")}
                     </div>
                   )}
                   <div className="border-t pt-2 mt-2 flex justify-between font-medium">
-                    <span>Total</span>
+                    <span>{t("total")}</span>
                     <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <div className="mb-4">
                   <label htmlFor="coupon" className="text-sm font-medium mb-2 block">
-                    Promo Code
+                    {t("promoCode")}
                   </label>
                   <div className="flex gap-2">
-                    <Input id="coupon" placeholder="Enter code" />
-                    <Button variant="outline" size="sm">Apply</Button>
+                    <Input id="coupon" placeholder={t("enterCode")} />
+                    <Button variant="outline" size="sm">{t("apply")}</Button>
                   </div>
                 </div>
 
@@ -244,7 +239,7 @@ const Cart: React.FC = () => {
                   disabled={isProcessing}
                 >
                   <CreditCard className="h-4 w-4" />
-                  {isProcessing ? "Processing..." : "Checkout"}
+                  {isProcessing ? t("processing") : t("checkout")}
                 </Button>
               </div>
             </div>
@@ -255,7 +250,6 @@ const Cart: React.FC = () => {
   );
 };
 
-// Mock cart data for development/fallback
 function getMockCartItems(): CartItem[] {
   return [
     {

@@ -2,12 +2,15 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { CheckCircle } from "lucide-react";
+import { useLanguage } from "@/components/LanguageSwitcher";
 
 interface BookingStepsProps {
   currentStep: number;
 }
 
 export function BookingSteps({ currentStep }: BookingStepsProps) {
+  const { t } = useLanguage();
+  
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-2">
@@ -34,16 +37,16 @@ export function BookingSteps({ currentStep }: BookingStepsProps) {
       </div>
       <div className="flex justify-between text-sm mt-2">
         <span className={cn("transition-colors duration-300", currentStep >= 1 ? "text-blue-600 font-medium" : "text-gray-500")}>
-          Pet Information
+          {t("petInfo")}
         </span>
         <span className={cn("transition-colors duration-300", currentStep >= 2 ? "text-blue-600 font-medium" : "text-gray-500")}>
-          Contact Details
+          {t("contactDetails")}
         </span>
         <span className={cn("transition-colors duration-300", currentStep >= 3 ? "text-blue-600 font-medium" : "text-gray-500")}>
-          Appointment Details
+          {t("appointmentDetails")}
         </span>
         <span className={cn("transition-colors duration-300", currentStep >= 4 ? "text-blue-600 font-medium" : "text-gray-500")}>
-          Confirmation
+          {t("confirmation")}
         </span>
       </div>
     </div>
