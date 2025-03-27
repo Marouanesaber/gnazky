@@ -1,3 +1,4 @@
+
 export const translations = {
   en: {
     // General
@@ -31,6 +32,9 @@ export const translations = {
     enterPassword: "Enter your password",
     loggingIn: "Logging in...",
     dontHaveAccount: "Don't have an account?",
+    loginSuccessful: "Login successful!",
+    loginFailedMessage: "Login failed. Please check your credentials.",
+    welcomeBack: "Welcome Back!",
     
     // ProductDetail translations
     productNotFound: "Product Not Found",
@@ -124,6 +128,9 @@ export const translations = {
     enterPassword: "Ingrese su contraseña",
     loggingIn: "Iniciando sesión...",
     dontHaveAccount: "¿No tiene una cuenta?",
+    loginSuccessful: "¡Inicio de sesión exitoso!",
+    loginFailedMessage: "Error de inicio de sesión. Por favor verifique sus credenciales.",
+    welcomeBack: "¡Bienvenido de nuevo!",
     
     // ProductDetail translations
     productNotFound: "Producto No Encontrado",
@@ -217,6 +224,9 @@ export const translations = {
     enterPassword: "Entrez votre mot de passe",
     loggingIn: "Connexion en cours...",
     dontHaveAccount: "Vous n'avez pas de compte ?",
+    loginSuccessful: "Connexion réussie !",
+    loginFailedMessage: "Échec de la connexion. Veuillez vérifier vos identifiants.",
+    welcomeBack: "Bon retour !",
     
     // ProductDetail translations
     productNotFound: "Produit non trouvé",
@@ -310,6 +320,9 @@ export const translations = {
     enterPassword: "Geben Sie Ihr Passwort ein",
     loggingIn: "Anmeldung läuft...",
     dontHaveAccount: "Haben Sie kein Konto?",
+    loginSuccessful: "Anmeldung erfolgreich!",
+    loginFailedMessage: "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldedaten.",
+    welcomeBack: "Willkommen zurück!",
     
     // ProductDetail translations
     productNotFound: "Produkt nicht gefunden",
@@ -403,6 +416,9 @@ export const translations = {
     enterPassword: "输入您的密码",
     loggingIn: "登录中...",
     dontHaveAccount: "没有账户？",
+    loginSuccessful: "登录成功！",
+    loginFailedMessage: "登录失败。请检查您的凭证。",
+    welcomeBack: "欢迎回来！",
     
     // ProductDetail translations
     productNotFound: "未找到商品",
@@ -440,7 +456,7 @@ export const translations = {
     promoCode: "优惠码",
     enterCode: "输入优惠码",
     apply: "应用",
-    processing: "��理中...",
+    processing: "处理中...",
     checkout: "结账",
     
     // Profile translations

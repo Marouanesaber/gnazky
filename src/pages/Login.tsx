@@ -42,13 +42,13 @@ const Login = () => {
       
       if (success) {
         setShowSuccessAnimation(true);
-        toast.success("Login successful!");
+        toast.success(t("loginSuccessful"));
         setTimeout(() => {
           navigate(from || '/');
         }, 1000);
       }
     } catch (err: any) {
-      setError(err.message || "Login failed. Please check your credentials.");
+      setError(err.message || t("loginFailedMessage"));
     } finally {
       setLoading(false);
     }
