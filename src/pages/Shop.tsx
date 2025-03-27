@@ -1,8 +1,9 @@
+
 import React, { useEffect } from "react";
 import { Container } from "@/components/ui/container";
 import { Navigation } from "@/components/home/Navigation";
 import Footer from "@/components/home/Footer";
-import { ProductCategory } from "@/components/shop/ProductCategory";
+import ProductCard from "@/components/shop/ProductCard";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/utils/api";
@@ -148,7 +149,7 @@ const Shop = () => {
                     <BreadcrumbLink href="/">{t('home')}</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/shop" className="font-semibold">{t('shop')}</BreadcrumbLink>
+                    <BreadcrumbLink href="/shop">{t('shop')}</BreadcrumbLink>
                   </BreadcrumbItem>
                 </Breadcrumb>
               </div>
@@ -177,12 +178,18 @@ const Shop = () => {
           ) : (
             <div className="space-y-16">
               {getProductsByCategory().map((category) => (
-                <ProductCategory 
-                  key={category.name} 
-                  name={category.name} 
-                  products={category.products}
-                  onAddedToCart={handleAddedToCart}
-                />
+                <div key={category.name} className="space-y-4">
+                  <h2 className="text-2xl font-bold capitalize">{category.name}</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {category.products.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        onAddedToCart={handleAddedToCart}
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           )}

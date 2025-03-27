@@ -1,28 +1,30 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
+import ProductCard from "./ProductCard";
+import { Product } from "@/pages/Shop";
 
 interface ProductCategoryProps {
-  category: {
-    id: string;
-    name: string;
-  };
-  isSelected: boolean;
-  onSelect: () => void;
+  name: string;
+  products: Product[];
+  onAddedToCart?: () => void;
 }
 
-export function ProductCategory({ category, isSelected, onSelect }: ProductCategoryProps) {
+export function ProductCategory({ name, products, onAddedToCart }: ProductCategoryProps) {
   return (
-    <button
-      onClick={onSelect}
-      className={cn(
-        "w-full text-left px-3 py-2 rounded-md transition-colors text-sm",
-        isSelected
-          ? "bg-primary/10 text-primary font-medium"
-          : "hover:bg-gray-100 text-gray-700"
-      )}
-    >
-      {category.name}
-    </button>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold capitalize">{name}</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            onAddedToCart={onAddedToCart}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
+
+export default ProductCategory;

@@ -3,10 +3,13 @@ import { useEffect, useState, createContext, useContext, ReactNode } from "react
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Globe } from "lucide-react";
-import { translations, TranslationKey } from "@/utils/translations";
+import { translations } from "@/utils/translations";
+
+// Define TranslationKey type
+export type TranslationKey = keyof typeof translations.en;
 
 // Language type
-export type Language = "en" | "zh";
+export type Language = "en" | "es" | "fr" | "de";
 
 // Create a context for language
 interface LanguageContextType {
@@ -17,7 +20,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType>({
   language: "en",
-  t: (key) => key,
+  t: (key) => String(key),
   changeLanguage: () => {},
 });
 
@@ -28,7 +31,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Load language preference from localStorage
     const savedLanguage = localStorage.getItem("language") as Language;
-    if (savedLanguage) {
+    if (savedLanguage && ["en", "es", "fr", "de"].includes(savedLanguage)) {
       setLanguage(savedLanguage);
       document.documentElement.lang = savedLanguage;
     }
@@ -42,7 +45,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   // Translation function
   const t = (key: TranslationKey): string => {
-    return translations[language]?.[key] || translations.en[key] || key;
+    return translations[language]?.[key] || translations.en[key] || String(key);
   };
 
   return (
@@ -66,15 +69,26 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="flex items-center gap-1">
           <Globe className="h-4 w-4" />
-          <span>{language === "en" ? "English" : "中文"}</span>
+          <span>{
+            language === "en" ? "English" : 
+            language === "es" ? "Español" :
+            language === "fr" ? "Français" : 
+            "Deutsch"
+          }</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => changeLanguage("en")}>
           <span className={language === "en" ? "font-bold" : ""}>English</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeLanguage("zh")}>
-          <span className={language === "zh" ? "font-bold" : ""}>中文</span>
+        <DropdownMenuItem onClick={() => changeLanguage("es")}>
+          <span className={language === "es" ? "font-bold" : ""}>Español</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => changeLanguage("fr")}>
+          <span className={language === "fr" ? "font-bold" : ""}>Français</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => changeLanguage("de")}>
+          <span className={language === "de" ? "font-bold" : ""}>Deutsch</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
