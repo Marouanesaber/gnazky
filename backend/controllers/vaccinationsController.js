@@ -14,25 +14,36 @@ export const getAllVaccinations = async (req, res) => {
       return res.status(500).json({ error: 'Database connection not available' });
     }
     
+    // Execute the query with proper error handling
     const [rows] = await db.promise().query(`
       SELECT 
         id, 
         pet_id as petId, 
         date, 
         type, 
-        by, 
+        \`by\`, 
         temp, 
         created_at as createdAt, 
         updated_at as updatedAt 
       FROM vaccinations 
       ORDER BY id DESC
-    `);
+    `).catch(err => {
+      console.error('SQL query error:', err);
+      throw new Error(`Database query failed: ${err.message}`);
+    });
     
     console.log('Successfully fetched vaccinations:', rows.length);
-    res.json(rows);
+    
+    // Format date strings to YYYY-MM-DD
+    const formattedRows = rows.map(row => ({
+      ...row,
+      date: row.date instanceof Date ? row.date.toISOString().split('T')[0] : row.date,
+    }));
+    
+    res.json(formattedRows);
   } catch (error) {
     console.error('Error fetching vaccinations:', error);
-    res.status(500).json({ error: 'Error fetching vaccinations' });
+    res.status(500).json({ error: 'Error fetching vaccinations: ' + error.message });
   }
 };
 
@@ -56,23 +67,32 @@ export const getVaccinationById = async (req, res) => {
         pet_id as petId, 
         date, 
         type, 
-        by, 
+        \`by\`, 
         temp, 
         created_at as createdAt, 
         updated_at as updatedAt 
       FROM vaccinations 
       WHERE id = ?
-    `, [id]);
+    `, [id]).catch(err => {
+      console.error('SQL query error:', err);
+      throw new Error(`Database query failed: ${err.message}`);
+    });
     
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Vaccination not found' });
     }
     
+    // Format date string to YYYY-MM-DD
+    const formattedVaccination = {
+      ...rows[0],
+      date: rows[0].date instanceof Date ? rows[0].date.toISOString().split('T')[0] : rows[0].date,
+    };
+    
     console.log('Successfully fetched vaccination details');
-    res.json(rows[0]);
+    res.json(formattedVaccination);
   } catch (error) {
     console.error(`Error fetching vaccination with ID ${id}:`, error);
-    res.status(500).json({ error: 'Error fetching vaccination' });
+    res.status(500).json({ error: 'Error fetching vaccination: ' + error.message });
   }
 };
 
@@ -96,11 +116,14 @@ export const createVaccination = async (req, res) => {
       return res.status(400).json({ error: 'Pet ID, date, and type are required' });
     }
     
-    // Create new vaccination record - use pet_id for database column
-    const query = `INSERT INTO vaccinations (pet_id, date, type, by, temp) 
+    // Create new vaccination record - use pet_id for database column and escape 'by' field since it's a reserved word
+    const query = `INSERT INTO vaccinations (pet_id, date, type, \`by\`, temp) 
                   VALUES (?, ?, ?, ?, ?)`;
     
-    const [result] = await db.promise().query(query, [petId, date, type, by || 'Admin Admin', temp || '']);
+    const [result] = await db.promise().query(query, [petId, date, type, by || 'Admin Admin', temp || '']).catch(err => {
+      console.error('SQL query error:', err);
+      throw new Error(`Database query failed: ${err.message}`);
+    });
     
     // Get the newly created vaccination and convert pet_id to petId for client
     const [newVaccination] = await db.promise().query(`
@@ -109,19 +132,28 @@ export const createVaccination = async (req, res) => {
         pet_id as petId, 
         date, 
         type, 
-        by, 
+        \`by\`, 
         temp, 
         created_at as createdAt, 
         updated_at as updatedAt 
       FROM vaccinations 
       WHERE id = ?
-    `, [result.insertId]);
+    `, [result.insertId]).catch(err => {
+      console.error('SQL query error:', err);
+      throw new Error(`Database query failed: ${err.message}`);
+    });
+    
+    // Format date string to YYYY-MM-DD
+    const formattedVaccination = {
+      ...newVaccination[0],
+      date: newVaccination[0].date instanceof Date ? newVaccination[0].date.toISOString().split('T')[0] : newVaccination[0].date,
+    };
     
     console.log('Successfully created vaccination record with ID:', result.insertId);
-    res.status(201).json(newVaccination[0]);
+    res.status(201).json(formattedVaccination);
   } catch (error) {
     console.error('Error creating vaccination:', error);
-    res.status(500).json({ error: 'Error creating vaccination record' });
+    res.status(500).json({ error: 'Error creating vaccination record: ' + error.message });
   }
 };
 
@@ -141,19 +173,22 @@ export const updateVaccination = async (req, res) => {
     }
     
     // Check if vaccination exists
-    const [existing] = await db.promise().query('SELECT * FROM vaccinations WHERE id = ?', [id]);
+    const [existing] = await db.promise().query('SELECT * FROM vaccinations WHERE id = ?', [id]).catch(err => {
+      console.error('SQL query error:', err);
+      throw new Error(`Database query failed: ${err.message}`);
+    });
     
     if (existing.length === 0) {
       console.error(`Vaccination with ID ${id} not found`);
       return res.status(404).json({ error: 'Vaccination not found' });
     }
     
-    // Update vaccination record - remember pet_id is the database column name
+    // Update vaccination record - escape 'by' field since it's a reserved word
     const query = `UPDATE vaccinations SET 
                   pet_id = ?,
                   date = ?,
                   type = ?,
-                  by = ?,
+                  \`by\` = ?,
                   temp = ?
                   WHERE id = ?`;
     
@@ -164,7 +199,10 @@ export const updateVaccination = async (req, res) => {
       by || existing[0].by,
       temp || existing[0].temp,
       id
-    ]);
+    ]).catch(err => {
+      console.error('SQL query error:', err);
+      throw new Error(`Database query failed: ${err.message}`);
+    });
     
     // Get the updated vaccination with proper field naming for client
     const [updated] = await db.promise().query(`
@@ -173,19 +211,28 @@ export const updateVaccination = async (req, res) => {
         pet_id as petId, 
         date, 
         type, 
-        by, 
+        \`by\`, 
         temp, 
         created_at as createdAt, 
         updated_at as updatedAt 
       FROM vaccinations 
       WHERE id = ?
-    `, [id]);
+    `, [id]).catch(err => {
+      console.error('SQL query error:', err);
+      throw new Error(`Database query failed: ${err.message}`);
+    });
+    
+    // Format date string to YYYY-MM-DD
+    const formattedVaccination = {
+      ...updated[0],
+      date: updated[0].date instanceof Date ? updated[0].date.toISOString().split('T')[0] : updated[0].date,
+    };
     
     console.log(`Successfully updated vaccination with ID: ${id}`);
-    res.json(updated[0]);
+    res.json(formattedVaccination);
   } catch (error) {
     console.error(`Error updating vaccination with ID ${id}:`, error);
-    res.status(500).json({ error: 'Error updating vaccination record' });
+    res.status(500).json({ error: 'Error updating vaccination record: ' + error.message });
   }
 };
 
@@ -204,7 +251,10 @@ export const deleteVaccination = async (req, res) => {
     }
     
     // Check if vaccination exists
-    const [existing] = await db.promise().query('SELECT * FROM vaccinations WHERE id = ?', [id]);
+    const [existing] = await db.promise().query('SELECT * FROM vaccinations WHERE id = ?', [id]).catch(err => {
+      console.error('SQL query error:', err);
+      throw new Error(`Database query failed: ${err.message}`);
+    });
     
     if (existing.length === 0) {
       console.error(`Vaccination with ID ${id} not found`);
@@ -212,7 +262,10 @@ export const deleteVaccination = async (req, res) => {
     }
     
     // Delete the vaccination
-    const [result] = await db.promise().query('DELETE FROM vaccinations WHERE id = ?', [id]);
+    const [result] = await db.promise().query('DELETE FROM vaccinations WHERE id = ?', [id]).catch(err => {
+      console.error('SQL query error:', err);
+      throw new Error(`Database query failed: ${err.message}`);
+    });
     
     if (result.affectedRows === 0) {
       console.error(`Failed to delete vaccination with ID ${id}`);
@@ -223,6 +276,6 @@ export const deleteVaccination = async (req, res) => {
     res.json({ message: 'Vaccination deleted successfully', id });
   } catch (error) {
     console.error(`Error deleting vaccination with ID ${id}:`, error);
-    res.status(500).json({ error: 'Error deleting vaccination record' });
+    res.status(500).json({ error: 'Error deleting vaccination record: ' + error.message });
   }
 };

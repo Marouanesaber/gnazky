@@ -43,12 +43,20 @@ export const apiRequest = async (endpoint: string, options: RequestOptions = {})
   }
   
   try {
+    console.log(`API Request: ${method} ${API_BASE_URL}${endpoint}`);
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     
     // Handle HTTP errors
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `HTTP error ${response.status}`);
+      let errorMessage = `HTTP error ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        // If response cannot be parsed as JSON, use status text
+        errorMessage = `${errorMessage}: ${response.statusText}`;
+      }
+      throw new Error(errorMessage);
     }
     
     // Parse JSON response
