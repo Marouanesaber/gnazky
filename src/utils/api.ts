@@ -1,4 +1,3 @@
-
 /**
  * API utility for making requests to the backend
  */
@@ -46,6 +45,9 @@ export const apiRequest = async (endpoint: string, options: RequestOptions = {})
     console.log(`API Request: ${method} ${API_BASE_URL}${endpoint}`);
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     
+    // Debug response information
+    console.log(`Response status: ${response.status}`);
+    
     // Handle HTTP errors
     if (!response.ok) {
       let errorMessage = `HTTP error ${response.status}`;
@@ -61,6 +63,7 @@ export const apiRequest = async (endpoint: string, options: RequestOptions = {})
     
     // Parse JSON response
     const data = await response.json();
+    console.log(`API Response data:`, data);
     return data;
   } catch (error) {
     console.error(`API error (${endpoint}):`, error);
