@@ -1,33 +1,32 @@
 
 import express from 'express';
+import { authenticateUser } from '../middleware/auth.js';
+import { 
+  getAllVaccinations, 
+  getVaccinationById, 
+  createVaccination, 
+  updateVaccination, 
+  deleteVaccination 
+} from '../controllers/vaccinationsController.js';
+
 const router = express.Router();
 
-// Placeholder for vaccinations controller
-// This will be implemented in the future
+// Apply authentication middleware to all vaccination routes
+router.use(authenticateUser);
 
 // GET all vaccinations
-router.get('/', (req, res) => {
-  res.json({ message: 'Get all vaccinations endpoint' });
-});
+router.get('/', getAllVaccinations);
 
 // GET a single vaccination by ID
-router.get('/:id', (req, res) => {
-  res.json({ message: `Get vaccination with ID: ${req.params.id}` });
-});
+router.get('/:id', getVaccinationById);
 
 // POST a new vaccination
-router.post('/', (req, res) => {
-  res.json({ message: 'Create new vaccination endpoint' });
-});
+router.post('/', createVaccination);
 
 // PUT/UPDATE a vaccination
-router.put('/:id', (req, res) => {
-  res.json({ message: `Update vaccination with ID: ${req.params.id}` });
-});
+router.put('/:id', updateVaccination);
 
 // DELETE a vaccination
-router.delete('/:id', (req, res) => {
-  res.json({ message: `Delete vaccination with ID: ${req.params.id}` });
-});
+router.delete('/:id', deleteVaccination);
 
 export default router;

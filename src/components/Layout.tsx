@@ -5,26 +5,41 @@ import { Header } from "./Header";
 import { Home, Globe, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "./AuthProvider";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const Layout = () => {
   const { isAuthenticated, logout, checkAuthStatus } = useAuth();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check authentication status when the component mounts
     const checkAuth = async () => {
-      const isAuth = await checkAuthStatus();
-      
-      // Redirect to login if not authenticated and not flagged as logged in
-      if (!isAuth && !localStorage.getItem("isLoggedIn")) {
-        navigate("/login");
+      setIsLoading(true);
+      try {
+        const isAuth = await checkAuthStatus();
+        
+        // Only redirect to login if not authenticated
+        if (!isAuth) {
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Error checking auth status:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     
     checkAuth();
   }, [checkAuthStatus, navigate]);
+
+  // Don't render anything until we've checked authentication
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
 
   const handleSignOut = () => {
     logout();

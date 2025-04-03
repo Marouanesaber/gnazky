@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,25 +27,30 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { vaccinationsApi } from "@/utils/api";
+import { useAuth } from "@/components/AuthProvider";
+import { useLanguage } from "@/components/LanguageSwitcher";
 
-const vaccinations = [
-  { id: 8, petId: "OVHMS0011", date: "2025-03-03", type: "DHPP 4", by: "Admin Admin", temp: "55°C" },
-  { id: 7, petId: "OVHMS0011", date: "2024-12-05", type: "Anti Rabies", by: "Admin Admin", temp: "37.1°C" },
-  { id: 6, petId: "OVHMS0011", date: "2025-01-05", type: "DHPP 1", by: "Admin Admin", temp: "37.7°C" },
-  { id: 5, petId: "OVHMS0001", date: "1975-03-14", type: "Magnam sunt offici", by: "Admin Admin", temp: "58°C" },
-  { id: 4, petId: "OVHMS0008", date: "2021-01-02", type: "Necessitatibus quis", by: "Admin Admin", temp: "23°C" },
-  { id: 3, petId: "OVHMS0001", date: "2024-02-20", type: "Anti Rabies", by: "Admin Admin", temp: "43°C" },
-  { id: 2, petId: "OVHMS0001", date: "2023-12-11", type: "Anti Rabies y", by: "Admin Admin", temp: "admin°C" },
-  { id: 1, petId: "OVHMS0001", date: "2023-12-11", type: "DHPP 1", by: "Admin Admin", temp: "admin°C" },
-];
+interface Vaccination {
+  id: number;
+  petId: string;
+  date: string;
+  type: string;
+  by: string;
+  temp: string;
+}
 
 const VaccinationsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState("25");
   const [currentLocation, setCurrentLocation] = useState("");
-  const [vaccRecords, setVaccRecords] = useState(vaccinations);
-  const [editVaccination, setEditVaccination] = useState<any>(null);
-  const [viewVaccination, setViewVaccination] = useState<any>(null);
+  const [vaccRecords, setVaccRecords] = useState<Vaccination[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [editVaccination, setEditVaccination] = useState<Vaccination | null>(null);
+  const [viewVaccination, setViewVaccination] = useState<Vaccination | null>(null);
+  const { token } = useAuth();
+  const { t } = useLanguage();
+  
   const [newVaccination, setNewVaccination] = useState({
     petId: "",
     date: "",
@@ -54,41 +59,78 @@ const VaccinationsPage = () => {
     temp: ""
   });
 
+  useEffect(() => {
+    // Load vaccination records from API
+    const loadVaccinations = async () => {
+      setIsLoading(true);
+      try {
+        const data = await vaccinationsApi.getAll();
+        setVaccRecords(data);
+      } catch (error) {
+        console.error("Error loading vaccinations:", error);
+        toast.error("Failed to load vaccination records");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadVaccinations();
+  }, [token]);
+
   // Filter vaccinations based on search term
   const filteredVaccinations = vaccRecords.filter(vacc => 
     vacc.petId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     vacc.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddVaccination = () => {
-    const newRecord = {
-      id: vaccRecords.length + 1,
-      ...newVaccination
-    };
-    setVaccRecords([newRecord, ...vaccRecords]);
-    setNewVaccination({
-      petId: "",
-      date: "",
-      type: "",
-      by: "Admin Admin",
-      temp: ""
-    });
-    toast.success("Vaccination record added successfully!");
+  const handleAddVaccination = async () => {
+    if (!newVaccination.petId || !newVaccination.date || !newVaccination.type) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+    
+    try {
+      const response = await vaccinationsApi.create(newVaccination);
+      setVaccRecords([response, ...vaccRecords]);
+      setNewVaccination({
+        petId: "",
+        date: "",
+        type: "",
+        by: "Admin Admin",
+        temp: ""
+      });
+      toast.success("Vaccination record added successfully!");
+    } catch (error) {
+      console.error("Error adding vaccination:", error);
+      toast.error("Failed to add vaccination record");
+    }
   };
 
-  const handleUpdateVaccination = () => {
+  const handleUpdateVaccination = async () => {
     if (!editVaccination) return;
     
-    setVaccRecords(vaccRecords.map(v => 
-      v.id === editVaccination.id ? editVaccination : v
-    ));
-    setEditVaccination(null);
-    toast.success("Vaccination record updated successfully!");
+    try {
+      const updatedRecord = await vaccinationsApi.update(editVaccination.id, editVaccination);
+      setVaccRecords(vaccRecords.map(v => 
+        v.id === updatedRecord.id ? updatedRecord : v
+      ));
+      setEditVaccination(null);
+      toast.success("Vaccination record updated successfully!");
+    } catch (error) {
+      console.error("Error updating vaccination:", error);
+      toast.error("Failed to update vaccination record");
+    }
   };
 
-  const handleDeleteVaccination = (id: number) => {
-    setVaccRecords(vaccRecords.filter(v => v.id !== id));
-    toast.success("Vaccination record deleted successfully!");
+  const handleDeleteVaccination = async (id: number) => {
+    try {
+      await vaccinationsApi.delete(id);
+      setVaccRecords(vaccRecords.filter(v => v.id !== id));
+      toast.success("Vaccination record deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting vaccination:", error);
+      toast.error("Failed to delete vaccination record");
+    }
   };
 
   return (
@@ -217,182 +259,196 @@ const VaccinationsPage = () => {
 
       <Card className="shadow-sm border animate-fade-in [animation-delay:200ms]">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-muted/40 border-b">
-                  <th className="text-left py-3 px-4 font-medium text-sm">#</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Pet Hospital ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Date of Vaccination</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Type of Vaccine</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Vaccinated By</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Temp °C</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredVaccinations.map((vacc) => (
-                  <tr key={vacc.id} className="border-b hover:bg-muted/20 transition-colors">
-                    <td className="py-3 px-4">{vacc.id}</td>
-                    <td className="py-3 px-4">{vacc.petId}</td>
-                    <td className="py-3 px-4">{vacc.date}</td>
-                    <td className="py-3 px-4">{vacc.type}</td>
-                    <td className="py-3 px-4">{vacc.by}</td>
-                    <td className="py-3 px-4">{vacc.temp}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-1">
-                        {/* Edit Button with Dialog */}
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="default" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 bg-blue-500"
-                              onClick={() => setEditVaccination({...vacc})}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                              <DialogTitle>Edit Vaccination Record</DialogTitle>
-                              <DialogDescription>
-                                Make changes to the vaccination record below.
-                              </DialogDescription>
-                            </DialogHeader>
-                            {editVaccination && (
-                              <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                  <label htmlFor="edit-petId" className="text-right">Pet ID</label>
-                                  <Input 
-                                    id="edit-petId" 
-                                    value={editVaccination.petId} 
-                                    onChange={(e) => setEditVaccination({...editVaccination, petId: e.target.value})}
-                                    className="col-span-3" 
-                                  />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                  <label htmlFor="edit-date" className="text-right">Date</label>
-                                  <Input 
-                                    id="edit-date" 
-                                    type="date" 
-                                    value={editVaccination.date} 
-                                    onChange={(e) => setEditVaccination({...editVaccination, date: e.target.value})}
-                                    className="col-span-3" 
-                                  />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                  <label htmlFor="edit-type" className="text-right">Type</label>
-                                  <Input 
-                                    id="edit-type" 
-                                    value={editVaccination.type} 
-                                    onChange={(e) => setEditVaccination({...editVaccination, type: e.target.value})}
-                                    className="col-span-3" 
-                                  />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                  <label htmlFor="edit-temp" className="text-right">Temp</label>
-                                  <Input 
-                                    id="edit-temp" 
-                                    value={editVaccination.temp} 
-                                    onChange={(e) => setEditVaccination({...editVaccination, temp: e.target.value})}
-                                    className="col-span-3" 
-                                  />
-                                </div>
-                              </div>
-                            )}
-                            <DialogFooter>
-                              <DialogClose asChild>
-                                <Button type="button" variant="outline">Cancel</Button>
-                              </DialogClose>
-                              <DialogClose asChild>
-                                <Button type="button" onClick={handleUpdateVaccination}>Save Changes</Button>
-                              </DialogClose>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-
-                        {/* View Button with Dialog */}
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="default" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 bg-blue-500"
-                              onClick={() => setViewVaccination(vacc)}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                              <DialogTitle>Vaccination Details</DialogTitle>
-                              <DialogDescription>
-                                View details of this vaccination record.
-                              </DialogDescription>
-                            </DialogHeader>
-                            {viewVaccination && (
-                              <div className="space-y-4 py-4">
-                                <div className="flex flex-col space-y-1">
-                                  <span className="text-sm font-medium text-muted-foreground">Pet Hospital ID:</span>
-                                  <span>{viewVaccination.petId}</span>
-                                </div>
-                                <div className="flex flex-col space-y-1">
-                                  <span className="text-sm font-medium text-muted-foreground">Date of Vaccination:</span>
-                                  <span>{viewVaccination.date}</span>
-                                </div>
-                                <div className="flex flex-col space-y-1">
-                                  <span className="text-sm font-medium text-muted-foreground">Type of Vaccine:</span>
-                                  <span>{viewVaccination.type}</span>
-                                </div>
-                                <div className="flex flex-col space-y-1">
-                                  <span className="text-sm font-medium text-muted-foreground">Vaccinated By:</span>
-                                  <span>{viewVaccination.by}</span>
-                                </div>
-                                <div className="flex flex-col space-y-1">
-                                  <span className="text-sm font-medium text-muted-foreground">Temperature:</span>
-                                  <span>{viewVaccination.temp}</span>
-                                </div>
-                              </div>
-                            )}
-                            <DialogFooter>
-                              <DialogClose asChild>
-                                <Button type="button">Close</Button>
-                              </DialogClose>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-
-                        {/* Delete Button with Alert Dialog */}
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="default" size="sm" className="h-8 w-8 p-0 bg-red-500">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Vaccination Record</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete this vaccination record? 
-                                This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteVaccination(vacc.id)}>
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </td>
+          {isLoading ? (
+            <div className="flex justify-center items-center p-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-muted/40 border-b">
+                    <th className="text-left py-3 px-4 font-medium text-sm">#</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm">Pet Hospital ID</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm">Date of Vaccination</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm">Type of Vaccine</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm">Vaccinated By</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm">Temp °C</th>
+                    <th className="text-left py-3 px-4 font-medium text-sm">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredVaccinations.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="text-center py-4 text-muted-foreground">
+                        No vaccination records found
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredVaccinations.map((vacc) => (
+                      <tr key={vacc.id} className="border-b hover:bg-muted/20 transition-colors">
+                        <td className="py-3 px-4">{vacc.id}</td>
+                        <td className="py-3 px-4">{vacc.petId}</td>
+                        <td className="py-3 px-4">{vacc.date}</td>
+                        <td className="py-3 px-4">{vacc.type}</td>
+                        <td className="py-3 px-4">{vacc.by}</td>
+                        <td className="py-3 px-4">{vacc.temp}</td>
+                        <td className="py-3 px-4">
+                          <div className="flex gap-1">
+                            {/* Edit Button with Dialog */}
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  variant="default" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 bg-blue-500"
+                                  onClick={() => setEditVaccination({...vacc})}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle>Edit Vaccination Record</DialogTitle>
+                                  <DialogDescription>
+                                    Make changes to the vaccination record below.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                {editVaccination && (
+                                  <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                      <label htmlFor="edit-petId" className="text-right">Pet ID</label>
+                                      <Input 
+                                        id="edit-petId" 
+                                        value={editVaccination.petId} 
+                                        onChange={(e) => setEditVaccination({...editVaccination, petId: e.target.value})}
+                                        className="col-span-3" 
+                                      />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                      <label htmlFor="edit-date" className="text-right">Date</label>
+                                      <Input 
+                                        id="edit-date" 
+                                        type="date" 
+                                        value={editVaccination.date} 
+                                        onChange={(e) => setEditVaccination({...editVaccination, date: e.target.value})}
+                                        className="col-span-3" 
+                                      />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                      <label htmlFor="edit-type" className="text-right">Type</label>
+                                      <Input 
+                                        id="edit-type" 
+                                        value={editVaccination.type} 
+                                        onChange={(e) => setEditVaccination({...editVaccination, type: e.target.value})}
+                                        className="col-span-3" 
+                                      />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                      <label htmlFor="edit-temp" className="text-right">Temp</label>
+                                      <Input 
+                                        id="edit-temp" 
+                                        value={editVaccination.temp} 
+                                        onChange={(e) => setEditVaccination({...editVaccination, temp: e.target.value})}
+                                        className="col-span-3" 
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                                <DialogFooter>
+                                  <DialogClose asChild>
+                                    <Button type="button" variant="outline">Cancel</Button>
+                                  </DialogClose>
+                                  <DialogClose asChild>
+                                    <Button type="button" onClick={handleUpdateVaccination}>Save Changes</Button>
+                                  </DialogClose>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+
+                            {/* View Button with Dialog */}
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  variant="default" 
+                                  size="sm" 
+                                  className="h-8 w-8 p-0 bg-blue-500"
+                                  onClick={() => setViewVaccination(vacc)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle>Vaccination Details</DialogTitle>
+                                  <DialogDescription>
+                                    View details of this vaccination record.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                {viewVaccination && (
+                                  <div className="space-y-4 py-4">
+                                    <div className="flex flex-col space-y-1">
+                                      <span className="text-sm font-medium text-muted-foreground">Pet Hospital ID:</span>
+                                      <span>{viewVaccination.petId}</span>
+                                    </div>
+                                    <div className="flex flex-col space-y-1">
+                                      <span className="text-sm font-medium text-muted-foreground">Date of Vaccination:</span>
+                                      <span>{viewVaccination.date}</span>
+                                    </div>
+                                    <div className="flex flex-col space-y-1">
+                                      <span className="text-sm font-medium text-muted-foreground">Type of Vaccine:</span>
+                                      <span>{viewVaccination.type}</span>
+                                    </div>
+                                    <div className="flex flex-col space-y-1">
+                                      <span className="text-sm font-medium text-muted-foreground">Vaccinated By:</span>
+                                      <span>{viewVaccination.by}</span>
+                                    </div>
+                                    <div className="flex flex-col space-y-1">
+                                      <span className="text-sm font-medium text-muted-foreground">Temperature:</span>
+                                      <span>{viewVaccination.temp}</span>
+                                    </div>
+                                  </div>
+                                )}
+                                <DialogFooter>
+                                  <DialogClose asChild>
+                                    <Button type="button">Close</Button>
+                                  </DialogClose>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+
+                            {/* Delete Button with Alert Dialog */}
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="default" size="sm" className="h-8 w-8 p-0 bg-red-500">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Vaccination Record</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete this vaccination record? 
+                                    This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDeleteVaccination(vacc.id)}>
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
 
