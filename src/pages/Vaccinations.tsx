@@ -46,6 +46,7 @@ const VaccinationsPage = () => {
   const [currentLocation, setCurrentLocation] = useState("");
   const [vaccRecords, setVaccRecords] = useState<Vaccination[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editVaccination, setEditVaccination] = useState<Vaccination | null>(null);
   const [viewVaccination, setViewVaccination] = useState<Vaccination | null>(null);
   const { token } = useAuth();
@@ -63,11 +64,15 @@ const VaccinationsPage = () => {
     // Load vaccination records from API
     const loadVaccinations = async () => {
       setIsLoading(true);
+      setError(null);
       try {
+        console.log("Fetching vaccinations...");
         const data = await vaccinationsApi.getAll();
+        console.log("Received vaccinations:", data);
         setVaccRecords(data);
       } catch (error) {
         console.error("Error loading vaccinations:", error);
+        setError("Failed to load vaccination records. Please try again later.");
         toast.error("Failed to load vaccination records");
       } finally {
         setIsLoading(false);
@@ -79,8 +84,8 @@ const VaccinationsPage = () => {
 
   // Filter vaccinations based on search term
   const filteredVaccinations = vaccRecords.filter(vacc => 
-    vacc.petId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vacc.type.toLowerCase().includes(searchTerm.toLowerCase())
+    vacc.petId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vacc.type?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleAddVaccination = async () => {
@@ -189,6 +194,15 @@ const VaccinationsPage = () => {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="by" className="text-right">Vaccinated By</label>
+              <Input 
+                id="by" 
+                value={newVaccination.by} 
+                onChange={(e) => setNewVaccination({...newVaccination, by: e.target.value})}
+                className="col-span-3" 
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
               <label htmlFor="temp" className="text-right">Temp</label>
               <Input 
                 id="temp" 
@@ -262,6 +276,29 @@ const VaccinationsPage = () => {
           {isLoading ? (
             <div className="flex justify-center items-center p-8">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center">
+              <p className="text-red-500 mb-4">{error}</p>
+              <Button 
+                onClick={() => {
+                  setIsLoading(true);
+                  setError(null);
+                  vaccinationsApi.getAll()
+                    .then(data => {
+                      setVaccRecords(data);
+                      setIsLoading(false);
+                    })
+                    .catch(err => {
+                      console.error("Error reloading vaccinations:", err);
+                      setError("Failed to load vaccination records. Please try again later.");
+                      setIsLoading(false);
+                      toast.error("Failed to reload vaccination records");
+                    });
+                }}
+              >
+                Try Again
+              </Button>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -341,6 +378,15 @@ const VaccinationsPage = () => {
                                         id="edit-type" 
                                         value={editVaccination.type} 
                                         onChange={(e) => setEditVaccination({...editVaccination, type: e.target.value})}
+                                        className="col-span-3" 
+                                      />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                      <label htmlFor="edit-by" className="text-right">Vaccinated By</label>
+                                      <Input 
+                                        id="edit-by" 
+                                        value={editVaccination.by} 
+                                        onChange={(e) => setEditVaccination({...editVaccination, by: e.target.value})}
                                         className="col-span-3" 
                                       />
                                     </div>

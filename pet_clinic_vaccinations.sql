@@ -1,7 +1,7 @@
 
 -- Create vaccinations table
 CREATE TABLE IF NOT EXISTS `vaccinations` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `pet_id` varchar(20) NOT NULL,
   `date` date NOT NULL,
   `type` varchar(100) NOT NULL,

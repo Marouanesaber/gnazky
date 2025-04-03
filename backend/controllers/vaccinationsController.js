@@ -7,6 +7,7 @@ export const getAllVaccinations = async (req, res) => {
   
   try {
     const [rows] = await db.promise().query('SELECT * FROM vaccinations ORDER BY id DESC');
+    console.log('Fetched vaccinations:', rows.length);
     res.json(rows);
   } catch (error) {
     console.error('Error fetching vaccinations:', error);
