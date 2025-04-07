@@ -48,7 +48,7 @@ const Login = () => {
           navigate(from);
         }, 1000);
       } else {
-        setError(t("invalidCredentials"));
+        setError(t("loginFailedMessage"));
       }
     } catch (err: any) {
       console.error("Login error:", err);

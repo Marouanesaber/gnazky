@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { apiRequest } from "@/utils/api";
@@ -41,8 +40,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("authToken");
-    const storedUserProfile = localStorage.getItem("userProfile");
+    const storedToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+    const storedUserProfile = localStorage.getItem("userProfile") || sessionStorage.getItem("userProfile");
     
     if (storedToken && storedUserProfile) {
       try {
@@ -57,23 +56,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Helper function to clear all auth data
   const clearAllAuthData = () => {
     setIsAuthenticated(false);
     setUserProfile(null);
     setToken(null);
     
-    // Clear from localStorage
     localStorage.removeItem("authToken");
     localStorage.removeItem("userProfile");
     localStorage.removeItem("isLoggedIn");
     
-    // Clear from sessionStorage
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("userProfile");
     sessionStorage.removeItem("isLoggedIn");
     
-    // Clear from cookies
     document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   };
 
@@ -109,7 +104,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Error verifying token:', error);
       
-      // Check if we should attempt offline fallback
       const isLoggedIn = localStorage.getItem("isLoggedIn");
       const storedUserProfile = localStorage.getItem("userProfile");
       
@@ -166,6 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string, keepMeOnline: boolean = true): Promise<boolean> => {
     try {
+      console.log("Login attempt with:", email);
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
@@ -182,6 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
 
+      console.log("Login successful:", data);
       setIsAuthenticated(true);
       setUserProfile(data.user);
       setToken(data.token);

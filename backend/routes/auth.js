@@ -80,13 +80,17 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   
   try {
+    console.log("Login attempt for:", email);
+    
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
     
     const [users] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
+    console.log("Found users:", users.length);
     
     if (users.length === 0) {
+      console.log("No user found with email:", email);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     
@@ -94,8 +98,10 @@ router.post('/login', async (req, res) => {
     
     // Compare password with hashed password in DB
     const match = await bcrypt.compare(password, user.password);
+    console.log("Password match:", match);
     
     if (!match) {
+      console.log("Invalid password for user:", email);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     
@@ -105,12 +111,13 @@ router.post('/login', async (req, res) => {
     // Return user info (excluding password)
     const userInfo = {
       id: user.id,
-      name: user.name,
+      name: user.name || `${user.first_name} ${user.last_name}`,
       email: user.email,
-      profilePicture: user.profile_picture,
+      profilePicture: user.profile_picture || null,
       role: user.role
     };
     
+    console.log("Login successful for:", email);
     res.status(200).json({ 
       message: 'Login successful',
       token,
