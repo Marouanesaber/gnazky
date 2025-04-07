@@ -19,7 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 // Middleware
 app.use(cors({
-  origin: '*', // Allow all origins for development
+  origin: 'http://localhost:8080', // Specify the exact origin instead of wildcard
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));

@@ -1,3 +1,4 @@
+
 /**
  * API utility for making requests to the backend
  */
@@ -8,13 +9,14 @@ interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: any;
   token?: string | null;
+  useCredentials?: boolean;
 }
 
 /**
  * Make a request to the API
  */
 export const apiRequest = async (endpoint: string, options: RequestOptions = {}) => {
-  const { method = 'GET', body, token } = options;
+  const { method = 'GET', body, token, useCredentials = true } = options;
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -34,7 +36,7 @@ export const apiRequest = async (endpoint: string, options: RequestOptions = {})
   const config: RequestInit = {
     method,
     headers,
-    credentials: 'include',
+    credentials: useCredentials ? 'include' : 'same-origin',
   };
   
   if (body && method !== 'GET') {

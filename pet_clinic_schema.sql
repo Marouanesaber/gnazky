@@ -129,6 +129,56 @@ CREATE TABLE surgery (
   FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE
 );
 
+-- Products table for shop
+CREATE TABLE products (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  image_url VARCHAR(255),
+  category VARCHAR(50) NOT NULL,
+  stock_quantity INT NOT NULL DEFAULT 0,
+  is_featured BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Cart table 
+CREATE TABLE cart (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- Orders table
+CREATE TABLE orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  total_amount DECIMAL(10,2) NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  shipping_address TEXT,
+  payment_method VARCHAR(50),
+  notes TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Order items table
+CREATE TABLE order_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL,
+  price_per_unit DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
 -- Insert sample data for owners
 INSERT INTO owners (name, email, phone, address) VALUES
 ('John Smith', 'john@example.com', '555-123-4567', '123 Main St, City'),
@@ -175,3 +225,16 @@ INSERT INTO surgery (pet_id, surgery_type, surgery_date, surgeon, notes) VALUES
 -- Add dummy user for testing (password: password123)
 INSERT INTO users (username, password, email, role, first_name, last_name) VALUES
 ('admin', '$2b$10$qL.VSdruKpwCJlQxHZOqXuCf8WVqgDW7QCtPsI6peCl2KSVXpLl2m', 'admin@petclinic.com', 'admin', 'Admin', 'User');
+
+-- Insert sample products
+INSERT INTO products (name, description, price, category, stock_quantity, is_featured) VALUES
+('Premium Dog Food', 'High-quality nutrition for dogs of all ages', 29.99, 'Food', 50, TRUE),
+('Cat Scratching Post', 'Durable scratching post with toy', 19.99, 'Accessories', 25, FALSE),
+('Pet Brush', 'Gentle brush for all pets', 12.99, 'Grooming', 35, TRUE),
+('Dog Leash', 'Strong and durable leash', 15.99, 'Accessories', 40, FALSE),
+('Cat Toy Set', 'Set of 5 interactive cat toys', 9.99, 'Toys', 30, TRUE),
+('Fish Tank Filter', 'Advanced filtration system', 24.99, 'Aquarium', 15, FALSE),
+('Bird Cage', 'Spacious cage for small birds', 49.99, 'Housing', 10, TRUE),
+('Small Animal Bedding', 'Soft bedding for hamsters and guinea pigs', 8.99, 'Bedding', 45, FALSE),
+('Dog Treats', 'Healthy treats for training', 7.99, 'Food', 60, TRUE),
+('Pet Shampoo', 'Gentle formula for sensitive skin', 11.99, 'Grooming', 40, FALSE);

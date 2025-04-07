@@ -15,8 +15,8 @@ const AppointmentStats = () => {
       try {
         // Using a more reliable approach with mock fallback
         try {
-          // First try to get real data
-          const response = await apiRequest('/appointments/stats');
+          // First try to get real data with credentials: 'same-origin'
+          const response = await apiRequest('/appointments/stats', { useCredentials: false });
           setStats({
             count: response.todayCount || 0,
             loading: false,
