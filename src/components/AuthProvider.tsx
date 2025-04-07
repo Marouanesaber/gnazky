@@ -1,5 +1,7 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
+import { apiRequest } from "@/utils/api";
 
 interface UserProfile {
   id: number;
@@ -43,12 +45,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedUserProfile = localStorage.getItem("userProfile");
     
     if (storedToken && storedUserProfile) {
-      setIsAuthenticated(true);
-      setToken(storedToken);
-      setUserProfile(JSON.parse(storedUserProfile));
-      localStorage.setItem("isLoggedIn", "true");
+      try {
+        setIsAuthenticated(true);
+        setToken(storedToken);
+        setUserProfile(JSON.parse(storedUserProfile));
+        localStorage.setItem("isLoggedIn", "true");
+      } catch (error) {
+        console.error("Error parsing stored user profile:", error);
+        clearAllAuthData();
+      }
     }
   }, []);
+
+  // Helper function to clear all auth data
+  const clearAllAuthData = () => {
+    setIsAuthenticated(false);
+    setUserProfile(null);
+    setToken(null);
+    
+    // Clear from localStorage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userProfile");
+    localStorage.removeItem("isLoggedIn");
+    
+    // Clear from sessionStorage
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("userProfile");
+    sessionStorage.removeItem("isLoggedIn");
+    
+    // Clear from cookies
+    document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  };
 
   const checkAuthStatus = async (): Promise<boolean> => {
     if (isAuthenticated && token && userProfile) {
@@ -56,47 +83,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     const storedToken = localStorage.getItem("authToken");
-    const storedUserProfile = localStorage.getItem("userProfile");
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (!storedToken) return false;
     
-    if (storedToken && storedUserProfile) {
-      try {
-        const response = await fetch('http://localhost:5000/api/auth/verify', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${storedToken}`
-          }
-        });
-        
-        if (response.ok) {
-          setIsAuthenticated(true);
-          setToken(storedToken);
-          setUserProfile(JSON.parse(storedUserProfile));
-          return true;
-        } else {
-          localStorage.removeItem("authToken");
-          localStorage.removeItem("userProfile");
-          localStorage.removeItem("isLoggedIn");
-          setIsAuthenticated(false);
-          setToken(null);
-          setUserProfile(null);
-          return false;
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/verify', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${storedToken}`
         }
-      } catch (error) {
-        console.error('Error verifying token:', error);
-        
-        if (isLoggedIn === "true") {
-          setIsAuthenticated(true);
-          setToken(storedToken);
-          setUserProfile(JSON.parse(storedUserProfile));
-          return true;
-        }
-        
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setIsAuthenticated(true);
+        setToken(data.token);
+        setUserProfile(data.user);
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("userProfile", JSON.stringify(data.user));
+        localStorage.setItem("isLoggedIn", "true");
+        return true;
+      } else {
+        clearAllAuthData();
         return false;
       }
+    } catch (error) {
+      console.error('Error verifying token:', error);
+      
+      // Check if we should attempt offline fallback
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+      const storedUserProfile = localStorage.getItem("userProfile");
+      
+      if (isLoggedIn === "true" && storedUserProfile && storedToken) {
+        try {
+          setIsAuthenticated(true);
+          setToken(storedToken);
+          setUserProfile(JSON.parse(storedUserProfile));
+          return true;
+        } catch (e) {
+          clearAllAuthData();
+          return false;
+        }
+      }
+      
+      clearAllAuthData();
+      return false;
     }
-    
-    return false;
   };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
@@ -146,6 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await response.json();
 
       if (!response.ok) {
+        console.error("Login failed:", data.error);
         toast.error(data.error || 'Login failed');
         return false;
       }
@@ -157,9 +189,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (keepMeOnline) {
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("userProfile", JSON.stringify(data.user));
+        localStorage.setItem("isLoggedIn", "true");
+      } else {
+        sessionStorage.setItem("authToken", data.token);
+        sessionStorage.setItem("userProfile", JSON.stringify(data.user));
+        sessionStorage.setItem("isLoggedIn", "true");
       }
-      
-      localStorage.setItem("isLoggedIn", "true");
       
       return true;
     } catch (error) {
@@ -170,16 +205,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    setUserProfile(null);
-    setToken(null);
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userProfile");
-    localStorage.removeItem("isLoggedIn");
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("userProfile");
-    sessionStorage.removeItem("isLoggedIn");
-    document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    clearAllAuthData();
     
     try {
       fetch('http://localhost:5000/api/auth/logout', {

@@ -19,7 +19,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || "/dashboard";
   const [animationComplete, setAnimationComplete] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const { t } = useLanguage();
@@ -27,7 +27,7 @@ const Login = () => {
   useEffect(() => {
     // Redirect if already logged in
     if (isAuthenticated) {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
 
@@ -38,16 +38,20 @@ const Login = () => {
     setError("");
     
     try {
+      console.log("Attempting login with:", email);
       const success = await login(email, password);
       
       if (success) {
         setShowSuccessAnimation(true);
         toast.success(t("loginSuccessful"));
         setTimeout(() => {
-          navigate(from || '/');
+          navigate(from);
         }, 1000);
+      } else {
+        setError(t("invalidCredentials"));
       }
     } catch (err: any) {
+      console.error("Login error:", err);
       setError(err.message || t("loginFailedMessage"));
     } finally {
       setLoading(false);
@@ -117,6 +121,35 @@ const Login = () => {
               <Link to="/register" className="text-primary hover:underline">
                 {t('signUp')}
               </Link>
+            </div>
+            <div className="border-t pt-2 mt-2">
+              <p className="text-xs text-center text-gray-500 mb-1">Demo accounts:</p>
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    setEmail("admin@petclinic.com");
+                    setPassword("admin123");
+                  }}
+                  className="text-xs"
+                >
+                  Admin
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setEmail("user@example.com");
+                    setPassword("password123");
+                  }}
+                  className="text-xs"
+                >
+                  User
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

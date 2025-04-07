@@ -18,7 +18,7 @@ const Logout = () => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          setTimeout(() => navigate("/"), 500);
+          setTimeout(() => navigate("/login"), 500); // Navigate to login instead of home
           return 0;
         }
         return prev - 1;
@@ -74,24 +74,16 @@ const Logout = () => {
         </div>
         
         <p className="text-sm text-gray-500 animate-fade-in [animation-delay:500ms]">
-          Redirecting to home page in {countdown} seconds...
+          Redirecting to login page in {countdown} seconds...
         </p>
         
         <div className="space-y-3 pt-4 animate-fade-in [animation-delay:600ms]">
           <Button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/login")}
             className="w-full gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Return to Home Page Now
-          </Button>
-          
-          <Button
-            onClick={() => navigate("/login")}
-            variant="outline"
-            className="w-full gap-2"
-          >
-            Sign in Again
+            Return to Login Page Now
           </Button>
         </div>
       </div>
