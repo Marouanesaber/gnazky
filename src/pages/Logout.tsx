@@ -3,12 +3,17 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogOut, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/AuthProvider";
 
 const Logout = () => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(5);
+  const { logout } = useAuth();
 
   useEffect(() => {
+    // Ensure logout is called immediately when this component mounts
+    logout();
+    
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -21,7 +26,7 @@ const Logout = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [navigate]);
+  }, [navigate, logout]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -40,7 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
     const storedToken = localStorage.getItem("authToken");
     const storedUserProfile = localStorage.getItem("userProfile");
     
@@ -48,25 +46,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(true);
       setToken(storedToken);
       setUserProfile(JSON.parse(storedUserProfile));
-      // Store a flag to indicate user is logged in for page refreshes
       localStorage.setItem("isLoggedIn", "true");
     }
   }, []);
 
   const checkAuthStatus = async (): Promise<boolean> => {
-    // First check if we already have authentication state in memory
     if (isAuthenticated && token && userProfile) {
       return true;
     }
     
-    // Then check localStorage
     const storedToken = localStorage.getItem("authToken");
     const storedUserProfile = localStorage.getItem("userProfile");
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     
     if (storedToken && storedUserProfile) {
       try {
-        // Validate token by making a request to the backend
         const response = await fetch('http://localhost:5000/api/auth/verify', {
           method: 'GET',
           headers: {
@@ -75,13 +69,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         
         if (response.ok) {
-          // Token is valid
           setIsAuthenticated(true);
           setToken(storedToken);
           setUserProfile(JSON.parse(storedUserProfile));
           return true;
         } else {
-          // Token is invalid, clear auth state
           localStorage.removeItem("authToken");
           localStorage.removeItem("userProfile");
           localStorage.removeItem("isLoggedIn");
@@ -93,7 +85,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (error) {
         console.error('Error verifying token:', error);
         
-        // If server is down but we have isLoggedIn flag, assume user is authenticated
         if (isLoggedIn === "true") {
           setIsAuthenticated(true);
           setToken(storedToken);
@@ -129,7 +120,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserProfile(data.user);
       setToken(data.token);
       
-      // Save to localStorage
       localStorage.setItem("authToken", data.token);
       localStorage.setItem("userProfile", JSON.stringify(data.user));
       localStorage.setItem("isLoggedIn", "true");
@@ -164,13 +154,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUserProfile(data.user);
       setToken(data.token);
       
-      // Save to localStorage if keepMeOnline is true
       if (keepMeOnline) {
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("userProfile", JSON.stringify(data.user));
       }
       
-      // Always set the isLoggedIn flag
       localStorage.setItem("isLoggedIn", "true");
       
       return true;
@@ -188,18 +176,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("authToken");
     localStorage.removeItem("userProfile");
     localStorage.removeItem("isLoggedIn");
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("userProfile");
+    sessionStorage.removeItem("isLoggedIn");
+    document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    
+    try {
+      fetch('http://localhost:5000/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }).catch(error => {
+        console.log("Backend logout notification failed, but user was logged out client-side");
+      });
+    } catch (error) {
+      console.log("Error during logout request, but user was logged out client-side");
+    }
   };
 
   const updateProfile = async (data: Partial<{ name: string; email: string; profilePicture: string }>): Promise<boolean> => {
     if (!userProfile || !token) return false;
     
     try {
-      // If updating profile picture, need to compress it before sending
       let updatedData = {...data};
       
       if (data.profilePicture) {
         try {
-          // Compress the image before sending
           updatedData.profilePicture = await compressImage(data.profilePicture);
         } catch (error) {
           console.error('Error compressing image:', error);
@@ -236,14 +240,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Function to compress an image
   const compressImage = (base64Image: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.src = base64Image;
       
       img.onload = () => {
-        // Create canvas
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
@@ -252,14 +254,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
         
-        // Set target dimensions (adjust these for your needs)
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
         
         let width = img.width;
         let height = img.height;
         
-        // Calculate new dimensions while maintaining aspect ratio
         if (width > height) {
           if (width > MAX_WIDTH) {
             height *= MAX_WIDTH / width;
@@ -272,14 +272,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
         
-        // Set canvas dimensions
         canvas.width = width;
         canvas.height = height;
         
-        // Draw image on canvas
         ctx.drawImage(img, 0, 0, width, height);
         
-        // Get compressed base64 (0.7 quality)
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
         
         resolve(compressedBase64);

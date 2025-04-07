@@ -22,17 +22,22 @@ const Layout = () => {
         
         // Only redirect to login if not authenticated
         if (!isAuth) {
+          // Clear any remaining auth data to be safe
+          logout();
           navigate("/login");
         }
       } catch (error) {
         console.error("Error checking auth status:", error);
+        // On error, also redirect to login
+        logout();
+        navigate("/login");
       } finally {
         setIsLoading(false);
       }
     };
     
     checkAuth();
-  }, [checkAuthStatus, navigate]);
+  }, [checkAuthStatus, navigate, logout]);
 
   // Don't render anything until we've checked authentication
   if (isLoading) {
@@ -54,6 +59,12 @@ const Layout = () => {
     // Don't logout - just navigate, keeping authentication state
     navigate("/", { replace: false });
   };
+
+  // If somehow we got here without authentication, redirect to login
+  if (!isAuthenticated) {
+    navigate("/login");
+    return null;
+  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background theme-transition animate-fade-in">

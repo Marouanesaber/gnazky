@@ -1,4 +1,3 @@
-
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -166,6 +165,11 @@ router.get('/verify', async (req, res) => {
   } catch (error) {
     res.status(401).json({ valid: false, error: 'Invalid token' });
   }
+});
+
+// Logout endpoint (invalidate token)
+router.post('/logout', async (req, res) => {
+  res.status(200).json({ message: 'Logout successful' });
 });
 
 // Get user profile
