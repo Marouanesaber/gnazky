@@ -95,7 +95,7 @@ app.get('/api/appointments/stats', verifyToken, (req, res) => {
     (err, results) => {
       if (err) {
         console.error('Error fetching appointment stats:', err);
-        return res.status(500).json({ error: 'Database error' });
+        return res.status(500).json({ error: 'Database error: ' + err.message });
       }
       
       res.json({ 

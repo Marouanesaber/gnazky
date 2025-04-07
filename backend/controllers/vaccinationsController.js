@@ -14,19 +14,19 @@ export const getAllVaccinations = async (req, res) => {
       return res.status(500).json({ error: 'Database connection not available' });
     }
     
-    // Execute the query with proper error handling
+    // Execute the query with proper error handling using the correct column names
     const [rows] = await db.promise().query(`
       SELECT 
-        id, 
-        pet_id as petId, 
-        date, 
-        type, 
-        \`by\`, 
-        temp, 
-        created_at as createdAt, 
-        updated_at as updatedAt 
-      FROM vaccinations 
-      ORDER BY id DESC
+        v.id, 
+        v.pet_id as petId, 
+        v.vaccination_date as date, 
+        v.vaccine_type as type, 
+        v.administered_by as \`by\`, 
+        v.temperature as temp, 
+        v.created_at as createdAt, 
+        v.updated_at as updatedAt 
+      FROM vaccinations v
+      ORDER BY v.id DESC
     `).catch(err => {
       console.error('SQL query error:', err);
       throw new Error(`Database query failed: ${err.message}`);
@@ -63,16 +63,16 @@ export const getVaccinationById = async (req, res) => {
     
     const [rows] = await db.promise().query(`
       SELECT 
-        id, 
-        pet_id as petId, 
-        date, 
-        type, 
-        \`by\`, 
-        temp, 
-        created_at as createdAt, 
-        updated_at as updatedAt 
-      FROM vaccinations 
-      WHERE id = ?
+        v.id, 
+        v.pet_id as petId, 
+        v.vaccination_date as date, 
+        v.vaccine_type as type, 
+        v.administered_by as \`by\`, 
+        v.temperature as temp, 
+        v.created_at as createdAt, 
+        v.updated_at as updatedAt 
+      FROM vaccinations v
+      WHERE v.id = ?
     `, [id]).catch(err => {
       console.error('SQL query error:', err);
       throw new Error(`Database query failed: ${err.message}`);
@@ -116,28 +116,39 @@ export const createVaccination = async (req, res) => {
       return res.status(400).json({ error: 'Pet ID, date, and type are required' });
     }
     
-    // Create new vaccination record - use pet_id for database column and escape 'by' field since it's a reserved word
-    const query = `INSERT INTO vaccinations (pet_id, date, type, \`by\`, temp) 
-                  VALUES (?, ?, ?, ?, ?)`;
+    // Create new vaccination record with correct column names
+    const query = `INSERT INTO vaccinations (
+      pet_id, 
+      vaccination_date, 
+      vaccine_type, 
+      administered_by, 
+      temperature
+    ) VALUES (?, ?, ?, ?, ?)`;
     
-    const [result] = await db.promise().query(query, [petId, date, type, by || 'Admin Admin', temp || '']).catch(err => {
+    const [result] = await db.promise().query(query, [
+      petId, 
+      date, 
+      type, 
+      by || 'Admin Admin', 
+      temp || ''
+    ]).catch(err => {
       console.error('SQL query error:', err);
       throw new Error(`Database query failed: ${err.message}`);
     });
     
-    // Get the newly created vaccination and convert pet_id to petId for client
+    // Get the newly created vaccination with proper field naming for client
     const [newVaccination] = await db.promise().query(`
       SELECT 
-        id, 
-        pet_id as petId, 
-        date, 
-        type, 
-        \`by\`, 
-        temp, 
-        created_at as createdAt, 
-        updated_at as updatedAt 
-      FROM vaccinations 
-      WHERE id = ?
+        v.id, 
+        v.pet_id as petId, 
+        v.vaccination_date as date, 
+        v.vaccine_type as type, 
+        v.administered_by as \`by\`, 
+        v.temperature as temp, 
+        v.created_at as createdAt, 
+        v.updated_at as updatedAt 
+      FROM vaccinations v
+      WHERE v.id = ?
     `, [result.insertId]).catch(err => {
       console.error('SQL query error:', err);
       throw new Error(`Database query failed: ${err.message}`);
@@ -183,21 +194,21 @@ export const updateVaccination = async (req, res) => {
       return res.status(404).json({ error: 'Vaccination not found' });
     }
     
-    // Update vaccination record - escape 'by' field since it's a reserved word
+    // Update vaccination record with correct column names
     const query = `UPDATE vaccinations SET 
                   pet_id = ?,
-                  date = ?,
-                  type = ?,
-                  \`by\` = ?,
-                  temp = ?
+                  vaccination_date = ?,
+                  vaccine_type = ?,
+                  administered_by = ?,
+                  temperature = ?
                   WHERE id = ?`;
     
     await db.promise().query(query, [
       petId || existing[0].pet_id,
-      date || existing[0].date,
-      type || existing[0].type,
-      by || existing[0].by,
-      temp || existing[0].temp,
+      date || existing[0].vaccination_date,
+      type || existing[0].vaccine_type,
+      by || existing[0].administered_by,
+      temp || existing[0].temperature,
       id
     ]).catch(err => {
       console.error('SQL query error:', err);
@@ -207,16 +218,16 @@ export const updateVaccination = async (req, res) => {
     // Get the updated vaccination with proper field naming for client
     const [updated] = await db.promise().query(`
       SELECT 
-        id, 
-        pet_id as petId, 
-        date, 
-        type, 
-        \`by\`, 
-        temp, 
-        created_at as createdAt, 
-        updated_at as updatedAt 
-      FROM vaccinations 
-      WHERE id = ?
+        v.id, 
+        v.pet_id as petId, 
+        v.vaccination_date as date, 
+        v.vaccine_type as type, 
+        v.administered_by as \`by\`, 
+        v.temperature as temp, 
+        v.created_at as createdAt, 
+        v.updated_at as updatedAt 
+      FROM vaccinations v
+      WHERE v.id = ?
     `, [id]).catch(err => {
       console.error('SQL query error:', err);
       throw new Error(`Database query failed: ${err.message}`);
