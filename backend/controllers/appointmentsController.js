@@ -1,11 +1,18 @@
-
 // Appointments controller
 
 // Get all appointments
 const getAllAppointments = (req, res) => {
   const db = req.db;
   
-  db.query('SELECT * FROM appointments ORDER BY appointment_date ASC', (err, results) => {
+  // Join with pets table to get pet name
+  db.query(`
+    SELECT a.*, p.name as pet_name, p.species as pet_type, 
+           CONCAT(o.first_name, ' ', o.last_name) as owner_name
+    FROM appointments a
+    LEFT JOIN pets p ON a.pet_id = p.id
+    LEFT JOIN owners o ON p.owner_id = o.id
+    ORDER BY a.appointment_date ASC
+  `, (err, results) => {
     if (err) {
       console.error('Error fetching appointments:', err);
       return res.status(500).json({ error: 'Error fetching appointments: ' + err.message });
@@ -105,7 +112,8 @@ const createAppointment = (req, res) => {
     end_time,
     reason, 
     notes, 
-    status = 'scheduled'
+    status = 'scheduled',
+    doctor
   } = req.body;
   
   const userId = req.user?.id || null; // Get user ID from JWT token if available
@@ -115,10 +123,10 @@ const createAppointment = (req, res) => {
   }
   
   const query = `INSERT INTO appointments 
-                (pet_id, appointment_date, end_time, reason, notes, status) 
-                VALUES (?, ?, ?, ?, ?, ?)`;
+                (pet_id, appointment_date, end_time, reason, notes, status, doctor) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)`;
   
-  db.query(query, [pet_id, appointment_date, end_time, reason, notes, status], (err, result) => {
+  db.query(query, [pet_id, appointment_date, end_time, reason, notes, status, doctor], (err, result) => {
     if (err) {
       console.error('Error creating appointment:', err);
       return res.status(500).json({ error: 'Error creating appointment: ' + err.message });
@@ -151,7 +159,8 @@ const updateAppointment = (req, res) => {
     end_time, 
     reason, 
     notes, 
-    status
+    status,
+    doctor
   } = req.body;
   
   // Build the query based on provided fields
@@ -187,6 +196,11 @@ const updateAppointment = (req, res) => {
   if (status) {
     updates.push('status = ?');
     values.push(status);
+  }
+  
+  if (doctor !== undefined) {
+    updates.push('doctor = ?');
+    values.push(doctor);
   }
   
   // Add updated timestamp

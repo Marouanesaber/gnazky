@@ -78,6 +78,7 @@ export const apiRequest = async (endpoint: string, options: RequestOptions = {})
 export const appointmentsApi = {
   getAll: () => apiRequest('/appointments'),
   getById: (id: string | number) => apiRequest(`/appointments/${id}`),
+  getStats: () => apiRequest('/appointments/stats'), 
   create: (data: any) => apiRequest('/appointments', { method: 'POST', body: data }),
   update: (id: string | number, data: any) => apiRequest(`/appointments/${id}`, { method: 'PUT', body: data }),
   delete: (id: string | number) => apiRequest(`/appointments/${id}`, { method: 'DELETE' }),
