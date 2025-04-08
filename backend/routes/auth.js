@@ -52,14 +52,17 @@ router.post('/register', async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
-    // Create new user with first_name and last_name
-    const query = `INSERT INTO users (first_name, last_name, email, password, profile_picture, role) 
-                  VALUES (?, ?, ?, ?, ?, ?)`;
+    // Create username from email (before the @ symbol)
+    const username = email.split('@')[0];
+    
+    // Create new user with first_name and last_name and username
+    const query = `INSERT INTO users (username, first_name, last_name, email, password, profile_picture, role) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?)`;
     
     const defaultProfilePic = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff`;
     const role = 'user'; // Default role
     
-    const [result] = await db.promise().query(query, [firstName, lastName, email, hashedPassword, defaultProfilePic, role]);
+    const [result] = await db.promise().query(query, [username, firstName, lastName, email, hashedPassword, defaultProfilePic, role]);
     
     // Generate token
     const token = jwt.sign({ id: result.insertId, email, role }, JWT_SECRET, { expiresIn: '7d' });
