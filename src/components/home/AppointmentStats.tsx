@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "@/utils/api";
 import { Calendar } from "lucide-react";
+import { toast } from "sonner";
 
 const AppointmentStats = () => {
   const [stats, setStats] = useState({
@@ -30,6 +31,7 @@ const AppointmentStats = () => {
             loading: false,
             error: null
           });
+          // Don't show error toast since we're handling gracefully with mock data
         }
       } catch (error) {
         console.error('Error in appointment stats component:', error);

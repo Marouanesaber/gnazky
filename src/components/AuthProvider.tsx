@@ -126,18 +126,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      console.log("Registration attempt with:", email);
+      const data = await apiRequest('/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
+        body: { name, email, password }
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.error || 'Registration failed');
+      if (!data || data.error) {
+        toast.error(data?.error || 'Registration failed');
         return false;
       }
 
@@ -161,19 +157,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string, keepMeOnline: boolean = true): Promise<boolean> => {
     try {
       console.log("Login attempt with:", email);
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const data = await apiRequest('/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+        body: { email, password }
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("Login failed:", data.error);
-        toast.error(data.error || 'Login failed');
+      if (!data || data.error) {
+        console.error("Login failed:", data?.error);
+        toast.error(data?.error || 'Login failed');
         return false;
       }
 

@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   server: {
-    port: 5050, // Changed to 5050 to match backend
+    port: 8080,
     proxy: {
       // Proxy API requests to backend
       '/api': {

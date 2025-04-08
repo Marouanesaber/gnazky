@@ -1,3 +1,4 @@
+
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2';
@@ -18,7 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5050',
+  origin: 'http://localhost:8080', // Updated to match frontend port
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
