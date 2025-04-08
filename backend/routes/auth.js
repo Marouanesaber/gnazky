@@ -1,3 +1,4 @@
+
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -33,6 +34,13 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Name, email and password are required' });
     }
     
+    // Split name into first_name and last_name (simple approach)
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+    
+    console.log(`Registering user: ${firstName} ${lastName}, ${email}`);
+    
     // Check if user already exists
     const [existingUsers] = await db.promise().query('SELECT * FROM users WHERE email = ?', [email]);
     
@@ -44,28 +52,31 @@ router.post('/register', async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
-    // Create new user
-    const query = `INSERT INTO users (name, email, password, profile_picture, role) 
-                  VALUES (?, ?, ?, ?, ?)`;
+    // Create new user with first_name and last_name
+    const query = `INSERT INTO users (first_name, last_name, email, password, profile_picture, role) 
+                  VALUES (?, ?, ?, ?, ?, ?)`;
     
     const defaultProfilePic = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff`;
     const role = 'user'; // Default role
     
-    const [result] = await db.promise().query(query, [name, email, hashedPassword, defaultProfilePic, role]);
+    const [result] = await db.promise().query(query, [firstName, lastName, email, hashedPassword, defaultProfilePic, role]);
     
     // Generate token
     const token = jwt.sign({ id: result.insertId, email, role }, JWT_SECRET, { expiresIn: '7d' });
     
+    // Create user object with name field for client compatibility
+    const user = {
+      id: result.insertId,
+      name: `${firstName} ${lastName}`,
+      email,
+      profilePicture: defaultProfilePic,
+      role
+    };
+    
     res.status(201).json({ 
       id: result.insertId,
       token,
-      user: {
-        id: result.insertId,
-        name,
-        email,
-        profilePicture: defaultProfilePic,
-        role
-      },
+      user,
       message: 'User registered successfully'
     });
   } catch (error) {
@@ -108,10 +119,10 @@ router.post('/login', async (req, res) => {
     // Generate token with extended expiration
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
     
-    // Return user info (excluding password)
+    // Create user object with name field for client compatibility
     const userInfo = {
       id: user.id,
-      name: user.name || `${user.first_name} ${user.last_name}`,
+      name: user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.email,
       email: user.email,
       profilePicture: user.profile_picture || null,
       role: user.role
@@ -143,7 +154,7 @@ router.get('/verify', async (req, res) => {
     const db = req.db;
     
     // Get fresh user data
-    const [users] = await db.promise().query('SELECT id, name, email, profile_picture, role FROM users WHERE id = ?', [decoded.id]);
+    const [users] = await db.promise().query('SELECT id, first_name, last_name, email, profile_picture, role FROM users WHERE id = ?', [decoded.id]);
     
     if (users.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -158,16 +169,19 @@ router.get('/verify', async (req, res) => {
       { expiresIn: '7d' }
     );
     
+    // Create user object with name field for client compatibility
+    const userInfo = {
+      id: user.id,
+      name: user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.email,
+      email: user.email,
+      profilePicture: user.profile_picture,
+      role: user.role
+    };
+    
     res.status(200).json({
       valid: true,
       token: newToken,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        profilePicture: user.profile_picture,
-        role: user.role
-      }
+      user: userInfo
     });
   } catch (error) {
     res.status(401).json({ valid: false, error: 'Invalid token' });
@@ -185,7 +199,7 @@ router.get('/profile', verifyToken, async (req, res) => {
   const userId = req.user.id;
   
   try {
-    const [users] = await db.promise().query('SELECT id, name, email, profile_picture, role FROM users WHERE id = ?', [userId]);
+    const [users] = await db.promise().query('SELECT id, first_name, last_name, email, profile_picture, role FROM users WHERE id = ?', [userId]);
     
     if (users.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -193,13 +207,16 @@ router.get('/profile', verifyToken, async (req, res) => {
     
     const user = users[0];
     
-    res.status(200).json({
+    // Create user object with name field for client compatibility
+    const userInfo = {
       id: user.id,
-      name: user.name,
+      name: user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.email,
       email: user.email,
       profilePicture: user.profile_picture,
       role: user.role
-    });
+    };
+    
+    res.status(200).json(userInfo);
   } catch (error) {
     console.error('Error fetching user profile:', error);
     res.status(500).json({ error: 'Error fetching profile: ' + error.message });
@@ -228,9 +245,17 @@ router.put('/profile', verifyToken, async (req, res) => {
     const values = [];
     const updates = [];
     
+    // If name provided, split into first_name and last_name
     if (name) {
-      updates.push('name = ?');
-      values.push(name);
+      const nameParts = name.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+      
+      updates.push('first_name = ?');
+      values.push(firstName);
+      
+      updates.push('last_name = ?');
+      values.push(lastName);
     }
     
     if (email) {
@@ -257,19 +282,22 @@ router.put('/profile', verifyToken, async (req, res) => {
     }
     
     // Get updated user profile
-    const [users] = await db.promise().query('SELECT id, name, email, profile_picture, role FROM users WHERE id = ?', [userId]);
+    const [users] = await db.promise().query('SELECT id, first_name, last_name, email, profile_picture, role FROM users WHERE id = ?', [userId]);
     
     const user = users[0];
     
+    // Create user object with name field for client compatibility
+    const userInfo = {
+      id: user.id,
+      name: user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.email,
+      email: user.email,
+      profilePicture: user.profile_picture,
+      role: user.role
+    };
+    
     res.status(200).json({
       message: 'Profile updated successfully',
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        profilePicture: user.profile_picture,
-        role: user.role
-      }
+      user: userInfo
     });
   } catch (error) {
     console.error('Error updating profile:', error);

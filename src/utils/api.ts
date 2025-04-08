@@ -3,7 +3,8 @@
  * API utility for making requests to the backend
  */
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// Use relative URLs instead of hardcoded base URL
+const API_BASE_URL = '/api';
 
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';

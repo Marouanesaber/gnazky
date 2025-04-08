@@ -5,7 +5,7 @@
 const getAllAppointments = (req, res) => {
   const db = req.db;
   
-  db.query('SELECT * FROM appointments ORDER BY date ASC, time ASC', (err, results) => {
+  db.query('SELECT * FROM appointments ORDER BY appointment_date ASC', (err, results) => {
     if (err) {
       console.error('Error fetching appointments:', err);
       return res.status(500).json({ error: 'Error fetching appointments: ' + err.message });
@@ -23,13 +23,13 @@ const getAppointmentStats = (req, res) => {
   const today = new Date().toISOString().split('T')[0];
   
   // Query for today's appointments count
-  const todayQuery = 'SELECT COUNT(*) as todayCount FROM appointments WHERE date = ?';
+  const todayQuery = 'SELECT COUNT(*) as todayCount FROM appointments WHERE DATE(appointment_date) = ?';
   
   // Query for upcoming appointments (next 7 days)
   const upcomingQuery = `
     SELECT COUNT(*) as upcomingCount 
     FROM appointments 
-    WHERE date BETWEEN ? AND DATE_ADD(?, INTERVAL 7 DAY)
+    WHERE appointment_date BETWEEN ? AND DATE_ADD(?, INTERVAL 7 DAY)
   `;
   
   // Query for status counts
@@ -101,25 +101,24 @@ const createAppointment = (req, res) => {
   const db = req.db;
   const { 
     pet_id, 
-    date, 
-    time, 
+    appointment_date,
+    end_time,
     reason, 
     notes, 
-    status = 'pending',
-    doctor 
+    status = 'scheduled'
   } = req.body;
   
   const userId = req.user?.id || null; // Get user ID from JWT token if available
   
-  if (!pet_id || !date || !time) {
-    return res.status(400).json({ error: 'Required fields: pet_id, date, time' });
+  if (!pet_id || !appointment_date) {
+    return res.status(400).json({ error: 'Required fields: pet_id, appointment_date' });
   }
   
   const query = `INSERT INTO appointments 
-                (pet_id, date, time, reason, notes, status, doctor, created_by) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+                (pet_id, appointment_date, end_time, reason, notes, status) 
+                VALUES (?, ?, ?, ?, ?, ?)`;
   
-  db.query(query, [pet_id, date, time, reason, notes, status, doctor, userId], (err, result) => {
+  db.query(query, [pet_id, appointment_date, end_time, reason, notes, status], (err, result) => {
     if (err) {
       console.error('Error creating appointment:', err);
       return res.status(500).json({ error: 'Error creating appointment: ' + err.message });
@@ -148,12 +147,11 @@ const updateAppointment = (req, res) => {
   const appointmentId = req.params.id;
   const { 
     pet_id, 
-    date, 
-    time, 
+    appointment_date,
+    end_time, 
     reason, 
     notes, 
-    status,
-    doctor 
+    status
   } = req.body;
   
   // Build the query based on provided fields
@@ -166,14 +164,14 @@ const updateAppointment = (req, res) => {
     values.push(pet_id);
   }
   
-  if (date) {
-    updates.push('date = ?');
-    values.push(date);
+  if (appointment_date) {
+    updates.push('appointment_date = ?');
+    values.push(appointment_date);
   }
   
-  if (time) {
-    updates.push('time = ?');
-    values.push(time);
+  if (end_time !== undefined) {
+    updates.push('end_time = ?');
+    values.push(end_time);
   }
   
   if (reason) {
@@ -189,11 +187,6 @@ const updateAppointment = (req, res) => {
   if (status) {
     updates.push('status = ?');
     values.push(status);
-  }
-  
-  if (doctor) {
-    updates.push('doctor = ?');
-    values.push(doctor);
   }
   
   // Add updated timestamp

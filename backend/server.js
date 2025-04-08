@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2';
@@ -14,16 +13,16 @@ import shopRoutes from './routes/shop.js';
 import jwt from 'jsonwebtoken';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:8080', // Specify the exact origin instead of wildcard
+  origin: 'http://localhost:5050',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
+app.use(express.json({ limit: '10mb' }));
 
 // Database connection
 const db = mysql.createConnection({
@@ -48,7 +47,6 @@ const verifyToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
   
   if (!token) {
-    // Allow request to proceed without user info if no token
     req.user = null;
     return next();
   }
@@ -58,7 +56,6 @@ const verifyToken = (req, res, next) => {
     req.user = verified;
     next();
   } catch (error) {
-    // If token is invalid, proceed without user info
     req.user = null;
     next();
   }
@@ -86,7 +83,6 @@ app.use('/api/shop', shopRoutes);
 
 // Add stats endpoint for appointments
 app.get('/api/appointments/stats', verifyToken, (req, res) => {
-  // Get current date in YYYY-MM-DD format
   const today = new Date().toISOString().split('T')[0];
   
   db.query(
@@ -116,7 +112,6 @@ app.get('/api/auth/verify', verifyToken, (req, res) => {
 
 // Test route - improved to provide more details
 app.get('/api/test', (req, res) => {
-  // Check database connection
   db.query('SELECT 1', (err, result) => {
     if (err) {
       return res.status(500).json({ 
@@ -134,6 +129,18 @@ app.get('/api/test', (req, res) => {
       serverTime: new Date().toISOString()
     });
   });
+});
+
+// Serve frontend static files in production
+app.use(express.static('./dist'));
+
+// Handle SPA routes for client-side routing
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  
+  res.sendFile('index.html', { root: './dist' });
 });
 
 // Start server

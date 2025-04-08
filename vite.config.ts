@@ -11,7 +11,17 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   server: {
-    port: 8080, // Using port 8080 as instructed
+    port: 5050, // Changed to 5050 to match backend
+    proxy: {
+      // Proxy API requests to backend
+      '/api': {
+        target: 'http://localhost:5050',
+        changeOrigin: true,
+      }
+    }
+  },
+  build: {
+    outDir: 'dist',
   },
   resolve: {
     alias: {
