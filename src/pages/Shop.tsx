@@ -107,11 +107,11 @@ const Shop = () => {
     const categories: Record<string, Category> = {};
     
     products.forEach((product: Product) => {
-      const category = product.category.toLowerCase();
+      const category = product.category?.toLowerCase() || 'uncategorized';
       
       if (!categories[category]) {
         categories[category] = {
-          name: product.category,
+          name: product.category || 'Uncategorized',
           products: []
         };
       }
@@ -127,10 +127,14 @@ const Shop = () => {
   };
 
   useEffect(() => {
-    const cleanupFn = window.addEventListener('cart-updated', handleAddedToCart);
+    const handleCartUpdated = () => {
+      // Handle cart updates
+    };
+    
+    window.addEventListener('cart-updated', handleCartUpdated);
     
     return () => {
-      window.removeEventListener('cart-updated', handleAddedToCart);
+      window.removeEventListener('cart-updated', handleCartUpdated);
     };
   }, []);
 
