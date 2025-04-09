@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,93 @@ interface Doctor {
   name: string;
   speciality: string;
 }
+
+// AppointmentCard component
+interface AppointmentCardProps {
+  appointment: Appointment;
+  onComplete: (id: number) => void;
+  onConfirm: (id: number) => void;
+  onEdit: () => void;
+  onCancel: () => void;
+  getStatusBadge: (status: string) => React.ReactNode;
+  getReasonIcon: (reason: string) => React.ReactNode;
+}
+
+const AppointmentCard = ({
+  appointment,
+  onComplete,
+  onConfirm,
+  onEdit,
+  onCancel,
+  getStatusBadge,
+  getReasonIcon
+}: AppointmentCardProps) => {
+  return (
+    <div className="p-4 border rounded-lg bg-white shadow-sm">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-3">
+          {getReasonIcon(appointment.reason)}
+          <div>
+            <h3 className="font-medium">{appointment.petName} ({appointment.petType})</h3>
+            <p className="text-sm text-muted-foreground">{appointment.ownerName}</p>
+          </div>
+        </div>
+        {getStatusBadge(appointment.status)}
+      </div>
+      
+      <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+        <div className="flex items-center gap-1">
+          <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
+          <span>{format(new Date(appointment.date), 'MMM dd, yyyy')}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+          <span>{appointment.time}</span>
+        </div>
+        <div className="col-span-2 flex items-center gap-1">
+          <UserCircle className="h-3.5 w-3.5 text-muted-foreground" />
+          <span>{appointment.doctor}</span>
+        </div>
+        {appointment.notes && (
+          <div className="col-span-2 mt-1 text-xs text-muted-foreground">
+            <p className="line-clamp-2">{appointment.notes}</p>
+          </div>
+        )}
+      </div>
+      
+      <div className="mt-3 flex justify-end gap-2">
+        {appointment.status === "pending" && (
+          <Button size="sm" variant="outline" onClick={() => onConfirm(appointment.id)}>
+            <CheckCircle className="mr-1 h-3.5 w-3.5" />
+            Confirm
+          </Button>
+        )}
+        {["pending", "confirmed"].includes(appointment.status) && (
+          <>
+            <Button size="sm" variant="outline" onClick={() => onComplete(appointment.id)}>
+              <CheckCircle className="mr-1 h-3.5 w-3.5" />
+              Complete
+            </Button>
+            <Button size="sm" variant="outline" onClick={onEdit}>
+              <Pencil className="mr-1 h-3.5 w-3.5" />
+              Edit
+            </Button>
+            <Button size="sm" variant="outline" className="text-destructive hover:text-destructive" onClick={onCancel}>
+              <Trash2 className="mr-1 h-3.5 w-3.5" />
+              Cancel
+            </Button>
+          </>
+        )}
+        {["completed", "cancelled"].includes(appointment.status) && (
+          <Button size="sm" variant="outline" onClick={onEdit}>
+            <FileText className="mr-1 h-3.5 w-3.5" />
+            Details
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const AppointmentsPage = () => {
   // Sample data for doctors
@@ -879,3 +967,103 @@ const AppointmentsPage = () => {
                   <SelectTrigger id="edit-reason" className="col-span-3">
                     <SelectValue />
                   </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="checkup">Regular Checkup</SelectItem>
+                    <SelectItem value="vaccination">Vaccination</SelectItem>
+                    <SelectItem value="illness">Illness/Injury</SelectItem>
+                    <SelectItem value="dental">Dental Care</SelectItem>
+                    <SelectItem value="surgery">Surgery</SelectItem>
+                    <SelectItem value="grooming">Grooming</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-status" className="text-right">
+                  Status
+                </Label>
+                <Select
+                  value={selectedAppointment.status}
+                  onValueChange={(value: "pending" | "confirmed" | "completed" | "cancelled") => 
+                    setSelectedAppointment({...selectedAppointment, status: value})}
+                >
+                  <SelectTrigger id="edit-status" className="col-span-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-doctor" className="text-right">
+                  Doctor
+                </Label>
+                <Select
+                  value={selectedAppointment.doctor}
+                  onValueChange={(value) => setSelectedAppointment({...selectedAppointment, doctor: value})}
+                >
+                  <SelectTrigger id="edit-doctor" className="col-span-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {doctors.map((doctor) => (
+                      <SelectItem key={doctor.id} value={doctor.name}>
+                        {doctor.name} ({doctor.speciality})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="edit-notes" className="text-right pt-2">
+                  Notes
+                </Label>
+                <Textarea
+                  id="edit-notes"
+                  placeholder="Additional details about the appointment"
+                  value={selectedAppointment.notes}
+                  onChange={(e) => setSelectedAppointment({...selectedAppointment, notes: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleUpdateAppointment}>Update Appointment</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Appointment Dialog */}
+      <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Cancel Appointment</DialogTitle>
+            <DialogDescription>
+              {selectedAppointment && `Are you sure you want to cancel ${selectedAppointment.petName}'s appointment on ${format(new Date(selectedAppointment.date), 'PPP')}?`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              This action cannot be undone. The appointment will be marked as cancelled.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCancelDialogOpen(false)}>
+              Keep Appointment
+            </Button>
+            <Button variant="destructive" onClick={handleCancelAppointment}>
+              Cancel Appointment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AppointmentsPage;
