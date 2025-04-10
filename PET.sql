@@ -1,6 +1,11 @@
 
 -- PET.sql - Consolidated Pet Clinic Database Schema
 
+-- Create and select database
+DROP DATABASE IF EXISTS pet_clinic;
+CREATE DATABASE pet_clinic;
+USE pet_clinic;
+
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS shop_orders;
 DROP TABLE IF EXISTS shop_cart_items;
