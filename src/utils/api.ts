@@ -1,4 +1,3 @@
-
 /**
  * API utility for making requests to the backend
  */
@@ -21,6 +20,7 @@ export const apiRequest = async (endpoint: string, options: RequestOptions = {})
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   };
   
   // Add authorization header if token is provided
@@ -45,7 +45,7 @@ export const apiRequest = async (endpoint: string, options: RequestOptions = {})
   }
   
   try {
-    console.log(`API Request: ${method} ${API_BASE_URL}${endpoint}`);
+    console.log(`API Request: ${method} ${API_BASE_URL}${endpoint}`, body);
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     
     // Debug response information
@@ -56,7 +56,7 @@ export const apiRequest = async (endpoint: string, options: RequestOptions = {})
       let errorMessage = `HTTP error ${response.status}`;
       try {
         const errorData = await response.json();
-        errorMessage = errorData.error || errorMessage;
+        errorMessage = errorData.error || errorData.message || errorMessage;
       } catch (e) {
         // If response cannot be parsed as JSON, use status text
         errorMessage = `${errorMessage}: ${response.statusText}`;

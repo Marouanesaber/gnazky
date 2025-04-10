@@ -1,5 +1,5 @@
 
--- Comprehensive PetClinic Database Schema
+-- PET.sql - Consolidated Pet Clinic Database Schema
 
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS shop_orders;
@@ -41,6 +41,8 @@ CREATE TABLE staff (
   phone VARCHAR(20),
   hire_date DATE NOT NULL,
   status ENUM('active', 'on_leave', 'terminated') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -56,8 +58,10 @@ CREATE TABLE owners (
   city VARCHAR(50),
   state VARCHAR(50),
   postal_code VARCHAR(20),
-  registration_date DATE NOT NULL,
+  registration_date DATE NOT NULL DEFAULT CURRENT_DATE,
   notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
@@ -121,6 +125,7 @@ CREATE TABLE consultations (
   follow_up_date DATE,
   status ENUM('scheduled', 'completed', 'cancelled', 'no_show') DEFAULT 'scheduled',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE,
   FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE
 );
@@ -177,6 +182,7 @@ CREATE TABLE vaccinations (
   next_due_date DATE,
   notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE,
   FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE
 );
@@ -201,6 +207,7 @@ CREATE TABLE shop_cart_items (
   product_id INT NOT NULL,
   quantity INT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (product_id) REFERENCES shop_products(id) ON DELETE CASCADE
 );
@@ -217,8 +224,15 @@ CREATE TABLE shop_orders (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Sample initial data insertion (optional)
+-- Sample initial data insertion
 INSERT INTO users (username, password, email, role, first_name, last_name) VALUES 
-('admin', 'hashed_password', 'admin@petclinic.com', 'admin', 'Admin', 'User');
+('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@petclinic.com', 'admin', 'Admin', 'User');
 
--- Optional: Add more sample data as needed
+-- Add indexes for performance optimization
+CREATE INDEX idx_pets_owner_id ON pets(owner_id);
+CREATE INDEX idx_appointments_pet_id ON appointments(pet_id);
+CREATE INDEX idx_appointments_date ON appointments(appointment_date);
+CREATE INDEX idx_vaccinations_pet_id ON vaccinations(pet_id);
+CREATE INDEX idx_lab_tests_pet_id ON lab_tests(pet_id);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role ON users(role);
