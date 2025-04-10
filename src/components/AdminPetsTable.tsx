@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody } from "@/components/ui/table";
 import { toast } from "sonner";
@@ -11,11 +10,81 @@ import { AdminPet } from "./pets-admin/types";
 
 // Sample data for pets registered by admin
 const initialAdminPetsData = [
-  { id: 1, chipId: "CHIP900001", name: "Teddy", registeredBy: "Admin Admin", vaccinationRecords: [{ name: "Rabies", date: "2023-03-15" }], petRecords: [{ type: "Checkup", date: "2023-05-20", notes: "Healthy" }] },
-  { id: 2, chipId: "CHIP900002", name: "Buddy", registeredBy: "Admin Admin", vaccinationRecords: [{ name: "Distemper", date: "2023-04-10" }], petRecords: [{ type: "Surgery", date: "2023-06-05", notes: "Minor procedure" }] },
-  { id: 3, chipId: "CHIP900003", name: "Whiskers", registeredBy: "Admin Admin", vaccinationRecords: [{ name: "FVRCP", date: "2023-02-20" }], petRecords: [{ type: "Dental", date: "2023-07-12", notes: "Teeth cleaning" }] },
-  { id: 4, chipId: "CHIP900004", name: "Lucy", registeredBy: "Admin Admin", vaccinationRecords: [{ name: "Bordetella", date: "2023-08-01" }], petRecords: [{ type: "Checkup", date: "2023-08-15", notes: "Weight management" }] },
-  { id: 5, chipId: "CHIP900005", name: "Max", registeredBy: "Admin Admin", vaccinationRecords: [{ name: "Leptospirosis", date: "2023-01-10" }], petRecords: [{ type: "Grooming", date: "2023-09-01", notes: "Full service" }] },
+  { 
+    id: 1, 
+    chipId: "CHIP900001", 
+    name: "Teddy", 
+    registeredBy: "Admin Admin", 
+    vaccinationRecords: [{ name: "Rabies", date: "2023-03-15" }], 
+    petRecords: [{ type: "Checkup", date: "2023-05-20", notes: "Healthy" }],
+    species: "Dog",
+    breed: "Golden Retriever",
+    gender: "male",
+    weight: 25,
+    weight_unit: "kg",
+    color: "Golden",
+    notes: "Friendly and active dog"
+  },
+  { 
+    id: 2, 
+    chipId: "CHIP900002", 
+    name: "Buddy", 
+    registeredBy: "Admin Admin", 
+    vaccinationRecords: [{ name: "Distemper", date: "2023-04-10" }], 
+    petRecords: [{ type: "Surgery", date: "2023-06-05", notes: "Minor procedure" }],
+    species: "Dog",
+    breed: "Beagle",
+    gender: "male",
+    weight: 15,
+    weight_unit: "kg",
+    color: "Brown/White",
+    notes: "Loves to play fetch"
+  },
+  { 
+    id: 3, 
+    chipId: "CHIP900003", 
+    name: "Whiskers", 
+    registeredBy: "Admin Admin", 
+    vaccinationRecords: [{ name: "FVRCP", date: "2023-02-20" }], 
+    petRecords: [{ type: "Dental", date: "2023-07-12", notes: "Teeth cleaning" }],
+    species: "Cat",
+    breed: "Siamese",
+    gender: "female",
+    weight: 4.5,
+    weight_unit: "kg",
+    color: "Cream/Brown",
+    notes: "Quiet and shy"
+  },
+  { 
+    id: 4, 
+    chipId: "CHIP900004", 
+    name: "Lucy", 
+    registeredBy: "Admin Admin", 
+    vaccinationRecords: [{ name: "Bordetella", date: "2023-08-01" }], 
+    petRecords: [{ type: "Checkup", date: "2023-08-15", notes: "Weight management" }],
+    species: "Dog",
+    breed: "Labrador",
+    gender: "female",
+    weight: 30,
+    weight_unit: "kg",
+    color: "Black",
+    notes: "Needs diet management"
+  },
+  { 
+    id: 5, 
+    chipId: "CHIP900005", 
+    name: "Max", 
+    registeredBy: "Admin Admin", 
+    vaccinationRecords: [{ name: "Leptospirosis", date: "2023-01-10" }], 
+    petRecords: [{ type: "Grooming", date: "2023-09-01", notes: "Full service" }],
+    species: "Dog",
+    breed: "German Shepherd",
+    gender: "male",
+    weight: 35,
+    weight_unit: "kg",
+    color: "Black/Tan",
+    notes: "Well-trained guard dog"
+  },
 ];
 
 export function AdminPetsTable() {
@@ -25,11 +94,6 @@ export function AdminPetsTable() {
   const [isVaccinationDialogOpen, setIsVaccinationDialogOpen] = useState(false);
   const [isPetRecordsDialogOpen, setIsPetRecordsDialogOpen] = useState(false);
   const [currentPet, setCurrentPet] = useState<null | AdminPet>(null);
-  
-  const [editForm, setEditForm] = useState({
-    name: "",
-    chipId: ""
-  });
   
   const [newVaccination, setNewVaccination] = useState({
     name: "",
@@ -67,10 +131,6 @@ export function AdminPetsTable() {
 
   const handleEditClick = (pet: AdminPet) => {
     setCurrentPet(pet);
-    setEditForm({
-      name: pet.name,
-      chipId: pet.chipId
-    });
     setIsEditDialogOpen(true);
   };
 
@@ -93,10 +153,6 @@ export function AdminPetsTable() {
     setIsPetRecordsDialogOpen(true);
   };
 
-  const handleEditFormChange = (field: string, value: string) => {
-    setEditForm({...editForm, [field]: value});
-  };
-
   const handleNewVaccinationChange = (field: string, value: string) => {
     setNewVaccination({...newVaccination, [field]: value});
   };
@@ -106,23 +162,6 @@ export function AdminPetsTable() {
   };
 
   const handleSaveEdit = () => {
-    if (!currentPet) return;
-    
-    // Validate
-    if (!editForm.name || !editForm.chipId) {
-      toast.error("All fields are required");
-      return;
-    }
-    
-    // Update the data
-    const updatedData = adminPetsData.map(pet => 
-      pet.id === currentPet.id 
-        ? { ...pet, name: editForm.name, chipId: editForm.chipId } 
-        : pet
-    );
-    
-    setAdminPetsData(updatedData);
-    setIsEditDialogOpen(false);
     toast.success("Pet information updated successfully!");
   };
 
@@ -232,9 +271,7 @@ export function AdminPetsTable() {
         isOpen={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         currentPet={currentPet}
-        editForm={editForm}
-        onEditFormChange={handleEditFormChange}
-        onSave={handleSaveEdit}
+        onSuccess={handleSaveEdit}
       />
 
       <VaccinationDialog

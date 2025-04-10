@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { 
   Form,
@@ -17,6 +16,13 @@ import {
 } from "@/components/ui/form";
 import { AdminPet } from "./types";
 import { petsApi } from "@/utils/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PetEditFormProps {
   pet: AdminPet | null;
@@ -47,14 +53,14 @@ const PetEditForm = ({ pet, onSuccess, onCancel }: PetEditFormProps) => {
     if (pet) {
       form.reset({
         name: pet.name || "",
-        species: pet.species || "",
-        breed: pet.breed || "",
+        species: pet?.species || "",
+        breed: pet?.breed || "",
         microchip_id: pet.chipId || "",
-        gender: pet.gender || "unknown",
-        weight: pet.weight?.toString() || "",
-        weight_unit: pet.weight_unit || "kg",
-        color: pet.color || "",
-        notes: pet.notes || "",
+        gender: pet?.gender || "unknown",
+        weight: pet?.weight?.toString() || "",
+        weight_unit: pet?.weight_unit || "kg",
+        color: pet?.color || "",
+        notes: pet?.notes || "",
       });
     }
   }, [pet, form]);
@@ -158,18 +164,15 @@ const PetEditForm = ({ pet, onSuccess, onCancel }: PetEditFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Gender</FormLabel>
-                <Select 
-                  value={field.value}
-                  onValueChange={field.onChange}
-                >
-                  <Select.Trigger>
-                    <Select.Value placeholder="Select gender" />
-                  </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value="male">Male</Select.Item>
-                    <Select.Item value="female">Female</Select.Item>
-                    <Select.Item value="unknown">Unknown</Select.Item>
-                  </Select.Content>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="unknown">Unknown</SelectItem>
+                  </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
@@ -215,17 +218,14 @@ const PetEditForm = ({ pet, onSuccess, onCancel }: PetEditFormProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Unit</FormLabel>
-                    <Select 
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <Select.Trigger>
-                        <Select.Value placeholder="Unit" />
-                      </Select.Trigger>
-                      <Select.Content>
-                        <Select.Item value="kg">kg</Select.Item>
-                        <Select.Item value="lb">lb</Select.Item>
-                      </Select.Content>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="kg">kg</SelectItem>
+                        <SelectItem value="lb">lb</SelectItem>
+                      </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>

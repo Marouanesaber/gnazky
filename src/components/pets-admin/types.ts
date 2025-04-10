@@ -17,4 +17,11 @@ export interface AdminPet {
   registeredBy: string;
   vaccinationRecords: VaccinationRecord[];
   petRecords: PetRecord[];
+  species?: string;
+  breed?: string;
+  gender?: string;
+  weight?: number;
+  weight_unit?: string;
+  color?: string;
+  notes?: string;
 }
