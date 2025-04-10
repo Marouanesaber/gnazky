@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,6 @@ import { CalendarIcon, Search, Filter, Plus, Clock, Calendar as CalendarIcon2, A
 import { toast } from "sonner";
 import { appointmentsApi, petsApi, ownersApi } from "@/utils/api";
 
-// Define Appointment interface for type checking
 interface Appointment {
   id: number;
   pet_id?: number;
@@ -32,7 +30,6 @@ interface Appointment {
   doctor: string;
 }
 
-// Define Pet interface for the dropdown
 interface Pet {
   id: number;
   name: string;
@@ -42,14 +39,12 @@ interface Pet {
   owner_id?: number;
 }
 
-// Doctor interface for the dropdown
 interface Doctor {
   id: number;
   name: string;
   speciality: string;
 }
 
-// AppointmentCard component
 interface AppointmentCardProps {
   appointment: Appointment;
   onComplete: (id: number) => void;
@@ -137,7 +132,6 @@ const AppointmentCard = ({
 };
 
 const AppointmentsPage = () => {
-  // Sample data for doctors
   const doctors = [
     { id: 1, name: "Dr. Sarah Johnson", speciality: "Surgery, Internal Medicine" },
     { id: 2, name: "Dr. Michael Chen", speciality: "Dermatology, Nutrition" },
@@ -156,7 +150,6 @@ const AppointmentsPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   
-  // Form state for new appointment
   const [newAppointment, setNewAppointment] = useState({
     petId: "",
     date: format(new Date(), 'yyyy-MM-dd'),
@@ -167,14 +160,12 @@ const AppointmentsPage = () => {
     doctorId: ""
   });
   
-  // Load appointments from API
   useEffect(() => {
     const fetchAppointments = async () => {
       setLoading(true);
       try {
         const data = await appointmentsApi.getAll();
         
-        // Format the appointments data
         const formattedAppointments: Appointment[] = data.map((app: any) => ({
           id: app.id,
           pet_id: app.pet_id,
@@ -185,7 +176,7 @@ const AppointmentsPage = () => {
           time: app.appointment_date ? format(new Date(app.appointment_date), 'HH:mm') : "00:00",
           end_time: app.end_time,
           reason: app.reason || "checkup",
-          status: app.status || "pending",
+          status: (app.status as "pending" | "confirmed" | "completed" | "cancelled") || "pending",
           notes: app.notes || "",
           doctor: app.doctor || "Dr. Unknown"
         }));
@@ -195,7 +186,6 @@ const AppointmentsPage = () => {
         console.error("Error fetching appointments:", error);
         toast.error("Failed to load appointments");
         
-        // Set sample data if API fails
         setAppointments([
           { 
             id: 1, 
@@ -272,7 +262,6 @@ const AppointmentsPage = () => {
       try {
         const petsData = await petsApi.getAll();
         
-        // Get owner info for each pet to display in dropdown
         const enhancedPets = await Promise.all(petsData.map(async (pet: any) => {
           try {
             const ownerData = pet.owner_id ? await ownersApi.getById(pet.owner_id) : null;
@@ -312,7 +301,6 @@ const AppointmentsPage = () => {
     fetchPets();
   }, []);
   
-  // Filter appointments based on search and status filter
   const filteredAppointments = appointments.filter(app => {
     const matchesSearch = 
       app.petName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -323,7 +311,6 @@ const AppointmentsPage = () => {
     return matchesSearch && matchesStatus;
   });
   
-  // Get appointments for the selected date
   const appointmentsForSelectedDate = appointments.filter(app => 
     selectedDate && app.date && isSameDay(parseISO(app.date), selectedDate)
   );
@@ -343,7 +330,6 @@ const AppointmentsPage = () => {
     }
 
     try {
-      // Format the data for the API
       const appointmentData = {
         pet_id: parseInt(newAppointment.petId),
         appointment_date: `${newAppointment.date}T${newAppointment.time}`,
@@ -354,12 +340,10 @@ const AppointmentsPage = () => {
         doctor: doctor?.name || ""
       };
       
-      // Send to API
       const response = await appointmentsApi.create(appointmentData);
       
-      // If successful, add to state
       const newAppointmentObj: Appointment = {
-        id: response.id || Date.now(), // use returned ID or timestamp fallback
+        id: response.id || Date.now(),
         pet_id: parseInt(newAppointment.petId),
         petName: pet.name,
         petType: pet.type,
@@ -376,7 +360,6 @@ const AppointmentsPage = () => {
       setAppointments([...appointments, newAppointmentObj]);
       setIsCreateDialogOpen(false);
       
-      // Reset form
       setNewAppointment({
         petId: "",
         date: format(new Date(), 'yyyy-MM-dd'),
@@ -398,7 +381,6 @@ const AppointmentsPage = () => {
     if (!selectedAppointment) return;
     
     try {
-      // Format data for API
       const updateData = {
         appointment_date: `${selectedAppointment.date}T${selectedAppointment.time}`,
         end_time: selectedAppointment.end_time,
@@ -408,10 +390,8 @@ const AppointmentsPage = () => {
         doctor: selectedAppointment.doctor
       };
       
-      // Send to API
       await appointmentsApi.update(selectedAppointment.id, updateData);
       
-      // Update local state
       const updatedAppointments = appointments.map(app => {
         if (app.id === selectedAppointment.id) {
           return selectedAppointment;
@@ -432,13 +412,11 @@ const AppointmentsPage = () => {
     if (!selectedAppointment) return;
     
     try {
-      // Send cancellation to API
       await appointmentsApi.update(selectedAppointment.id, { status: "cancelled" });
       
-      // Update local state
       const updatedAppointments = appointments.map(app => {
         if (app.id === selectedAppointment.id) {
-          return { ...app, status: "cancelled" };
+          return { ...app, status: "cancelled" as "pending" | "confirmed" | "completed" | "cancelled" };
         }
         return app;
       });
@@ -454,13 +432,11 @@ const AppointmentsPage = () => {
   
   const handleCompleteAppointment = async (id: number) => {
     try {
-      // Send completion to API
       await appointmentsApi.update(id, { status: "completed" });
       
-      // Update local state
       const updatedAppointments = appointments.map(app => {
         if (app.id === id) {
-          return { ...app, status: "completed" };
+          return { ...app, status: "completed" as "pending" | "confirmed" | "completed" | "cancelled" };
         }
         return app;
       });
@@ -475,13 +451,11 @@ const AppointmentsPage = () => {
 
   const handleConfirmAppointment = async (id: number) => {
     try {
-      // Send confirmation to API
       await appointmentsApi.update(id, { status: "confirmed" });
       
-      // Update local state
       const updatedAppointments = appointments.map(app => {
         if (app.id === id) {
-          return { ...app, status: "confirmed" };
+          return { ...app, status: "confirmed" as "pending" | "confirmed" | "completed" | "cancelled" };
         }
         return app;
       });
@@ -787,7 +761,6 @@ const AppointmentsPage = () => {
         </div>
       )}
 
-      {/* Create Appointment Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -918,7 +891,6 @@ const AppointmentsPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Appointment Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
@@ -1038,7 +1010,6 @@ const AppointmentsPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Cancel Appointment Dialog */}
       <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
