@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PawPrint, Menu, X, ShoppingCart, UserCircle2, Home, ClipboardList, Users, Phone, LogOut } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import { LanguageSwitcher, useLanguage } from "@/components/LanguageSwitcher";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { apiRequest } from "@/utils/api";
 import { onEvent } from "@/utils/eventBus";
 
@@ -12,8 +11,6 @@ export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const [cartItemCount, setCartItemCount] = useState(0);
-  const { t } = useLanguage();
-  const [scrolled, setScrolled] = useState(false);
 
   const fetchCartCount = async () => {
     if (!isAuthenticated) {
@@ -36,39 +33,21 @@ export function Navigation() {
     const unsubscribe = onEvent('cart-updated', () => {
       fetchCartCount();
     });
-
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
     
-    return () => {
-      unsubscribe();
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return unsubscribe;
   }, [isAuthenticated]);
 
   return (
-    <nav className={`py-4 sticky top-0 z-40 w-full transition-all duration-300 ${
-      scrolled ? 'bg-white/95 shadow-md backdrop-blur-sm' : 'bg-white/80 backdrop-blur-sm'
-    }`}>
+    <nav className="py-4 bg-white/80 backdrop-blur-sm sticky top-0 z-40 w-full border-b border-gray-200">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
           <Link
             to="/"
-            className="flex items-center space-x-2 group"
+            className="flex items-center space-x-2"
             aria-label="PetClinic Home"
           >
-            <div className="relative">
-              <PawPrint className={`h-7 w-7 ${scrolled ? 'text-primary' : 'text-primary'} transition-all duration-500 group-hover:rotate-12`} />
-              <span className="absolute -inset-1 rounded-full bg-secondary/20 animate-pulse -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </div>
-            <span className="font-bold text-xl md:text-2xl font-playfair text-primary">{t('petClinic')}</span>
+            <PawPrint className="h-6 w-6 text-primary" />
+            <span className="font-bold text-xl md:text-2xl">PetClinic</span>
           </Link>
           
           <div className="md:hidden">
@@ -83,25 +62,25 @@ export function Navigation() {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1 font-montserrat">
+            <Link to="/" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1">
               <Home className="h-4 w-4" />
-              {t('home')}
+              Home
             </Link>
-            <Link to="/services" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1 font-montserrat">
+            <Link to="/services" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1">
               <ClipboardList className="h-4 w-4" />
-              {t('services')}
+              Services
             </Link>
-            <Link to="/shop" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1 font-montserrat">
+            <Link to="/shop" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1">
               <ShoppingCart className="h-4 w-4" />
-              {t('shop')}
+              Shop
             </Link>
-            <Link to="/technicians" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1 font-montserrat">
+            <Link to="/technicians" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1">
               <Users className="h-4 w-4" />
-              {t('technicians')}
+              Technicians
             </Link>
-            <Link to="/contact-us" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1 font-montserrat">
+            <Link to="/contact-us" className="text-gray-700 hover:text-primary transition-colors flex items-center gap-1">
               <Phone className="h-4 w-4" />
-              {t('contact')}
+              Contact
             </Link>
           </div>
           
@@ -111,15 +90,15 @@ export function Navigation() {
             {isAuthenticated ? (
               <>
                 <Link to="/dashboard">
-                  <Button variant="ghost" className="flex items-center gap-1 font-montserrat hover:bg-primary/10">
+                  <Button variant="ghost" className="flex items-center gap-1">
                     <UserCircle2 className="h-4 w-4" />
-                    {t('dashboard')}
+                    Dashboard
                   </Button>
                 </Link>
                 <Link to="/logout">
-                  <Button variant="ghost" className="flex items-center gap-1 text-red-500 hover:text-red-600 hover:bg-red-50 font-montserrat">
+                  <Button variant="ghost" className="flex items-center gap-1 text-red-500 hover:text-red-600 hover:bg-red-50">
                     <LogOut className="h-4 w-4" />
-                    {t('signOut')}
+                    Sign Out
                   </Button>
                 </Link>
                 <Link to="/cart">
@@ -134,10 +113,10 @@ export function Navigation() {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" className="font-montserrat">{t('signIn')}</Button>
+                  <Button variant="ghost">Sign In</Button>
                 </Link>
                 <Link to="/register">
-                  <Button className="bg-primary hover:bg-primary/90 font-montserrat">{t('signUp')}</Button>
+                  <Button>Sign Up</Button>
                 </Link>
               </>
             )}
@@ -149,82 +128,73 @@ export function Navigation() {
             <div className="flex flex-col space-y-4">
               <Link 
                 to="/"
-                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2 font-montserrat"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Home className="h-4 w-4" />
-                {t('home')}
+                Home
               </Link>
               <Link
                 to="/services"
-                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2 font-montserrat"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <ClipboardList className="h-4 w-4" />
-                {t('services')}
+                Services
               </Link>
               <Link
                 to="/shop"
-                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2 font-montserrat"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <ShoppingCart className="h-4 w-4" />
-                {t('shop')}
+                Shop
               </Link>
               <Link
                 to="/technicians"
-                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2 font-montserrat"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Users className="h-4 w-4" />
-                {t('technicians')}
+                Technicians
               </Link>
               <Link
                 to="/contact-us"
-                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2 font-montserrat"
+                className="px-2 py-1 text-gray-700 hover:text-primary transition-colors flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Phone className="h-4 w-4" />
-                {t('contact')}
+                Contact Us
               </Link>
-
-              <div className="flex justify-center py-2">
-                <LanguageSwitcher />
-              </div>
-
               <div className="pt-2 border-t border-gray-200">
                 {isAuthenticated ? (
                   <div className="flex flex-col space-y-2">
                     <Link to="/dashboard" className="w-full">
-                      <Button className="w-full flex items-center gap-2 font-montserrat" variant="ghost" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full flex items-center gap-2" variant="ghost" onClick={() => setIsMenuOpen(false)}>
                         <UserCircle2 className="h-4 w-4" />
-                        {t('dashboard')}
+                        Dashboard
                       </Button>
                     </Link>
                     <Link to="/cart" className="w-full">
-                      <Button className="w-full flex items-center gap-2 font-montserrat" variant="outline" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full flex items-center gap-2" variant="outline" onClick={() => setIsMenuOpen(false)}>
                         <ShoppingCart className="h-4 w-4" />
-                        {t('cart')} ({cartItemCount})
+                        Cart ({cartItemCount})
                       </Button>
                     </Link>
                     <Link to="/logout" className="w-full">
-                      <Button className="w-full flex items-center gap-2 bg-red-50 text-red-500 hover:bg-red-100 font-montserrat" variant="ghost" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full flex items-center gap-2 bg-red-50 text-red-500 hover:bg-red-100" variant="ghost" onClick={() => setIsMenuOpen(false)}>
                         <LogOut className="h-4 w-4" />
-                        {t('signOut')}
+                        Sign Out
                       </Button>
                     </Link>
                   </div>
                 ) : (
                   <div className="flex space-x-2">
                     <Link to="/login" className="flex-1">
-                      <Button className="w-full font-montserrat" variant="ghost" onClick={() => setIsMenuOpen(false)}>
-                        {t('signIn')}
-                      </Button>
+                      <Button className="w-full" variant="ghost" onClick={() => setIsMenuOpen(false)}>Sign In</Button>
                     </Link>
                     <Link to="/register" className="flex-1">
-                      <Button className="w-full bg-primary hover:bg-primary/90 font-montserrat" onClick={() => setIsMenuOpen(false)}>
-                        {t('signUp')}
-                      </Button>
+                      <Button className="w-full" onClick={() => setIsMenuOpen(false)}>Sign Up</Button>
                     </Link>
                   </div>
                 )}

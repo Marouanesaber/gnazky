@@ -31,7 +31,6 @@ import Cart from "./pages/Cart";
 import { AuthProvider } from "./components/AuthProvider";
 import { LanguageProvider } from "@/components/LanguageSwitcher";
 import ProductDetail from "./pages/ProductDetail";
-import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
@@ -46,8 +45,8 @@ function App() {
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  {/* Update root path to show Home component */}
-                  <Route path="/" element={<Home />} />
+                  {/* Change root path to redirect to dashboard instead of home */}
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/login" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/register" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />

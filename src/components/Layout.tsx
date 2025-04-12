@@ -1,4 +1,3 @@
-
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
@@ -33,9 +32,10 @@ const Layout = () => {
     navigate("/logout");
   };
 
-  // Navigate to the main home page, not the dashboard
+  // Preserve authentication when navigating to main page
   const navigateToMainPage = () => {
-    navigate("/");
+    // Don't logout - just navigate, keeping authentication state
+    navigate("/", { replace: false });
   };
 
   return (
