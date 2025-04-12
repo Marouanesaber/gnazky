@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter, Youtube, PawPrint } from "lucide-react";
@@ -37,13 +36,19 @@ const Footer = () => {
           <div>
             <h4 className="font-bold text-lg mb-4 text-white">Quick Links</h4>
             <ul className="space-y-2">
-              {['Home', 'Book Appointment', 'Services', 'Technicians', 'Contact Us'].map((item) => (
-                <li key={item}>
+              {[
+                { name: 'Home', path: '/' },
+                { name: 'Book Appointment', path: '/book-appointment' },
+                { name: 'Services', path: '/services' },
+                { name: 'Technicians', path: '/technicians' },
+                { name: 'Contact Us', path: '/contact-us' }
+              ].map((item) => (
+                <li key={item.name}>
                   <Link 
-                    to={item === 'Home' ? '/' : `/${item.toLowerCase().replace(' ', '-')}`}
+                    to={item.path}
                     className="text-blue-200 hover:text-white transition-colors"
                   >
-                    {item}
+                    {item.name}
                   </Link>
                 </li>
               ))}
