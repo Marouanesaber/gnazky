@@ -15,8 +15,11 @@ export function ProductCategory({ name, products, onAddedToCart }: ProductCatego
   const { t } = useLanguage();
   
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold capitalize">{name}</h2>
+    <div className="space-y-6">
+      <div className="flex items-center">
+        <h2 className="text-2xl font-bold capitalize font-playfair text-primary">{t(name as any) || name}</h2>
+        <div className="ml-4 h-px bg-gray-200 flex-grow"></div>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
           <ProductCard

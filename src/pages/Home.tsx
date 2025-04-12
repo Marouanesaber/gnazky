@@ -8,10 +8,11 @@ import ContactSection from "@/components/home/ContactSection";
 import PetGallery from "@/components/home/PetGallery";
 import Footer from "@/components/home/Footer";
 import AppointmentStats from "@/components/home/AppointmentStats";
+import BackToTop from "@/components/home/BackToTop";
 
 const Home = () => {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen font-montserrat">
       <Navigation />
       <HeroSection />
       <div className="container mx-auto px-4 py-8">
@@ -22,6 +23,7 @@ const Home = () => {
       <TestimonialsSection />
       <ContactSection />
       <Footer />
+      <BackToTop />
     </div>
   );
 };

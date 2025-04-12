@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,6 +18,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'playfair': ['Playfair Display', 'serif'],
+				'montserrat': ['Montserrat', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -26,11 +29,11 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
+					DEFAULT: '#1E3A8A',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
+					DEFAULT: '#A7F3D0',
 					foreground: 'hsl(var(--secondary-foreground))'
 				},
 				destructive: {
@@ -54,8 +57,8 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				clinic: {
-					blue: '#4361ee',
-					green: '#2ecc71',
+					blue: '#1E3A8A',
+					green: '#A7F3D0',
 					red: '#e74c3c',
 					yellow: '#f9ca24',
 					purple: '#8e44ad',

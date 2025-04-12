@@ -31,6 +31,7 @@ import Cart from "./pages/Cart";
 import { AuthProvider } from "./components/AuthProvider";
 import { LanguageProvider } from "@/components/LanguageSwitcher";
 import ProductDetail from "./pages/ProductDetail";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
