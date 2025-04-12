@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -45,12 +45,12 @@ function App() {
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  {/* Change root path to redirect to dashboard instead of home */}
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/login" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/register" element={<Navigate to="/dashboard" replace />} />
+                  {/* Change root path to render Home component */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/logout" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/logout" element={<Logout />} />
                   <Route path="/book-appointment" element={<BookAppointment />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/technicians" element={<Technicians />} />
@@ -71,7 +71,7 @@ function App() {
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="*" element={<NotFound />} />
                   </Route>
-                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
             </TooltipProvider>
