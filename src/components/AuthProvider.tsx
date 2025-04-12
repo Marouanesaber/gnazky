@@ -35,9 +35,15 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>({
+    id: 1,
+    name: "Guest User",
+    email: "guest@example.com",
+    profilePicture: "https://ui-avatars.com/api/?name=Guest+User&background=0D8ABC&color=fff",
+    role: "admin"
+  });
+  const [token, setToken] = useState<string | null>("demo-token-no-authentication");
 
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
@@ -45,21 +51,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (storedToken && storedUserProfile) {
       try {
-        setIsAuthenticated(true);
         setToken(storedToken);
         setUserProfile(JSON.parse(storedUserProfile));
         localStorage.setItem("isLoggedIn", "true");
       } catch (error) {
         console.error("Error parsing stored user profile:", error);
-        clearAllAuthData();
+        // Don't clear auth data, just use the default guest user
       }
     }
   }, []);
 
   const clearAllAuthData = () => {
-    setIsAuthenticated(false);
-    setUserProfile(null);
-    setToken(null);
+    setUserProfile({
+      id: 1,
+      name: "Guest User",
+      email: "guest@example.com",
+      profilePicture: "https://ui-avatars.com/api/?name=Guest+User&background=0D8ABC&color=fff",
+      role: "admin"
+    });
+    setToken("demo-token-no-authentication");
     
     localStorage.removeItem("authToken");
     localStorage.removeItem("userProfile");
@@ -73,55 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const checkAuthStatus = async (): Promise<boolean> => {
-    if (isAuthenticated && token && userProfile) {
-      return true;
-    }
-    
-    const storedToken = localStorage.getItem("authToken");
-    if (!storedToken) return false;
-    
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/verify', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${storedToken}`
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setIsAuthenticated(true);
-        setToken(data.token);
-        setUserProfile(data.user);
-        localStorage.setItem("authToken", data.token);
-        localStorage.setItem("userProfile", JSON.stringify(data.user));
-        localStorage.setItem("isLoggedIn", "true");
-        return true;
-      } else {
-        clearAllAuthData();
-        return false;
-      }
-    } catch (error) {
-      console.error('Error verifying token:', error);
-      
-      const isLoggedIn = localStorage.getItem("isLoggedIn");
-      const storedUserProfile = localStorage.getItem("userProfile");
-      
-      if (isLoggedIn === "true" && storedUserProfile && storedToken) {
-        try {
-          setIsAuthenticated(true);
-          setToken(storedToken);
-          setUserProfile(JSON.parse(storedUserProfile));
-          return true;
-        } catch (e) {
-          clearAllAuthData();
-          return false;
-        }
-      }
-      
-      clearAllAuthData();
-      return false;
-    }
+    return true;
   };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
@@ -303,7 +265,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider value={{ 
-      isAuthenticated, 
+      isAuthenticated: true,
       userProfile, 
       token, 
       login, 

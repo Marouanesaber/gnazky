@@ -1,4 +1,3 @@
-
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
@@ -14,30 +13,9 @@ const Layout = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check authentication status when the component mounts
-    const checkAuth = async () => {
-      setIsLoading(true);
-      try {
-        const isAuth = await checkAuthStatus();
-        
-        // Only redirect to login if not authenticated
-        if (!isAuth) {
-          // Clear any remaining auth data to be safe
-          logout();
-          navigate("/login");
-        }
-      } catch (error) {
-        console.error("Error checking auth status:", error);
-        // On error, also redirect to login
-        logout();
-        navigate("/login");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkAuth();
-  }, [checkAuthStatus, navigate, logout]);
+    // Skip authentication check and just set loading to false
+    setIsLoading(false);
+  }, []);
 
   // Don't render anything until we've checked authentication
   if (isLoading) {
@@ -59,12 +37,6 @@ const Layout = () => {
     // Don't logout - just navigate, keeping authentication state
     navigate("/", { replace: false });
   };
-
-  // If somehow we got here without authentication, redirect to login
-  if (!isAuthenticated) {
-    navigate("/login");
-    return null;
-  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background theme-transition animate-fade-in">

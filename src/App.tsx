@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -44,11 +45,12 @@ function App() {
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
+                  {/* Change root path to redirect to dashboard instead of home */}
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/register" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/logout" element={<Logout />} />
+                  <Route path="/logout" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/book-appointment" element={<BookAppointment />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/technicians" element={<Technicians />} />
@@ -69,7 +71,7 @@ function App() {
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="*" element={<NotFound />} />
                   </Route>
-                  <Route path="*" element={<Navigate to="/" replace />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </BrowserRouter>
             </TooltipProvider>
