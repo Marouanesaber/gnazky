@@ -45,8 +45,8 @@ function App() {
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  {/* Change root path to redirect to dashboard instead of home */}
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  {/* Update root path to show Home component */}
+                  <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/register" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
