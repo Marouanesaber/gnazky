@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCart, ExternalLink } from "lucide-react";
+import { ShoppingCart, ExternalLink, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/components/AuthProvider";
 import { apiRequest } from "@/utils/api";
 import { useLanguage } from "@/components/LanguageSwitcher";
 import { emitEvent } from "@/utils/eventBus";
+import { motion } from "framer-motion";
 
 interface Product {
   id: number;
@@ -76,55 +77,63 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddedToCart }) => 
   };
 
   return (
-    <Card 
-      className="overflow-hidden transition-all hover:shadow-md cursor-pointer h-full flex flex-col"
-      onClick={handleViewDetails}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
-        <img 
-          src={product.image} 
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform hover:scale-105" 
-        />
-        {product.stock <= 0 && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <span className="text-white font-medium px-3 py-1 bg-red-500 rounded-full text-sm">
-              {t('outOfStock')}
-            </span>
-          </div>
-        )}
-      </div>
-      <CardContent className="p-4 flex flex-col flex-grow">
-        <h3 className="font-medium mb-1 line-clamp-1">{product.name}</h3>
-        <p className="text-gray-500 text-sm mb-2 line-clamp-2">{product.description}</p>
-        <div className="flex items-end justify-between mt-auto pt-2">
-          <span className="font-semibold">${product.price.toFixed(2)}</span>
-          <div className="flex gap-2">
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewDetails();
-              }}
-              className="h-8 w-8 p-0"
+      <Card 
+        className="overflow-hidden transition-all hover:shadow-lg cursor-pointer h-full flex flex-col group bg-white border-gray-200"
+      >
+        <div 
+          className="relative aspect-square overflow-hidden bg-gray-100"
+          onClick={handleViewDetails}
+        >
+          <img 
+            src={product.image} 
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500" 
+          />
+          
+          {product.stock <= 0 && (
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+              <span className="text-white font-medium px-3 py-1 bg-red-500 rounded-full text-sm">
+                {t('outOfStock')}
+              </span>
+            </div>
+          )}
+          
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <Button
+              size="sm"
+              variant="secondary"
+              className="text-primary"
+              onClick={handleViewDetails}
             >
-              <ExternalLink className="h-4 w-4" />
-              <span className="sr-only">{t('viewDetails')}</span>
-            </Button>
-            <Button 
-              size="sm" 
-              onClick={handleAddToCart}
-              disabled={isAdding || product.stock <= 0}
-              className="h-8 w-8 p-0"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              <span className="sr-only">{t('addToCart')}</span>
+              <Eye className="h-4 w-4 mr-2" />
+              {t('viewDetails')}
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+        
+        <CardContent className="p-4 flex flex-col flex-grow">
+          <h3 className="font-medium mb-1 line-clamp-1 group-hover:text-primary transition-colors">{product.name}</h3>
+          <p className="text-gray-500 text-sm mb-2 line-clamp-2">{product.description}</p>
+          <div className="flex items-end justify-between mt-auto pt-2">
+            <span className="font-semibold text-primary">${product.price.toFixed(2)}</span>
+            <Button 
+              size="sm"
+              onClick={handleAddToCart}
+              disabled={isAdding || product.stock <= 0}
+              className="h-9 px-3"
+            >
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              {isAdding ? t('adding') : t('addToCart')}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 

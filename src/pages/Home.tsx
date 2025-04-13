@@ -8,6 +8,7 @@ import ContactSection from "@/components/home/ContactSection";
 import PetGallery from "@/components/home/PetGallery";
 import Footer from "@/components/home/Footer";
 import AppointmentStats from "@/components/home/AppointmentStats";
+import BackToTop from "@/components/home/BackToTop";
 
 const Home = () => {
   return (
@@ -22,6 +23,7 @@ const Home = () => {
       <TestimonialsSection />
       <ContactSection />
       <Footer />
+      <BackToTop />
     </div>
   );
 };

@@ -26,11 +26,11 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
+					DEFAULT: '#1E3A8A', // Dark Blue (Navy Blue)
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
+					DEFAULT: '#A7F3D0', // Light Mint Green
 					foreground: 'hsl(var(--secondary-foreground))'
 				},
 				destructive: {
@@ -54,8 +54,8 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				clinic: {
-					blue: '#4361ee',
-					green: '#2ecc71',
+					blue: '#1E3A8A', // Updated to primary color
+					green: '#A7F3D0', // Updated to secondary color
 					red: '#e74c3c',
 					yellow: '#f9ca24',
 					purple: '#8e44ad',
@@ -109,6 +109,10 @@ export default {
 				'pulse-gentle': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.8' }
+				},
+				'scroll-to-top': {
+					'0%': { transform: 'translateY(20px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
 				}
 			},
 			animation: {
@@ -119,7 +123,12 @@ export default {
 				'scale-in': 'scale-in 0.2s ease-out',
 				'slide-in': 'slide-in 0.3s ease-out',
 				'slide-up': 'slide-up 0.3s ease-out',
-				'pulse-gentle': 'pulse-gentle 2s infinite ease-in-out'
+				'pulse-gentle': 'pulse-gentle 2s infinite ease-in-out',
+				'scroll-to-top': 'scroll-to-top 0.3s ease-out'
+			},
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
+				serif: ['Playfair Display', 'serif']
 			}
 		}
 	},

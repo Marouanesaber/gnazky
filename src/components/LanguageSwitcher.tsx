@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Globe } from "lucide-react";
 import { translations } from "@/utils/translations";
+import { Flag } from '@/components/ui/flag';
 
 // Define TranslationKey type
 export type TranslationKey = keyof typeof translations.en;
 
 // Language type
-export type Language = "en" | "es" | "fr" | "de" | "zh";
+export type Language = "en" | "zh";
 
 // Create a context for language
 interface LanguageContextType {
@@ -31,7 +32,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Load language preference from localStorage
     const savedLanguage = localStorage.getItem("language") as Language;
-    if (savedLanguage && ["en", "es", "fr", "de", "zh"].includes(savedLanguage)) {
+    if (savedLanguage && ["en", "zh"].includes(savedLanguage)) {
       setLanguage(savedLanguage);
       document.documentElement.lang = savedLanguage;
     }
@@ -69,29 +70,16 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="flex items-center gap-1">
           <Globe className="h-4 w-4" />
-          <span>{
-            language === "en" ? "English" : 
-            language === "es" ? "Español" :
-            language === "fr" ? "Français" : 
-            language === "de" ? "Deutsch" :
-            "中文"
-          }</span>
+          <span>{language === "en" ? "English" : "中文"}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => changeLanguage("en")}>
+          <Flag country="us" className="mr-2" />
           <span className={language === "en" ? "font-bold" : ""}>English</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeLanguage("es")}>
-          <span className={language === "es" ? "font-bold" : ""}>Español</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeLanguage("fr")}>
-          <span className={language === "fr" ? "font-bold" : ""}>Français</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeLanguage("de")}>
-          <span className={language === "de" ? "font-bold" : ""}>Deutsch</span>
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => changeLanguage("zh")}>
+          <Flag country="cn" className="mr-2" />
           <span className={language === "zh" ? "font-bold" : ""}>中文</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
