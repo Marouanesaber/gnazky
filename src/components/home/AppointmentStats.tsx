@@ -1,8 +1,10 @@
 
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "@/utils/api";
-import { Calendar } from "lucide-react";
+import { Calendar, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/components/LanguageSwitcher";
 
 const AppointmentStats = () => {
   const [stats, setStats] = useState({
@@ -10,6 +12,7 @@ const AppointmentStats = () => {
     loading: true,
     error: null
   });
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -51,35 +54,37 @@ const AppointmentStats = () => {
   }, []);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <div className="flex items-center gap-3 mb-2">
-        <div className="rounded-full p-2 bg-clinic-blue/10">
-          <Calendar className="h-5 w-5 text-clinic-blue" />
-        </div>
-        <h3 className="text-lg font-semibold">Today's Appointments</h3>
-      </div>
-      
-      {stats.loading ? (
-        <div className="animate-pulse flex space-x-2 items-center">
-          <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-          <div className="h-6 bg-gray-200 rounded w-16"></div>
-        </div>
-      ) : stats.error ? (
-        <div>
-          <div className="text-3xl font-bold text-blue-600">--</div>
-          <p className="text-sm text-gray-500 mt-2">
-            Data not available at the moment
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className="text-3xl font-bold text-blue-600">{stats.count}</div>
-          <p className="text-sm text-gray-500 mt-2">
-            Appointments scheduled for today
-          </p>
-        </>
-      )}
-    </div>
+    <Card className="bg-white border border-gray-100 shadow-md">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          <div className="rounded-full p-1.5 bg-primary/10">
+            <Calendar className="h-4 w-4 text-primary" />
+          </div>
+          Today's Appointments
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {stats.loading ? (
+          <div className="flex items-center justify-center py-2">
+            <Loader2 className="h-5 w-5 text-primary animate-spin" />
+          </div>
+        ) : stats.error ? (
+          <div>
+            <div className="text-3xl font-bold text-primary">--</div>
+            <p className="text-sm text-gray-500 mt-1">
+              Data not available at the moment
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="text-3xl font-bold text-primary">{stats.count}</div>
+            <p className="text-sm text-gray-500 mt-1">
+              Appointments scheduled for today
+            </p>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

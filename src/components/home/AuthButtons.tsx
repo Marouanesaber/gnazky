@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { UserCircle2, LogOut } from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
 import { useLanguage } from "@/components/LanguageSwitcher";
 
 interface AuthButtonsProps {
@@ -12,44 +12,6 @@ interface AuthButtonsProps {
 
 export function AuthButtons({ isAuthenticated, onItemClick, mobile = false }: AuthButtonsProps) {
   const { t } = useLanguage();
-  
-  if (isAuthenticated) {
-    if (mobile) {
-      return (
-        <div className="flex flex-col space-y-2">
-          <Link to="/dashboard" className="w-full">
-            <Button className="w-full flex items-center gap-2" variant="ghost" onClick={onItemClick}>
-              <UserCircle2 className="h-4 w-4" />
-              {t("dashboard")}
-            </Button>
-          </Link>
-          <Link to="/logout" className="w-full">
-            <Button className="w-full flex items-center gap-2 bg-red-50 text-red-500 hover:bg-red-100" variant="ghost" onClick={onItemClick}>
-              <LogOut className="h-4 w-4" />
-              {t("logout")}
-            </Button>
-          </Link>
-        </div>
-      );
-    }
-    
-    return (
-      <>
-        <Link to="/dashboard">
-          <Button variant="ghost" className="flex items-center gap-1">
-            <UserCircle2 className="h-4 w-4" />
-            {t("dashboard")}
-          </Button>
-        </Link>
-        <Link to="/logout">
-          <Button variant="ghost" className="flex items-center gap-1 text-red-500 hover:text-red-600 hover:bg-red-50">
-            <LogOut className="h-4 w-4" />
-            {t("logout")}
-          </Button>
-        </Link>
-      </>
-    );
-  }
   
   if (mobile) {
     return (
@@ -71,10 +33,16 @@ export function AuthButtons({ isAuthenticated, onItemClick, mobile = false }: Au
   return (
     <>
       <Link to="/login">
-        <Button variant="ghost">{t("login")}</Button>
+        <Button variant="outline" size="sm" className="flex items-center gap-1">
+          <LogIn className="h-4 w-4" />
+          {t("login")}
+        </Button>
       </Link>
       <Link to="/register">
-        <Button>{t("signUp")}</Button>
+        <Button size="sm" className="flex items-center gap-1">
+          <UserPlus className="h-4 w-4" />
+          {t("signUp")}
+        </Button>
       </Link>
     </>
   );

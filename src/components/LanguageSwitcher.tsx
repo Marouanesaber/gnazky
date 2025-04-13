@@ -70,7 +70,7 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="flex items-center gap-1">
           <Globe className="h-4 w-4" />
-          <span>{language === "en" ? "English" : "中文"}</span>
+          <span className="text-sm">{language === "en" ? "English" : "中文"}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

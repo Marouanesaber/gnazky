@@ -1,60 +1,70 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Twitter, Youtube, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/components/LanguageSwitcher";
+import { Button } from "@/components/ui/button";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { t } = useLanguage();
   
   return (
-    <footer className="bg-primary text-white py-16 px-6 relative">
+    <footer className="bg-primary text-white pt-20 pb-8 px-6 relative">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12 mb-12">
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-3 mb-6">
               <img 
                 src="/lovable-uploads/9bee879e-f556-4063-97b6-360a5db49912.png"
                 alt="PetClinic Logo" 
                 className="h-12 w-auto"
               />
+              <div>
+                <h3 className="text-white font-bold text-xl">PETCLINIC</h3>
+                <p className="text-blue-200 text-xs">{t('vetWithSoul')}</p>
+              </div>
             </div>
-            <p className="text-blue-200 text-sm mb-4">
-              {t('footerTagline') || "Providing the best pet healthcare experience with professional staff and state-of-the-art facilities."}
+            <p className="text-blue-200 text-sm mb-6 leading-relaxed">
+              {t('footerTagline')}
             </p>
-            <div className="flex space-x-4 mt-4">
-              <a href="#" className="text-white hover:text-secondary transition-colors" aria-label="Facebook">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-white hover:text-secondary transition-colors" aria-label="Instagram">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-white hover:text-secondary transition-colors" aria-label="Twitter">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-white hover:text-secondary transition-colors" aria-label="YouTube">
-                <Youtube className="h-5 w-5" />
-              </a>
+            <div className="flex space-x-3 mt-4">
+              {[
+                { icon: Facebook, label: "Facebook" },
+                { icon: Instagram, label: "Instagram" },
+                { icon: Twitter, label: "Twitter" },
+                { icon: Youtube, label: "YouTube" }
+              ].map((social, index) => (
+                <a 
+                  key={index}
+                  href="#" 
+                  className="w-9 h-9 rounded-full bg-blue-800/30 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors" 
+                  aria-label={social.label}
+                >
+                  <social.icon className="h-4 w-4" />
+                </a>
+              ))}
             </div>
           </div>
           
           <div>
-            <h4 className="font-bold text-lg mb-4 text-white">{t('quickLinks') || "Quick Links"}</h4>
-            <ul className="space-y-2">
+            <h4 className="font-bold text-lg mb-6 text-white border-b border-blue-800/50 pb-2">
+              {t('quickLinks')}
+            </h4>
+            <ul className="space-y-3">
               {[
-                { name: t('home') || 'Home', path: '/' },
-                { name: t('bookAppointment') || 'Book Appointment', path: '/book-appointment' },
-                { name: t('services') || 'Services', path: '/services' },
-                { name: t('technicians') || 'Technicians', path: '/technicians' },
-                { name: t('contact') || 'Contact Us', path: '/contact-us' }
+                { name: t('home'), path: '/' },
+                { name: t('bookAppointment'), path: '/book-appointment' },
+                { name: t('services'), path: '/services' },
+                { name: t('technicians'), path: '/technicians' },
+                { name: t('contact'), path: '/contact-us' }
               ].map((item) => (
                 <li key={item.name}>
                   <Link 
                     to={item.path}
-                    className="text-blue-200 hover:text-white hover:underline transition-colors flex items-center"
+                    className="text-blue-200 hover:text-white transition-colors flex items-center"
                   >
-                    <span className="w-1 h-1 bg-secondary rounded-full mr-2"></span>
+                    <ChevronRight className="h-3 w-3 mr-1.5 text-secondary" />
                     {item.name}
                   </Link>
                 </li>
@@ -63,35 +73,39 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="font-bold text-lg mb-4 text-white">{t('openingHours') || "Opening Hours"}</h4>
-            <ul className="space-y-2">
+            <h4 className="font-bold text-lg mb-6 text-white border-b border-blue-800/50 pb-2">
+              {t('openingHours')}
+            </h4>
+            <ul className="space-y-3">
               <li className="flex justify-between text-blue-200">
-                <span>{t('mondayFriday') || "Monday - Friday:"}</span>
+                <span className="font-medium">{t('mondayFriday')}</span>
                 <span>9:00 AM - 6:00 PM</span>
               </li>
               <li className="flex justify-between text-blue-200">
-                <span>{t('saturday') || "Saturday:"}</span>
+                <span className="font-medium">{t('saturday')}</span>
                 <span>9:00 AM - 4:00 PM</span>
               </li>
               <li className="flex justify-between text-blue-200">
-                <span>{t('sunday') || "Sunday:"}</span>
-                <span>{t('closed') || "Closed"}</span>
+                <span className="font-medium">{t('sunday')}</span>
+                <span>{t('closed')}</span>
               </li>
             </ul>
-            <div className="mt-4 p-3 bg-blue-800/50 rounded-lg border border-blue-700">
+            <div className="mt-6 p-4 bg-blue-800/50 rounded-lg border border-blue-700">
               <p className="text-sm text-white flex items-center">
-                <Clock className="h-4 w-4 mr-2 text-secondary" />
-                <span>{t('emergencyService') || "24/7 Emergency Service"}</span>
+                <Clock className="h-4 w-4 mr-2 text-secondary flex-shrink-0" />
+                <span>{t('emergencyService')}</span>
               </p>
             </div>
           </div>
           
           <div>
-            <h4 className="font-bold text-lg mb-4 text-white">{t('contactUs') || "Contact Us"}</h4>
-            <ul className="space-y-3">
+            <h4 className="font-bold text-lg mb-6 text-white border-b border-blue-800/50 pb-2">
+              {t('contactUs')}
+            </h4>
+            <ul className="space-y-4">
               <li className="flex items-start gap-3 text-blue-200">
                 <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0 text-secondary" />
-                <span>123 Pet Care Street, Veterinary District, 10001</span>
+                <span className="leading-relaxed">123 Pet Care Street, Veterinary District, 10001</span>
               </li>
               <li className="flex items-center gap-3 text-blue-200">
                 <Phone className="h-5 w-5 flex-shrink-0 text-secondary" />
@@ -102,22 +116,26 @@ const Footer = () => {
                 <span>info@petclinic.com</span>
               </li>
             </ul>
-            <div className="mt-4">
+            <div className="mt-6">
               <Link 
                 to="/contact-us" 
-                className="inline-block px-4 py-2 bg-secondary text-primary font-medium rounded-md hover:bg-secondary/80 transition-colors"
+                className="inline-block"
               >
-                {t('getInTouch') || "Get in Touch"}
+                <Button 
+                  className="bg-secondary hover:bg-secondary/90 text-primary font-medium"
+                >
+                  {t('getInTouch')}
+                </Button>
               </Link>
             </div>
           </div>
         </div>
         
-        <div className="border-t border-blue-800/50 pt-6 text-sm text-blue-200 flex flex-col md:flex-row justify-between items-center">
-          <div>© {currentYear} PETCLINC - {t('vetWithSoul') || "Vet with Soul"}. {t('allRightsReserved') || "All rights reserved."}</div>
-          <div className="flex gap-4 mt-3 md:mt-0">
-            <Link to="/privacy-policy" className="hover:text-white transition-colors">{t('privacyPolicy') || "Privacy Policy"}</Link>
-            <Link to="/terms-of-service" className="hover:text-white transition-colors">{t('termsOfService') || "Terms of Service"}</Link>
+        <div className="border-t border-blue-800/30 pt-6 mt-8 text-sm text-blue-200 flex flex-col md:flex-row justify-between items-center">
+          <div>© {currentYear} PETCLINC - {t('vetWithSoul')}. {t('allRightsReserved')}</div>
+          <div className="flex gap-6 mt-4 md:mt-0">
+            <Link to="/privacy-policy" className="hover:text-white transition-colors">{t('privacyPolicy')}</Link>
+            <Link to="/terms-of-service" className="hover:text-white transition-colors">{t('termsOfService')}</Link>
           </div>
         </div>
       </div>

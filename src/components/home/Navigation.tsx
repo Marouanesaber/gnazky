@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { PawPrint, Menu, X, ShoppingCart } from "lucide-react";
+import { PawPrint, Menu, X, ShoppingCart, User, ChevronDown } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { LanguageSwitcher, useLanguage } from "@/components/LanguageSwitcher";
 import { apiRequest } from "@/utils/api";
@@ -12,11 +12,21 @@ import { AuthButtons } from "./AuthButtons";
 import { CartButton } from "./CartButton";
 import { MobileMenu } from "./MobileMenu";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout, userProfile } = useAuth();
   const [cartItemCount, setCartItemCount] = useState(0);
   const { t } = useLanguage();
 
@@ -53,6 +63,14 @@ export function Navigation() {
     };
   }, [isAuthenticated]);
 
+  const getInitials = (name = "") => {
+    return name
+      .split(" ")
+      .map(part => part[0])
+      .join("")
+      .toUpperCase();
+  };
+
   return (
     <nav className={`py-3 sticky top-0 z-40 w-full border-b transition-all duration-300 ${
       scrolled 
@@ -63,16 +81,16 @@ export function Navigation() {
         <div className="flex items-center justify-between">
           <Link
             to="/"
-            className="flex items-center space-x-2 transition-transform hover:scale-105"
+            className="flex items-center space-x-2.5 transition-transform hover:scale-105"
             aria-label="PetClinic Home"
           >
             <img 
               src="/lovable-uploads/9bee879e-f556-4063-97b6-360a5db49912.png" 
               alt="PetClinic Logo" 
-              className="h-12 w-auto"
+              className="h-10 w-auto"
             />
             <div className="flex flex-col">
-              <span className="font-bold text-primary text-xl tracking-tight">PETCLINC</span>
+              <span className="font-bold text-primary text-lg tracking-tight">PETCLINC</span>
               <span className="text-xs text-gray-500 italic">{t('vetWithSoul') || "Vet with Soul"}</span>
             </div>
           </Link>
@@ -89,14 +107,55 @@ export function Navigation() {
             </Button>
           </div>
           
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-12">
             <NavigationMenu />
           </div>
           
           <div className="hidden md:flex items-center space-x-4">
             <LanguageSwitcher />
             
-            <AuthButtons isAuthenticated={isAuthenticated} />
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1.5">
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage
+                        src={userProfile?.profilePicture || "https://github.com/shadcn.png"}
+                        alt={userProfile?.name || "User"}
+                      />
+                      <AvatarFallback>
+                        {userProfile?.name ? getInitials(userProfile.name) : "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <ChevronDown className="h-3.5 w-3.5 text-gray-500" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <Link to="/dashboard">
+                      <DropdownMenuItem>
+                        <span>{t("dashboard")}</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link to="/profile">
+                      <DropdownMenuItem>
+                        <span>{t("profile")}</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <Link to="/logout">
+                    <DropdownMenuItem>
+                      <span>{t("logout")}</span>
+                    </DropdownMenuItem>
+                  </Link>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <AuthButtons isAuthenticated={isAuthenticated} />
+            )}
             
             {isAuthenticated && <CartButton itemCount={cartItemCount} />}
           </div>
