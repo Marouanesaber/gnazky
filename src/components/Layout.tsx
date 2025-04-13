@@ -2,11 +2,12 @@
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import { Home, Globe, LogOut } from "lucide-react";
+import { Home, Globe } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "./AuthProvider";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { BackToTop } from "./home/BackToTop";
 
 const Layout = () => {
   const { isAuthenticated, logout, checkAuthStatus } = useAuth();
@@ -24,14 +25,6 @@ const Layout = () => {
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>;
   }
-
-  const handleSignOut = () => {
-    logout();
-    toast.success("You have been signed out", {
-      duration: 3000,
-    });
-    navigate("/logout");
-  };
 
   // Update to navigate to the main website's home page
   const navigateToMainPage = () => {
@@ -61,22 +54,14 @@ const Layout = () => {
               Main Page
             </Button>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="gap-2 transition-all hover:bg-red-100 hover:text-red-700"
-            onClick={handleSignOut}
-          >
-            <LogOut size={16} />
-            Sign Out
-          </Button>
         </div>
-        <main className="flex-1 overflow-auto p-4 md:p-6 animate-fade-in [animation-delay:300ms]">
+        <main className="flex-1 overflow-auto p-4 md:p-6 animate-fade-in [animation-delay:300ms] relative">
           <Outlet />
+          <BackToTop />
         </main>
       </div>
     </div>
   );
-};
+}
 
 export default Layout;
