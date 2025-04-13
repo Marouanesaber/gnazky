@@ -1,4 +1,3 @@
-
 import { NavLink } from "react-router-dom";
 import {
   Home,
@@ -14,6 +13,7 @@ import {
   User,
   ChevronLeft,
   ChevronRight,
+  ShoppingBag
 } from "lucide-react";
 import { useAuth } from "./AuthProvider";
 import { useState } from "react";
@@ -34,7 +34,11 @@ export function Sidebar() {
     }`}>
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <PawPrint className="h-6 w-6 text-clinic-blue" />
+          <img 
+            src="/lovable-uploads/9bee879e-f556-4063-97b6-360a5db49912.png" 
+            alt="PetClinic Logo" 
+            className="h-8 w-auto"
+          />
           {!collapsed && <span className="font-bold text-xl">PetClinic</span>}
         </div>
         <Button 
@@ -128,6 +132,12 @@ export function Sidebar() {
               to="/dashboard/owners" 
               icon={<Users className="h-5 w-5" />}
               label="Owners"
+              collapsed={collapsed}
+            />
+            <NavLinkItem 
+              to="/dashboard/shop" 
+              icon={<ShoppingBag className="h-5 w-5" />}
+              label="Shop"
               collapsed={collapsed}
             />
           </div>

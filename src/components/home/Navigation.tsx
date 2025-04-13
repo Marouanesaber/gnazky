@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PawPrint, Menu, X, ShoppingCart, User, ChevronDown } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
@@ -24,6 +24,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function Navigation() {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { isAuthenticated, logout, userProfile } = useAuth();
@@ -81,16 +82,16 @@ export function Navigation() {
         <div className="flex items-center justify-between">
           <Link
             to="/"
-            className="flex items-center space-x-2.5 transition-transform hover:scale-105"
+            className="flex items-center space-x-3 transition-transform hover:scale-105"
             aria-label="PetClinic Home"
           >
             <img 
               src="/lovable-uploads/9bee879e-f556-4063-97b6-360a5db49912.png" 
               alt="PetClinic Logo" 
-              className="h-10 w-auto"
+              className="h-12 w-auto" // Increased from h-10 to h-12
             />
             <div className="flex flex-col">
-              <span className="font-bold text-primary text-lg tracking-tight">PETCLINC</span>
+              <span className="font-bold text-primary text-xl tracking-tight">PETCLINC</span>
               <span className="text-xs text-gray-500 italic">{t('vetWithSoul') || "Vet with Soul"}</span>
             </div>
           </Link>
@@ -139,7 +140,7 @@ export function Navigation() {
                         <span>{t("dashboard")}</span>
                       </DropdownMenuItem>
                     </Link>
-                    <Link to="/profile">
+                    <Link to="/dashboard/profile">
                       <DropdownMenuItem>
                         <span>{t("profile")}</span>
                       </DropdownMenuItem>

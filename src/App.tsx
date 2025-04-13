@@ -31,6 +31,7 @@ import Cart from "./pages/Cart";
 import { AuthProvider } from "./components/AuthProvider";
 import { LanguageProvider } from "@/components/LanguageSwitcher";
 import ProductDetail from "./pages/ProductDetail";
+import DashboardShop from "./pages/DashboardShop"; // Import the new dashboard shop page
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ function App() {
                     <Route path="surgery" element={<SurgeryPage />} />
                     <Route path="pets" element={<PetsPage />} />
                     <Route path="owners" element={<OwnersPage />} />
+                    <Route path="shop" element={<DashboardShop />} /> {/* New Route */}
                     <Route path="settings" element={<SettingsPage />} />
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="*" element={<NotFound />} />
