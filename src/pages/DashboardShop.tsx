@@ -47,7 +47,7 @@ import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/utils/api";
 import { toast } from "sonner";
 
-// Sample data for purchase history
+// Sample data for purchase history - make sure status values match the Order interface
 const samplePurchaseHistory = [
   {
     id: "ORD-123456",
@@ -56,7 +56,7 @@ const samplePurchaseHistory = [
       { name: "Premium Dog Food", quantity: 2, price: 29.99 },
       { name: "Dog Chew Toy", quantity: 1, price: 8.99 }
     ],
-    status: "delivered",
+    status: "delivered" as const,
     total: 68.97
   },
   {
@@ -66,7 +66,7 @@ const samplePurchaseHistory = [
       { name: "Cat Scratching Post", quantity: 1, price: 24.99 },
       { name: "Gourmet Cat Food", quantity: 3, price: 24.99 }
     ],
-    status: "delivered",
+    status: "delivered" as const,
     total: 99.96
   },
   {
@@ -76,7 +76,7 @@ const samplePurchaseHistory = [
       { name: "Pet Shampoo", quantity: 1, price: 12.99 },
       { name: "Nail Clippers", quantity: 1, price: 9.99 }
     ],
-    status: "processing",
+    status: "processing" as const,
     total: 22.98
   }
 ];
