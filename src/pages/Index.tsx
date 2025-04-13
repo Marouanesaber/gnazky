@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, BarChart3, DollarSign, Users, PawPrint, Beaker, Syringe, Filter, ChevronsUpDown } from "lucide-react";
@@ -219,7 +218,7 @@ const Index = () => {
       {/* Quick Access Cards */}
       <div>
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-          <Lightning className="h-5 w-5 text-amber-500" />
+          <Zap className="h-5 w-5 text-amber-500" />
           Quick Access
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -292,7 +291,7 @@ const Index = () => {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <ChartIcon className="h-5 w-5 text-clinic-blue" />
+              <BarChart3 className="h-5 w-5 text-clinic-blue" />
               Vaccination Statistics
             </CardTitle>
             <Select defaultValue="month">
@@ -318,7 +317,7 @@ const Index = () => {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <ActivityIcon className="h-5 w-5 text-clinic-blue" />
+              <Activity className="h-5 w-5 text-clinic-blue" />
               Recent Activity
             </CardTitle>
             <Button variant="ghost" size="sm" className="h-8 text-xs">
@@ -540,6 +539,6 @@ const ActivityItem = ({ icon, title, description, color }: ActivityItemProps) =>
 };
 
 // Import additional icons
-import { TrendingUp, TrendingDown, Scissors, ChartIcon, ActivityIcon, Lightning } from "lucide-react";
+import { TrendingUp, TrendingDown, Scissors, Activity, Zap } from "lucide-react";
 
 export default Index;
