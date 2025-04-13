@@ -1,4 +1,3 @@
-
 export const translations = {
   en: {
     // General
@@ -30,6 +29,7 @@ export const translations = {
     termsOfService: "Terms of Service",
     footerTagline: "Providing the best pet healthcare experience with professional staff and state-of-the-art facilities.",
     all: "All Products",
+    technicians: "Technicians",
     
     // ProductCard translations
     loginToAddToCart: "Please login to add items to your cart",
@@ -141,6 +141,7 @@ export const translations = {
     termsOfService: "服务条款",
     footerTagline: "提供最好的宠物医疗体验，专业的员工和最先进的设施。",
     all: "所有产品",
+    technicians: "技术人员",
     
     // ProductCard translations
     loginToAddToCart: "请登录以添加商品到购物车",
